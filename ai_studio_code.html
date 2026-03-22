@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>井字遊戲 - 人機對戰版</title>
+    <style>
+        :root {
+            --bg-color: #eef2f3;
+            --cell-size: 100px;
+            --x-color: #ff4757; /* 玩家顏色 */
+            --o-color: #2ed573; /* 電腦顏色 */
+            --line-color: #2f3542;
+        }
+
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: var(--bg-color);
+        }
+
+        h1 { color: #2f3542; margin-bottom: 5px; }
+        p { color: #747d8c; margin-bottom: 20px; }
+
+        .status {
+            font-size: 1.4rem;
+            margin-bottom: 20px;
+            font-weight: bold;
+            height: 2rem;
+            color: #2f3542;
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(3, var(--cell-size));
+            grid-template-rows: repeat(3, var(--cell-size));
+            gap: 10px;
+            background-color: var(--line-color);
+            border: 8px solid var(--line-color);
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
+        }
+
+        .cell {
+            width: var(--cell-size);
+            height: var(--cell-size);
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .cell:hover { background-color: #f1f2f6; }
+        .cell.x { color: var(--x-color); }
+        .cell.o { color: var(--o-color); }
+        .cell.taken { cursor: not-allowed; }
+
+        .restart-btn {
+            margin-top: 30px;
+            padding: 12px 30px;
+            font-size: 1rem;
+            background-color: var(--line-color);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .restart-btn:hover { background-color: #57606f; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        /* 電腦思考時的動畫效果 */
+        .thinking { opacity: 0.5; pointer-events: none; }
+    </style>
+</head>
+<body>
+
+    <h1>井字遊戲</h1>
+    <p>你是 <b>X</b>，電腦是 <b>O</b></p>
+    <div class="status" id="status">準備好了嗎？</div>
+    
+    <div class="board" id="board">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+
+    <button class="restart-btn" id="restart">重新開始遊戲</button>
+
+    <script>
+        const cells = document.querySelectorAll('.cell');
+        const statusText = document.getElementById('status');
+        const restartBtn = document.getElementById('restart');
+        const boardElement = document.getElementById('board');
+
+        let gameState = ["", "", "", "", "", "", "", "", ""];
+        let gameActive = true;
+        const PLAYER_TOKEN = "X";
+        const COMPUTER_TOKEN = "O";
+
+        const winningConditions = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        cells.forEach(cell => cell.addEventListener('click', handleCellClick));
+        restartBtn.addEventListener('click', restartGame);
+
+        // 玩家點擊
+        function handleCellClick(e) {
+            const clickedCell = e.target;
+            const clickedIndex = parseInt(clickedCell.getAttribute('data-index'));
+
+            if (gameState[clickedIndex] !== "" || !gameActive) return;
+
+            updateCell(clickedCell, clickedIndex, PLAYER_TOKEN);
+
+            if (checkWin(PLAYER_TOKEN)) {
+                endGame(`恭喜！你贏了 🏆`);
+                return;
+            }
+
+            if (checkDraw()) {
+                endGame("平局！ 🤝");
+                return;
+            }
+
+            // 輪到電腦
+            statusText.innerText = "電腦思考中...";
+            boardElement.classList.add('thinking');
+            
+            setTimeout(() => {
+                makeComputerMove();
+            }, 600); // 增加延遲感，看起來更像在思考
+        }
+
+        // 電腦邏輯
+        function makeComputerMove() {
+            if (!gameActive) return;
+
+            let moveIndex;
+
+            // 1. 攻擊：看電腦自己是否快贏了
+            moveIndex = findBestMove(COMPUTER_TOKEN);
+            
+            // 2. 防守：如果沒得贏，看玩家是否快贏了
+            if (moveIndex === null) {
+                moveIndex = findBestMove(PLAYER_TOKEN);
+            }
+
+            // 3. 隨機：如果都沒有，隨機找位置
+            if (moveIndex === null) {
+                const availableMoves = gameState.map((val, idx) => val === "" ? idx : null).filter(val => val !== null);
+                moveIndex = availableMoves[Math.floor(Math.random() * availableMoves.length)];
+            }
+
+            const targetCell = document.querySelector(`[data-index="${moveIndex}"]`);
+            updateCell(targetCell, moveIndex, COMPUTER_TOKEN);
+
+            if (checkWin(COMPUTER_TOKEN)) {
+                endGame("電腦贏了！ 🤖");
+            } else if (checkDraw()) {
+                endGame("平局！ 🤝");
+            } else {
+                statusText.innerText = "輪到你了 (X)";
+                boardElement.classList.remove('thinking');
+            }
+        }
+
+        // 輔助函式：尋找關鍵位置 (快贏或快輸的位置)
+        function findBestMove(token) {
+            for (let condition of winningConditions) {
+                const [a, b, c] = condition;
+                const values = [gameState[a], gameState[b], gameState[c]];
+                
+                // 如果該線已經有兩個相同的符號，且第三個是空格
+                if (values.filter(v => v === token).length === 2 && values.filter(v => v === "").length === 1) {
+                    if (gameState[a] === "") return a;
+                    if (gameState[b] === "") return b;
+                    if (gameState[c] === "") return c;
+                }
+            }
+            return null;
+        }
+
+        function updateCell(cell, index, token) {
+            gameState[index] = token;
+            cell.innerText = token;
+            cell.classList.add(token.toLowerCase(), 'taken');
+        }
+
+        function checkWin(token) {
+            return winningConditions.some(condition => {
+                return condition.every(index => gameState[index] === token);
+            });
+        }
+
+        function checkDraw() {
+            return !gameState.includes("");
+        }
+
+        function endGame(message) {
+            statusText.innerText = message;
+            gameActive = false;
+            boardElement.classList.remove('thinking');
+        }
+
+        function restartGame() {
+            gameState = ["", "", "", "", "", "", "", "", ""];
+            gameActive = true;
+            statusText.innerText = "輪到你了 (X)";
+            boardElement.classList.remove('thinking');
+            cells.forEach(cell => {
+                cell.innerText = "";
+                cell.classList.remove('x', 'o', 'taken');
+            });
+        }
+    </script>
+</body>
+</html>

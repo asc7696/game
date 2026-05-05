@@ -2,77 +2,120 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8">
-<title>MBTI 決策樹挑戰</title>
+<title>MBTI 決策樹三關挑戰</title>
 <style>
 body { font-family: Arial; text-align: center; }
-.container { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
-.box { border: 2px dashed #aaa; padding: 20px; width: 150px; min-height: 100px; }
-.item { padding: 8px; margin: 5px; background: #4CAF50; color: white; cursor: grab; }
-button { margin-top: 20px; padding: 10px 20px; }
+.box { border: 2px dashed #aaa; padding: 15px; width: 120px; min-height: 80px; margin: 10px; }
+.container { display: flex; justify-content: center; flex-wrap: wrap; }
+.item { background: #4CAF50; color: white; padding: 8px; margin: 5px; border-radius: 6px; cursor: pointer; }
+.selected { background: orange; }
+.hidden { display: none; }
+button { padding: 10px 20px; margin: 10px; }
 </style>
 </head>
 
 <body>
 
-<h2>🌳 MBTI 決策樹拖曳挑戰</h2>
-<p>把 S / N 拖到 E 和 I 底下，建立正確決策樹！</p>
+<h2>🌳 MBTI 決策樹挑戰</h2>
+<h3 id="levelTitle">第1關：修復錯誤樹</h3>
+<p id="desc">讓每個分支都有完整選項（S / N）</p>
+
+<div>
+  <div class="item" onclick="selectItem(this)">S</div>
+  <div class="item" onclick="selectItem(this)">N</div>
+</div>
 
 <div class="container">
-
-<div>
-<h3>可拖曳選項</h3>
-<div class="item" draggable="true">S</div>
-<div class="item" draggable="true">N</div>
+  <div>
+    <h4>E 底下</h4>
+    <div class="box" onclick="place('E')" id="E"></div>
+  </div>
+  <div>
+    <h4>I 底下</h4>
+    <div class="box" onclick="place('I')" id="I"></div>
+  </div>
 </div>
 
-<div>
-<h3>E 底下</h3>
-<div class="box" id="E"></div>
-</div>
-
-<div>
-<h3>I 底下</h3>
-<div class="box" id="I"></div>
-</div>
-
-</div>
-
-<button onclick="check()">檢查答案</button>
-
+<button onclick="check()">檢查</button>
 <p id="result"></p>
 
+<h3 id="score">分數：0</h3>
+
 <script>
-let items = document.querySelectorAll('.item');
-let boxes = document.querySelectorAll('.box');
+let selected = null;
+let level = 1;
+let score = 0;
 
-items.forEach(item => {
-  item.addEventListener('dragstart', dragStart);
-});
-
-boxes.forEach(box => {
-  box.addEventListener('dragover', e => e.preventDefault());
-  box.addEventListener('drop', drop);
-});
-
-let dragged;
-
-function dragStart(e) {
-  dragged = e.target;
+function selectItem(el){
+  document.querySelectorAll('.item').forEach(i=>i.classList.remove('selected'));
+  el.classList.add('selected');
+  selected = el.innerText;
 }
 
-function drop(e) {
-  e.target.appendChild(dragged.cloneNode(true));
+function place(target){
+  if(!selected) return;
+  let box = document.getElementById(target);
+  let div = document.createElement("div");
+  div.innerText = selected;
+  div.className = "item";
+  box.appendChild(div);
 }
 
-function check() {
-  let eBox = document.getElementById('E').innerText;
-  let iBox = document.getElementById('I').innerText;
+function resetBoxes(){
+  document.getElementById("E").innerHTML = "";
+  document.getElementById("I").innerHTML = "";
+}
 
-  if (eBox.includes('S') && eBox.includes('N') &&
-      iBox.includes('S') && iBox.includes('N')) {
-    document.getElementById('result').innerText = "✅ 正確！你保留了所有可能性！";
-  } else {
-    document.getElementById('result').innerText = "❌ 錯誤！有些人格被消失了（分支不完整）";
+function check(){
+  let e = document.getElementById("E").innerText;
+  let i = document.getElementById("I").innerText;
+  let msg = "";
+
+  if(level === 1){
+    if(e.includes("S") && e.includes("N") && i.includes("S") && i.includes("N")){
+      msg = "✅ 正確！進入第2關";
+      score += 10;
+      nextLevel();
+    } else {
+      msg = "❌ 錯誤！有分支缺失";
+    }
+  }
+
+  else if(level === 2){
+    if(e.length >= 2 && i.length >= 2){
+      msg = "✅ 不錯！你建立了更多分類！進入第3關";
+      score += 10;
+      nextLevel();
+    } else {
+      msg = "❌ 分類太少，再試試";
+    }
+  }
+
+  else if(level === 3){
+    if(e.includes("S") && i.includes("S")){
+      msg = "🎉 完成挑戰！你是決策樹高手！";
+      score += 10;
+    } else {
+      msg = "❌ 邏輯仍有問題";
+    }
+  }
+
+  document.getElementById("result").innerText = msg;
+  document.getElementById("score").innerText = "分數：" + score;
+}
+
+function nextLevel(){
+  level++;
+  resetBoxes();
+
+  if(level === 2){
+    document.getElementById("levelTitle").innerText = "第2關：增加分類數量";
+    document.getElementById("desc").innerText = "讓每個分支至少有2個選項";
+  }
+
+  if(level === 3){
+    document.getElementById("levelTitle").innerText = "第3關：避免偏見";
+    document.getElementById("desc").innerText = "不要讓某一類型消失";
   }
 }
 </script>

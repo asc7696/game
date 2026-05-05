@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>MBTI 決策樹挑戰</title>
+<style>
+body { font-family: Arial; text-align: center; }
+.container { display: flex; justify-content: center; gap: 40px; margin-top: 20px; }
+.box { border: 2px dashed #aaa; padding: 20px; width: 150px; min-height: 100px; }
+.item { padding: 8px; margin: 5px; background: #4CAF50; color: white; cursor: grab; }
+button { margin-top: 20px; padding: 10px 20px; }
+</style>
+</head>
+
+<body>
+
+<h2>🌳 MBTI 決策樹拖曳挑戰</h2>
+<p>把 S / N 拖到 E 和 I 底下，建立正確決策樹！</p>
+
+<div class="container">
+
+<div>
+<h3>可拖曳選項</h3>
+<div class="item" draggable="true">S</div>
+<div class="item" draggable="true">N</div>
+</div>
+
+<div>
+<h3>E 底下</h3>
+<div class="box" id="E"></div>
+</div>
+
+<div>
+<h3>I 底下</h3>
+<div class="box" id="I"></div>
+</div>
+
+</div>
+
+<button onclick="check()">檢查答案</button>
+
+<p id="result"></p>
+
+<script>
+let items = document.querySelectorAll('.item');
+let boxes = document.querySelectorAll('.box');
+
+items.forEach(item => {
+  item.addEventListener('dragstart', dragStart);
+});
+
+boxes.forEach(box => {
+  box.addEventListener('dragover', e => e.preventDefault());
+  box.addEventListener('drop', drop);
+});
+
+let dragged;
+
+function dragStart(e) {
+  dragged = e.target;
+}
+
+function drop(e) {
+  e.target.appendChild(dragged.cloneNode(true));
+}
+
+function check() {
+  let eBox = document.getElementById('E').innerText;
+  let iBox = document.getElementById('I').innerText;
+
+  if (eBox.includes('S') && eBox.includes('N') &&
+      iBox.includes('S') && iBox.includes('N')) {
+    document.getElementById('result').innerText = "✅ 正確！你保留了所有可能性！";
+  } else {
+    document.getElementById('result').innerText = "❌ 錯誤！有些人格被消失了（分支不完整）";
+  }
+}
+</script>
+
+</body>
+</html>

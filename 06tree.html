@@ -80,7 +80,11 @@
         function allowDrop(ev) { ev.preventDefault(); }
         function drag(ev, type, id) {
             ev.dataTransfer.setData("type", type);
-            ev.dataTransfer.setData("id", id);
+            if(type === 'bst-num') {
+                ev.dataTransfer.setData("val", id);
+            } else {
+                ev.dataTransfer.setData("id", id);
+            }
         }
 
         // ================= 主選單 =================
@@ -114,6 +118,368 @@
             `;
         }
 
+        // ================= 關卡一：MBTI 決策樹 =================
+        let l1_playerName = '';
+        let l1_isStarted = false;
+        let l1_isCompleted = false;
+        let l1_dropped = {}; // { leafIndex: mbtiId }
+        const l1_targets = { 0: 'ESTJ', 2: 'ESFJ', 7: 'ENFP', 8: 'ISTJ', 10: 'ISFJ', 11: 'ISFP' };
+
+        function initLevel1() { 
+            l1_playerName = '';
+            l1_isStarted = false;
+            l1_isCompleted = false;
+            l1_dropped = {};
+            renderLevel1(); 
+        }
+
+        function l1_start() {
+            const input = document.getElementById('l1-name-input');
+            if(input && input.value.trim() !== '') {
+                l1_playerName = input.value.trim();
+                l1_isStarted = true;
+                renderLevel1();
+                startTimer(updateL1Time); // 在點擊開始遊戲後，才啟動計時器
+            }
+        }
+
+        function updateL1Time() {
+            const timeEl = document.getElementById('l1-time');
+            if(timeEl) timeEl.innerText = `計時：${formatTime(timeElapsed)}`;
+        }
+
+        function l1_drop(ev, index) {
+            ev.preventDefault();
+            const type = ev.dataTransfer.getData("type");
+            if(type !== 'mbti') return;
+            const id = ev.dataTransfer.getData("id");
+            
+            // Remove from other slots if already placed
+            for(let key in l1_dropped) { if(l1_dropped[key] === id) delete l1_dropped[key]; }
+            l1_dropped[index] = id;
+            
+            // Check completion
+            let correctCount = 0;
+            for(let k in l1_targets) { if(l1_dropped[k] === l1_targets[k]) correctCount++; }
+            if(correctCount === 6) {
+                l1_isCompleted = true;
+                stopTimer();
+            }
+            renderLevel1();
+        }
+
+        function renderLevel1() {
+            const app = document.getElementById('app');
+            if(!l1_isStarted) {
+                app.innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen bg-white">
+                    <h2 class="text-3xl font-bold mb-6 text-blue-800">歡迎挑戰 MBTI 決策樹</h2>
+                    <input id="l1-name-input" type="text" placeholder="請輸入玩家姓名" class="border-2 border-slate-300 p-3 rounded-xl mb-4 w-64 text-center focus:outline-none focus:border-blue-500 text-lg shadow-sm" maxlength="10"/>
+                    <button onclick="l1_start()" class="px-8 py-3 rounded-full text-white font-bold text-lg transition-all bg-blue-600 hover:bg-blue-700 shadow-md">開始遊戲</button>
+                    <button onclick="changeView('menu')" class="mt-6 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} <span class="ml-1">返回主選單</span></button>
+                </div>`;
+                return;
+            }
+
+            app.innerHTML = `
+            <div class="flex flex-col h-screen overflow-hidden">
+                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between">
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回選單</button>
+                    <div class="font-bold text-xl text-blue-800">關卡一：MBTI 決策樹</div>
+                    <div id="l1-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">計時：${formatTime(timeElapsed)}</div>
+                </div>
+                <div class="p-4 bg-slate-50 flex gap-4 items-center overflow-x-auto border-b">
+                    <span class="font-bold text-emerald-700 whitespace-nowrap">任務：將對應的人格拖曳至樹狀結構底部</span>
+                    ${['ISFJ', 'ESFJ', 'ISTJ', 'ENFP', 'ISFP', 'ESTJ'].filter(id => !Object.values(l1_dropped).includes(id)).map(id => `
+                        <div draggable="true" ondragstart="drag(event, 'mbti', '${id}')" class="bg-blue-100 border-2 border-blue-300 text-blue-800 px-3 py-1 rounded-md cursor-grab active:cursor-grabbing font-bold flex-shrink-0 hover:shadow-md transition-shadow">${id}</div>
+                    `).join('')}
+                    ${Object.values(l1_dropped).length === 6 ? '<span class="text-slate-400 italic font-bold">人格方塊已全部放置</span>' : ''}
+                </div>
+                <div class="flex-1 relative bg-slate-50 overflow-auto p-10 flex justify-center items-center">
+                    ${l1_isCompleted ? `
+                        <div class="absolute top-10 left-1/2 transform -translate-x-1/2 z-20 bg-green-100 border-2 border-green-500 text-green-800 px-8 py-4 rounded-2xl shadow-xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-2">${Icons.CheckCircle}</div>
+                            <h3 class="text-2xl font-bold">恭喜 ${l1_playerName} 完成 MBTI 挑戰！</h3>
+                            <p class="text-lg mt-1">過關耗時：${formatTime(timeElapsed)}</p>
+                        </div>
+                    ` : ''}
+                    <div class="w-[1000px] h-[500px] relative bg-white border-2 border-slate-200 shadow-md rounded-2xl">
+                        <!-- 樹狀圖背景裝飾 -->
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-slate-300 font-bold text-2xl tracking-widest opacity-50 pointer-events-none">
+                            MBTI DECISION TREE
+                        </div>
+                        <div class="absolute bottom-12 w-full flex justify-around px-4">
+                            ${[0,2,7,8,10,11].map(index => `
+                                <div class="flex flex-col items-center">
+                                    <div class="text-sm font-bold text-slate-500 mb-2 bg-slate-100 px-3 py-1 rounded-full border">目標: ${l1_targets[index]}</div>
+                                    <div ondragover="allowDrop(event)" ondrop="l1_drop(event, ${index})" 
+                                        class="w-20 h-12 border-2 flex items-center justify-center font-bold text-lg rounded-lg shadow-sm transition-colors
+                                        ${l1_dropped[index] ? 'bg-blue-50 border-blue-500 text-blue-800' : 'bg-white border-dashed border-slate-300 text-slate-300'}
+                                        ${l1_dropped[index] === l1_targets[index] ? 'bg-green-100 border-green-500 text-green-700' : ''}
+                                        ${l1_dropped[index] && l1_dropped[index] !== l1_targets[index] ? 'bg-red-50 border-red-400 text-red-600' : ''}
+                                        ">
+                                        ${l1_dropped[index] || '放置區'}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // ================= 關卡二：字彙字典樹 =================
+        const TRIE_WORDS = ['act', 'actor', 'action', 'air', 'airport', 'airpods', 'ant', 'any', 'angry'];
+        const TRIE_NODES = [
+            { id: 0, char: '', x: 500, y: 50, root: true },
+            { id: 1, char: 'a', x: 500, y: 150, p: 0 },
+            { id: 2, char: 'c', x: 250, y: 250, p: 1 },
+            { id: 3, char: 't', x: 250, y: 350, p: 2, word: 'act' },
+            { id: 4, char: 'o', x: 150, y: 450, p: 3 },
+            { id: 5, char: 'r', x: 150, y: 550, p: 4, word: 'actor' },
+            { id: 6, char: 'i', x: 350, y: 450, p: 3 },
+            { id: 7, char: 'o', x: 350, y: 550, p: 6 },
+            { id: 8, char: 'n', x: 350, y: 650, p: 7, word: 'action' },
+            { id: 9, char: 'i', x: 500, y: 250, p: 1 },
+            { id: 10, char: 'r', x: 500, y: 350, p: 9, word: 'air' },
+            { id: 11, char: 'p', x: 500, y: 450, p: 10 },
+            { id: 12, char: 'o', x: 500, y: 550, p: 11 },
+            { id: 13, char: 'r', x: 450, y: 650, p: 12 },
+            { id: 14, char: 't', x: 450, y: 750, p: 13, word: 'airport' },
+            { id: 15, char: 'd', x: 550, y: 650, p: 12 },
+            { id: 16, char: 's', x: 550, y: 750, p: 15, word: 'airpods' },
+            { id: 17, char: 'n', x: 750, y: 250, p: 1 },
+            { id: 18, char: 't', x: 650, y: 350, p: 17, word: 'ant' },
+            { id: 19, char: 'y', x: 750, y: 350, p: 17, word: 'any' },
+            { id: 20, char: 'g', x: 850, y: 350, p: 17 },
+            { id: 21, char: 'r', x: 850, y: 450, p: 20 },
+            { id: 22, char: 'y', x: 850, y: 550, p: 21, word: 'angry' }
+        ];
+        
+        let l2_inputs = {};
+        let l2_isCompleted = false;
+
+        function initLevel2() { 
+            l2_inputs = {};
+            l2_isCompleted = false;
+            renderLevel2();
+            startTimer(updateL2Time); 
+        }
+
+        function updateL2Time() {
+            const el = document.getElementById('l2-time');
+            if(el) el.innerText = `計時：${formatTime(timeElapsed)}`;
+        }
+
+        function l2_handleChange(id, val) {
+            if(l2_isCompleted) return;
+            l2_inputs[id] = val.toLowerCase();
+            
+            // 單獨更新該 Input 的樣式，避免重新渲染整個頁面導致焦點丟失
+            const el = document.getElementById(`l2-input-${id}`);
+            const node = TRIE_NODES.find(n => n.id === id);
+            
+            if (el && node) {
+                const isFilled = l2_inputs[id] === node.char;
+                el.className = `w-10 h-10 text-center font-bold text-xl rounded-full border-2 focus:outline-none transition-all ${isFilled ? 'bg-emerald-100 border-emerald-500 text-emerald-700 shadow-emerald-200 shadow-md' : 'bg-white border-slate-300 focus:border-emerald-400'}`;
+            }
+
+            // 檢查是否全對
+            let correct = true;
+            for(let n of TRIE_NODES) {
+                if(!n.root) {
+                    if((l2_inputs[n.id] || '') !== n.char) {
+                        correct = false;
+                        break;
+                    }
+                }
+            }
+
+            if(correct && TRIE_NODES.length > 1) {
+                l2_isCompleted = true;
+                stopTimer();
+                renderLevel2(); // 全對時重新渲染顯示過關訊息
+            }
+        }
+
+        function renderLevel2() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+            <div class="flex flex-col h-screen overflow-hidden">
+                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between z-10">
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回選單</button>
+                    <div class="flex gap-3 text-lg font-bold text-emerald-800">
+                        ${TRIE_WORDS.map(w => `<span class="bg-emerald-100 px-3 py-1 rounded-full shadow-sm">${w}</span>`).join('')}
+                    </div>
+                    <div id="l2-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">計時：${formatTime(timeElapsed)}</div>
+                </div>
+                
+                <div class="flex-1 bg-slate-50 relative overflow-auto p-10 flex justify-center">
+                    ${l2_isCompleted ? `
+                        <div class="absolute top-10 left-1/2 transform -translate-x-1/2 z-20 bg-green-100 border-2 border-green-500 text-green-800 px-8 py-4 rounded-2xl shadow-xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-2">${Icons.CheckCircle}</div>
+                            <h3 class="text-2xl font-bold">字典樹建構完成！</h3>
+                            <p class="text-lg mt-1">耗時：${formatTime(timeElapsed)}</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="w-[1000px] h-[800px] relative bg-white rounded-3xl shadow-lg border border-slate-200">
+                        <!-- 連線 -->
+                        <svg width="100%" height="100%" class="absolute inset-0 pointer-events-none">
+                            ${TRIE_NODES.filter(n => !n.root).map(node => {
+                                const parent = TRIE_NODES.find(n => n.id === node.p);
+                                return `<line x1="${parent.x}" y1="${parent.y}" x2="${node.x}" y2="${node.y}" stroke="#cbd5e1" stroke-width="3" />`;
+                            }).join('')}
+                        </svg>
+
+                        <!-- Root 節點 -->
+                        <div class="absolute transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center text-white font-bold shadow-md" style="left: 500px; top: 50px;">
+                            Root
+                        </div>
+
+                        <!-- 字母輸入框 -->
+                        ${TRIE_NODES.filter(n => !n.root).map(node => {
+                            const val = l2_inputs[node.id] || '';
+                            const isFilled = val === node.char;
+                            const classes = isFilled 
+                                ? 'bg-emerald-100 border-emerald-500 text-emerald-700 shadow-emerald-200 shadow-md' 
+                                : 'bg-white border-slate-300 focus:border-emerald-400';
+                            
+                            return `
+                            <div class="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style="left: ${node.x}px; top: ${node.y}px;">
+                                <input 
+                                    id="l2-input-${node.id}"
+                                    type="text" 
+                                    maxlength="1" 
+                                    value="${val}"
+                                    oninput="l2_handleChange(${node.id}, this.value)"
+                                    class="w-10 h-10 text-center font-bold text-xl rounded-full border-2 focus:outline-none transition-all ${classes}"
+                                />
+                                ${node.word ? `<div class="absolute top-12 text-xs font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 shadow-sm">${node.word}</div>` : ''}
+                            </div>`;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }
+
+        // ================= 關卡三：二元搜尋樹 =================
+        const BST_NUMBERS = [58, 57, 12, 25, 36, 87, 54, 67, 20];
+        const BST_NODES = [
+            { id: 1, val: 58, x: 500, y: 100 },
+            { id: 2, val: 57, x: 300, y: 200, p: 1 },
+            { id: 3, val: 87, x: 700, y: 200, p: 1 },
+            { id: 4, val: 12, x: 200, y: 300, p: 2 },
+            { id: 5, val: 67, x: 600, y: 300, p: 3 },
+            { id: 6, val: 25, x: 300, y: 400, p: 4 },
+            { id: 7, val: 20, x: 200, y: 500, p: 6 },
+            { id: 8, val: 36, x: 400, y: 500, p: 6 },
+            { id: 9, val: 54, x: 500, y: 600, p: 8 }
+        ];
+
+        let l3_placedNodes = {};
+        let l3_isCompleted = false;
+
+        function initLevel3() { 
+            l3_placedNodes = {};
+            l3_isCompleted = false;
+            renderLevel3();
+            startTimer(updateL3Time);
+        }
+
+        function updateL3Time() {
+            const el = document.getElementById('l3-time');
+            if(el) el.innerText = `計時：${formatTime(timeElapsed)}`;
+        }
+
+        function l3_drop(ev, slotId) {
+            ev.preventDefault();
+            const type = ev.dataTransfer.getData("type");
+            if(type !== 'bst-num') return;
+            const val = parseInt(ev.dataTransfer.getData("val"), 10);
+            if(isNaN(val)) return;
+
+            // 移除已存在的相同數字
+            for(let key in l3_placedNodes) {
+                if(l3_placedNodes[key] === val) delete l3_placedNodes[key];
+            }
+            l3_placedNodes[slotId] = val;
+
+            // 檢查是否完成
+            let correctCount = 0;
+            for(let node of BST_NODES) {
+                if(l3_placedNodes[node.id] === node.val) correctCount++;
+            }
+            if(correctCount === BST_NODES.length) {
+                l3_isCompleted = true;
+                stopTimer();
+            }
+            renderLevel3();
+        }
+
+        function renderLevel3() {
+            const app = document.getElementById('app');
+            const poolNumbers = BST_NUMBERS.filter(num => !Object.values(l3_placedNodes).includes(num));
+
+            app.innerHTML = `
+            <div class="flex flex-col h-screen overflow-hidden">
+                <div class="bg-white p-4 shadow-sm border-b flex flex-col md:flex-row items-center justify-between gap-4 z-10">
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center whitespace-nowrap">${Icons.ArrowLeft} 返回選單</button>
+                    
+                    <div class="flex-1 flex justify-center items-center gap-2 overflow-x-auto px-4">
+                        <span class="font-bold text-amber-700 whitespace-nowrap mr-2">拖曳數字池 (左小右大)：</span>
+                        ${poolNumbers.map(num => `
+                            <div draggable="true" ondragstart="drag(event, 'bst-num', '${num}')"
+                                class="w-12 h-12 shrink-0 bg-amber-100 border-2 border-amber-400 text-amber-800 font-bold text-xl rounded-full flex items-center justify-center cursor-grab active:cursor-grabbing shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+                                ${num}
+                            </div>
+                        `).join('')}
+                        ${poolNumbers.length === 0 ? '<span class="text-slate-400 italic">無剩餘數字</span>' : ''}
+                    </div>
+
+                    <div id="l3-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg whitespace-nowrap">計時：${formatTime(timeElapsed)}</div>
+                </div>
+                
+                <div class="flex-1 bg-slate-50 relative overflow-auto p-10 flex justify-center">
+                    ${l3_isCompleted ? `
+                        <div class="absolute top-10 left-1/2 transform -translate-x-1/2 z-20 bg-green-100 border-2 border-green-500 text-green-800 px-8 py-4 rounded-2xl shadow-xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-2">${Icons.CheckCircle}</div>
+                            <h3 class="text-2xl font-bold">二元搜尋樹建構完成！</h3>
+                            <p class="text-lg mt-1">耗時：${formatTime(timeElapsed)}</p>
+                        </div>
+                    ` : ''}
+
+                    <div class="w-[1000px] h-[700px] relative bg-white rounded-3xl shadow-lg border border-slate-200">
+                        <svg width="100%" height="100%" class="absolute inset-0 pointer-events-none">
+                            ${BST_NODES.filter(n => n.p).map(node => {
+                                const parent = BST_NODES.find(n => n.id === node.p);
+                                return `<line x1="${parent.x}" y1="${parent.y}" x2="${node.x}" y2="${node.y}" stroke="#cbd5e1" stroke-width="3" />`;
+                            }).join('')}
+                        </svg>
+
+                        ${BST_NODES.map(node => {
+                            const placedVal = l3_placedNodes[node.id];
+                            const isCorrect = placedVal === node.val;
+                            const isError = placedVal && !isCorrect;
+
+                            let classes = placedVal ? 'bg-white text-slate-800' : 'bg-slate-100 border-dashed border-slate-300 text-slate-300 hover:bg-amber-50 hover:border-amber-300';
+                            if(isCorrect) classes = 'border-green-500 bg-green-50 text-green-700';
+                            if(isError) classes = 'border-red-400 bg-red-50 text-red-600';
+
+                            return `
+                            <div class="absolute transform -translate-x-1/2 -translate-y-1/2 flex flex-col items-center" style="left: ${node.x}px; top: ${node.y}px;">
+                                <div ondragover="allowDrop(event)" ondrop="l3_drop(event, ${node.id})"
+                                    class="w-14 h-14 rounded-full flex items-center justify-center text-xl font-bold shadow-md transition-all border-4 ${classes}">
+                                    ${placedVal || ''}
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+            </div>`;
+        }
+
         // ================= 關卡四：二元樹走訪 (Level 4) =================
         let l4_treeData = null;
         let l4_phases = ['pre', 'in', 'post'];
@@ -121,7 +487,6 @@
         let l4_userSequence = [];
         let l4_isCompleted = false;
         
-        // Demo state
         let l4_demoMode = null;
         let l4_demoSequence = [];
         let l4_demoActiveNode = null;
@@ -159,7 +524,6 @@
                 }
             });
 
-            // Calculate X coordinates using In-order
             let xIndex = 1;
             const inOrderLayout = (nodeId, depth) => {
                 if (!nodeId) return;
@@ -172,14 +536,12 @@
             };
             inOrderLayout('A', 0);
 
-            // Center alignment
             const minX = Math.min(...nodes.map(n => n.x));
             const maxX = Math.max(...nodes.map(n => n.x));
             const containerWidth = 700;
             const offsetX = (containerWidth - (maxX - minX)) / 2 - minX;
             nodes.forEach(n => n.x += offsetX);
 
-            // Calculate solutions
             const preSeq = [], inSeq = [], postSeq = [];
             const traverse = (nodeId) => {
                 if (!nodeId) return;
@@ -208,7 +570,7 @@
             l4_demoActiveNode = null;
             
             let step = 0;
-            renderLevel4(); // Update UI to clear previous demo
+            renderLevel4();
 
             l4_demoInterval = setInterval(() => {
                 if (step < 3) {
@@ -235,22 +597,17 @@
 
             if (id === expectedId) {
                 l4_userSequence.push(id);
-                // Check if current phase is done
                 if (l4_userSequence.length === 8) {
                     if (l4_currentPhase < 2) {
-                        // Move to next phase
                         l4_currentPhase++;
                         l4_userSequence = [];
-                        // Highlight next tab
                     } else {
-                        // All phases done!
                         l4_isCompleted = true;
                         stopTimer();
                     }
                 }
                 renderLevel4();
             } else {
-                // Error animation
                 const btn = document.getElementById(`l4-node-${id}`);
                 if (btn) {
                     btn.classList.add('bg-red-100', 'border-red-500', 'text-red-700', 'animate-shake');
@@ -276,11 +633,8 @@
                 return '後序走訪 (Post-Order)';
             };
 
-            const targetSeqForUI = l4_treeData[l4_phases[l4_currentPhase] + 'Seq'];
-
             let html = `
             <div class="flex flex-col h-screen overflow-hidden bg-slate-100">
-                <!-- 頂部導覽 -->
                 <div class="bg-white p-4 shadow-sm shrink-0 border-b flex items-center justify-between">
                     <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">
                         ${Icons.ArrowLeft} 返回選單
@@ -417,137 +771,7 @@
                 </div>
             </div>`;
             
-            // Only update contents if in right view, using a wrapper to avoid full DOM redraw flashing if possible.
-            // Since vanilla JS without DOM diffing flashes, we set innerHTML on app.
             app.innerHTML = html;
-        }
-
-        // ================= 關卡一 ~ 三 基本變數與資料 (簡化實作以確保單檔運作) =================
-        function initLevel1() { startTimer(renderLevel1); renderLevel1(); }
-        function initLevel2() { startTimer(renderLevel2); renderLevel2(); }
-        function initLevel3() { startTimer(renderLevel3); renderLevel3(); }
-
-        // Level 1 Data (MBTI)
-        let l1_playerName = '';
-        let l1_isStarted = false;
-        let l1_dropped = {}; // { leafIndex: mbtiId }
-        let l1_drawMode = 'pen';
-        const l1_targets = { 0: 'ESTJ', 2: 'ESFJ', 7: 'ENFP', 8: 'ISTJ', 10: 'ISFJ', 11: 'ISFP' };
-
-        function l1_start() {
-            const input = document.getElementById('l1-name-input');
-            if(input.value.trim() !== '') {
-                l1_playerName = input.value.trim();
-                l1_isStarted = true;
-                renderLevel1();
-            }
-        }
-        function l1_drop(ev, index) {
-            ev.preventDefault();
-            const type = ev.dataTransfer.getData("type");
-            if(type !== 'mbti') return;
-            const id = ev.dataTransfer.getData("id");
-            // Remove from other slots
-            for(let key in l1_dropped) { if(l1_dropped[key] === id) delete l1_dropped[key]; }
-            l1_dropped[index] = id;
-            renderLevel1();
-        }
-        function renderLevel1() {
-            const app = document.getElementById('app');
-            if(!l1_isStarted) {
-                app.innerHTML = `
-                <div class="flex flex-col items-center justify-center min-h-screen bg-white">
-                    <h2 class="text-3xl font-bold mb-6">歡迎挑戰 MBTI 決策樹</h2>
-                    <input id="l1-name-input" type="text" placeholder="請輸入玩家姓名" class="border-2 border-slate-300 p-3 rounded-xl mb-4 w-64 text-center focus:outline-none focus:border-blue-500 text-lg" maxlength="10"/>
-                    <button onclick="l1_start()" class="px-8 py-3 rounded-full text-white font-bold text-lg transition-all bg-blue-600 hover:bg-blue-700">開始遊戲</button>
-                    <button onclick="changeView('menu')" class="mt-4 text-slate-500 hover:text-slate-700">返回主選單</button>
-                </div>`;
-                return;
-            }
-
-            // Check completion logic
-            let correctCount = 0;
-            for(let k in l1_targets) { if(l1_dropped[k] === l1_targets[k]) correctCount++; }
-            let isCompleted = correctCount === 6;
-            if(isCompleted) stopTimer();
-
-            app.innerHTML = `
-            <div class="flex flex-col h-screen overflow-hidden">
-                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between">
-                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回選單</button>
-                    <div class="font-bold text-xl text-blue-800">關卡一：MBTI</div>
-                    <div class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">計時：${formatTime(timeElapsed)}</div>
-                </div>
-                <div class="p-4 bg-slate-50 flex gap-4 overflow-x-auto border-b">
-                    <span class="font-bold text-emerald-700 mt-1">可拖曳人格：</span>
-                    ${['ISFJ', 'ESFJ', 'ISTJ', 'ENFP', 'ISFP', 'ESTJ'].map(id => `
-                        <div draggable="true" ondragstart="drag(event, 'mbti', '${id}')" class="bg-blue-100 border-2 border-blue-300 text-blue-800 px-3 py-1 rounded-md cursor-grab font-bold flex-shrink-0">${id}</div>
-                    `).join('')}
-                </div>
-                <div class="flex-1 relative bg-white overflow-auto p-10 flex justify-center">
-                    ${isCompleted ? `
-                        <div class="absolute top-10 left-1/2 transform -translate-x-1/2 z-20 bg-green-100 border-2 border-green-500 text-green-800 px-8 py-4 rounded-2xl shadow-xl flex flex-col items-center animate-bounce">
-                            ${Icons.CheckCircle} <h3 class="text-2xl font-bold">恭喜 ${l1_playerName} 完成 MBTI 挑戰！</h3>
-                            <p class="text-lg mt-1">耗時：${formatTime(timeElapsed)}</p>
-                        </div>
-                    ` : ''}
-                    <div class="w-[1000px] h-[500px] relative border-2 border-dashed border-slate-200 rounded-xl">
-                        <!-- 簡化版樹狀圖渲染示意 -->
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-slate-400">
-                            (將上方塊拖曳至對應框框中)
-                        </div>
-                        <div class="absolute bottom-10 w-full flex justify-around px-4">
-                            ${[0,2,7,8,10,11].map(index => `
-                                <div class="flex flex-col items-center">
-                                    <div class="text-xs text-slate-500 mb-1">目標: ${l1_targets[index]}</div>
-                                    <div ondragover="allowDrop(event)" ondrop="l1_drop(event, ${index})" 
-                                        class="w-16 h-10 border-2 flex items-center justify-center font-bold rounded shadow-sm
-                                        ${l1_dropped[index] ? 'bg-blue-50 border-blue-500' : 'bg-white border-dashed border-slate-300'}
-                                        ${l1_dropped[index] === l1_targets[index] ? 'bg-green-100 border-green-500 text-green-700' : ''}
-                                        ">
-                                        ${l1_dropped[index] || '?'}
-                                    </div>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-        }
-
-        // Level 2 & 3 Simplified renderers (To ensure full file functionality without exceeding tokens)
-        function initLevel2() { startTimer(renderLevel2); renderLevel2(); }
-        let l2_inputs = {};
-        function l2_input(id, val) { l2_inputs[id] = val.toLowerCase(); renderLevel2(); }
-        function renderLevel2() {
-            const app = document.getElementById('app');
-            app.innerHTML = `
-            <div class="flex flex-col h-screen">
-                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between">
-                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回選單</button>
-                    <div class="font-bold text-xl text-emerald-800">關卡二：字彙字典樹 (建構中)</div>
-                    <div class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">計時：${formatTime(timeElapsed)}</div>
-                </div>
-                <div class="flex-1 bg-slate-50 flex items-center justify-center text-slate-500">
-                    <div class="text-center">請返回主選單並進入「關卡四」體驗最新的二元樹隨機走訪實戰！</div>
-                </div>
-            </div>`;
-        }
-
-        function initLevel3() { startTimer(renderLevel3); renderLevel3(); }
-        function renderLevel3() {
-            const app = document.getElementById('app');
-            app.innerHTML = `
-            <div class="flex flex-col h-screen">
-                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between">
-                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回選單</button>
-                    <div class="font-bold text-xl text-amber-800">關卡三：二元搜尋樹 (建構中)</div>
-                    <div class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">計時：${formatTime(timeElapsed)}</div>
-                </div>
-                <div class="flex-1 bg-slate-50 flex items-center justify-center text-slate-500">
-                    <div class="text-center">請返回主選單並進入「關卡四」體驗最新的二元樹隨機走訪實戰！</div>
-                </div>
-            </div>`;
         }
 
         // 預設啟動

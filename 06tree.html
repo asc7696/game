@@ -20,8 +20,6 @@
         }
         .animate-bounce { animation: bounce 1s infinite; }
         
-        .drag-active { outline: 2px dashed #3b82f6; outline-offset: 4px; }
-        
         /* 隱藏原生捲軸但保持可滾動 */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -32,7 +30,8 @@
 
     <script>
         // ================= 全局狀態與工具 =================
-        let currentView = 'menu';
+        let globalPlayerName = '';
+        let currentView = 'login';
         let timerInterval = null;
         let timeElapsed = 0;
 
@@ -58,6 +57,7 @@
         function changeView(view) {
             stopTimer();
             currentView = view;
+            if (view === 'login') renderLogin();
             if (view === 'menu') renderMenu();
             if (view === 'level1') initLevel1();
             if (view === 'level2') initLevel2();
@@ -87,30 +87,61 @@
             }
         }
 
+        // ================= 登入頁面 =================
+        function handleLogin() {
+            const input = document.getElementById('global-name-input');
+            if (input && input.value.trim() !== '') {
+                globalPlayerName = input.value.trim();
+                changeView('menu');
+            } else {
+                alert('請輸入姓名才能開始挑戰！');
+            }
+        }
+
+        function renderLogin() {
+            document.getElementById('app').innerHTML = `
+                <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-indigo-100 to-blue-200">
+                    <div class="bg-white p-10 rounded-3xl shadow-xl max-w-md w-full text-center">
+                        <h1 class="text-3xl font-extrabold text-blue-800 mb-2">互動學習挑戰</h1>
+                        <p class="text-slate-500 mb-8">樹狀結構與走訪綜合測驗</p>
+                        
+                        <div class="mb-6 text-left">
+                            <label class="block text-slate-700 font-bold mb-2">請輸入學生姓名：</label>
+                            <input id="global-name-input" type="text" placeholder="例如：王小明" class="w-full border-2 border-slate-300 p-3 rounded-xl focus:outline-none focus:border-blue-500 text-lg shadow-sm" maxlength="15" onkeypress="if(event.key === 'Enter') handleLogin()"/>
+                        </div>
+                        
+                        <button onclick="handleLogin()" class="w-full py-3 rounded-xl text-white font-bold text-lg transition-all bg-blue-600 hover:bg-blue-700 shadow-md">
+                            進入學習大廳
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
         // ================= 主選單 =================
         function renderMenu() {
             document.getElementById('app').innerHTML = `
                 <div class="flex flex-col items-center justify-center min-h-screen p-6 bg-gradient-to-br from-indigo-100 to-purple-100">
-                    <div class="bg-white p-10 rounded-3xl shadow-xl max-w-2xl w-full text-center">
-                        <h1 class="text-4xl font-extrabold text-slate-800 mb-4">互動學習挑戰</h1>
-                        <p class="text-slate-600 mb-8">選擇一個關卡開始您的挑戰，每個關卡都有獨特的邏輯與結構等您探索！</p>
+                    <div class="bg-white p-10 rounded-3xl shadow-xl max-w-3xl w-full text-center">
+                        <h1 class="text-4xl font-extrabold text-slate-800 mb-2">學習大廳</h1>
+                        <p class="text-blue-600 font-bold text-xl mb-8">歡迎挑戰，${globalPlayerName} 同學！請自由選擇關卡：</p>
                         
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <button onclick="changeView('level1')" class="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 p-6 rounded-2xl transition-all duration-300 group">
+                            <button onclick="changeView('level1')" class="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 p-6 rounded-2xl transition-all duration-300 group shadow border border-blue-100">
                                 <h2 class="text-xl font-bold mb-2">關卡一：MBTI 決策樹</h2>
-                                <p class="text-sm opacity-80 text-center">了解性格維度，找出你的專屬人格</p>
+                                <p class="text-sm opacity-80 text-center">探索性格維度與決策分支</p>
                             </button>
-                            <button onclick="changeView('level2')" class="flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 p-6 rounded-2xl transition-all duration-300 group">
+                            <button onclick="changeView('level2')" class="flex flex-col items-center justify-center bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 p-6 rounded-2xl transition-all duration-300 group shadow border border-emerald-100">
                                 <h2 class="text-xl font-bold mb-2">關卡二：字彙字典樹</h2>
-                                <p class="text-sm opacity-80 text-center">透過單字建構樹狀結構，考驗邏輯</p>
+                                <p class="text-sm opacity-80 text-center">透過單字建構樹狀結構</p>
                             </button>
-                            <button onclick="changeView('level3')" class="flex flex-col items-center justify-center bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-700 p-6 rounded-2xl transition-all duration-300 group">
+                            <button onclick="changeView('level3')" class="flex flex-col items-center justify-center bg-amber-50 hover:bg-amber-600 hover:text-white text-amber-700 p-6 rounded-2xl transition-all duration-300 group shadow border border-amber-100">
                                 <h2 class="text-xl font-bold mb-2">關卡三：二元搜尋樹</h2>
-                                <p class="text-sm opacity-80 text-center">運用左小右大的規則排列數值節點</p>
+                                <p class="text-sm opacity-80 text-center">運用左小右大的規則排列數值</p>
                             </button>
-                            <button onclick="changeView('level4')" class="flex flex-col items-center justify-center bg-violet-50 hover:bg-violet-600 hover:text-white text-violet-700 p-6 rounded-2xl transition-all duration-300 group shadow-md border-2 border-violet-200 hover:border-transparent">
+                            <button onclick="changeView('level4')" class="flex flex-col items-center justify-center bg-violet-50 hover:bg-violet-600 hover:text-white text-violet-700 p-6 rounded-2xl transition-all duration-300 group shadow-md border-2 border-violet-300 hover:border-transparent">
                                 <h2 class="text-xl font-bold mb-2 flex items-center gap-2">${Icons.Network} 關卡四：二元樹走訪</h2>
-                                <p class="text-sm opacity-80 text-center">學習並完成前中後序的隨機樹走訪</p>
+                                <p class="text-sm opacity-80 text-center">前中後序隨機樹走訪實戰</p>
                             </button>
                         </div>
                     </div>
@@ -119,33 +150,77 @@
         }
 
         // ================= 關卡一：MBTI 決策樹 =================
-        let l1_playerName = '';
-        let l1_isStarted = false;
+        const MBTI_DESCS = [
+            { id: 'ISFJ', title: 'ISFJ 守衛者 (The Defender)', desc: '這通常是全球人口佔比最高的人格（約 13-14%），以細心、溫柔、負責任和照顧他人而聞名。' },
+            { id: 'ESFJ', title: 'ESFJ 執政官 (The Consul)', desc: '這類型的人非常熱情、樂於助人，喜歡與人互動並善於維繫社區或團體的和諧，非常普遍。' },
+            { id: 'ISTJ', title: 'ISTJ 物流師 (The Logistician)', desc: '專注於事實、紀律和效率，是注重責任和秩序的保守型人才，人口基數較大。' },
+            { id: 'ENFP', title: 'ENFP 競選者 (The Campaigner)', desc: '充满熱情、富有創造力且熱愛自由的樂天派，這種活潑的性格類型很常見。' },
+            { id: 'ISFP', title: 'ISFP 探險家 (The Adventurer)', desc: '安靜但善於觀察，擁有藝術家般的審美，喜歡體驗新事物，是非常常見的「自由靈魂」。' },
+            { id: 'ESTJ', title: 'ESTJ 總經理 (The Executive)', desc: '務實、果斷，喜歡組織和管理，善於確保事情有序進行，在職場和生活中都很常見。' }
+        ];
+
         let l1_isCompleted = false;
         let l1_dropped = {}; // { leafIndex: mbtiId }
+        let l1_treeData = null;
+        let l1_edgeColors = {}; // { edgeId: 'red' | '#1e293b' }
+        let l1_drawMode = 'pen'; // 'pen' or 'eraser'
+        let l1_playerMbti = null;
+
+        // Leaf indices based on binary path L=0, R=1
+        // LLLL=0000=0(ESTJ), LLLR=0001=1(ESTP), LLRL=0010=2(ESFJ), LLRR=0011=3(ESFP)
+        // LRLL=0100=4(ENTJ), LRLR=0101=5(ENTP), LRRL=0110=6(ENFJ), LRRR=0111=7(ENFP)
+        // RLLL=1000=8(ISTJ), RLLR=1001=9(ISTP), RLRL=1010=10(ISFJ), RLRR=1011=11(ISFP)
+        // RRLL=1100=12(INTJ), RRLR=1101=13(INTP), RRRL=1110=14(INFJ), RRRR=1111=15(INFP)
         const l1_targets = { 0: 'ESTJ', 2: 'ESFJ', 7: 'ENFP', 8: 'ISTJ', 10: 'ISFJ', 11: 'ISFP' };
+        const l1_all_16 = ['ESTJ', 'ESTP', 'ESFJ', 'ESFP', 'ENTJ', 'ENTP', 'ENFJ', 'ENFP', 'ISTJ', 'ISTP', 'ISFJ', 'ISFP', 'INTJ', 'INTP', 'INFJ', 'INFP'];
 
         function initLevel1() { 
-            l1_playerName = '';
-            l1_isStarted = false;
             l1_isCompleted = false;
             l1_dropped = {};
-            renderLevel1(); 
-        }
+            l1_edgeColors = {};
+            l1_drawMode = 'pen';
+            l1_playerMbti = null;
 
-        function l1_start() {
-            const input = document.getElementById('l1-name-input');
-            if(input && input.value.trim() !== '') {
-                l1_playerName = input.value.trim();
-                l1_isStarted = true;
-                renderLevel1();
-                startTimer(updateL1Time); // 在點擊開始遊戲後，才啟動計時器
+            // Generate SVG Tree Data
+            const nodes = [];
+            const edges = [];
+            const w = 1200;
+            
+            function genTree(id, level, x, y, dx, path) {
+                nodes.push({ id, level, x, y, path });
+                if (level < 4) {
+                    const leftId = id + '_L';
+                    const rightId = id + '_R';
+                    const dy = 70;
+                    edges.push({ id: `${id}-${leftId}`, from: id, to: leftId, label: level===0?'E':level===1?'S':level===2?'T':'J' });
+                    genTree(leftId, level + 1, x - dx, y + dy, dx / 2, path + 'L');
+                    
+                    edges.push({ id: `${id}-${rightId}`, from: id, to: rightId, label: level===0?'I':level===1?'N':level===2?'F':'P' });
+                    genTree(rightId, level + 1, x + dx, y + dy, dx / 2, path + 'R');
+                }
             }
+            genTree('root', 0, w / 2, 40, w / 4, '');
+            l1_treeData = { nodes, edges };
+
+            renderLevel1(); 
+            startTimer(updateL1Time);
         }
 
         function updateL1Time() {
-            const timeEl = document.getElementById('l1-time');
-            if(timeEl) timeEl.innerText = `計時：${formatTime(timeElapsed)}`;
+            const el = document.getElementById('l1-time');
+            if(el) el.innerText = `計時：${formatTime(timeElapsed)}`;
+        }
+
+        function setL1DrawMode(mode) {
+            l1_drawMode = mode;
+            renderLevel1();
+        }
+
+        function l1_clickEdge(edgeId) {
+            if(l1_isCompleted) return;
+            l1_edgeColors[edgeId] = l1_drawMode === 'pen' ? '#ef4444' : '#1e293b';
+            checkL1Completion();
+            renderLevel1();
         }
 
         function l1_drop(ev, index) {
@@ -154,79 +229,175 @@
             if(type !== 'mbti') return;
             const id = ev.dataTransfer.getData("id");
             
-            // Remove from other slots if already placed
             for(let key in l1_dropped) { if(l1_dropped[key] === id) delete l1_dropped[key]; }
             l1_dropped[index] = id;
             
-            // Check completion
-            let correctCount = 0;
-            for(let k in l1_targets) { if(l1_dropped[k] === l1_targets[k]) correctCount++; }
-            if(correctCount === 6) {
-                l1_isCompleted = true;
-                stopTimer();
-            }
+            checkL1Completion();
             renderLevel1();
         }
 
-        function renderLevel1() {
-            const app = document.getElementById('app');
-            if(!l1_isStarted) {
-                app.innerHTML = `
-                <div class="flex flex-col items-center justify-center min-h-screen bg-white">
-                    <h2 class="text-3xl font-bold mb-6 text-blue-800">歡迎挑戰 MBTI 決策樹</h2>
-                    <input id="l1-name-input" type="text" placeholder="請輸入玩家姓名" class="border-2 border-slate-300 p-3 rounded-xl mb-4 w-64 text-center focus:outline-none focus:border-blue-500 text-lg shadow-sm" maxlength="10"/>
-                    <button onclick="l1_start()" class="px-8 py-3 rounded-full text-white font-bold text-lg transition-all bg-blue-600 hover:bg-blue-700 shadow-md">開始遊戲</button>
-                    <button onclick="changeView('menu')" class="mt-6 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} <span class="ml-1">返回主選單</span></button>
-                </div>`;
-                return;
+        function checkL1Completion() {
+            // Check drops
+            let correctCount = 0;
+            for(let k in l1_targets) { if(l1_dropped[k] === l1_targets[k]) correctCount++; }
+
+            // Check drawn path for MBTI
+            let paths = [];
+            function dfs(nodeId, currentStr) {
+                if(currentStr.length === 4) { paths.push(currentStr); return; }
+                let outEdges = l1_treeData.edges.filter(e => e.from === nodeId && l1_edgeColors[e.id] === '#ef4444');
+                outEdges.forEach(e => dfs(e.to, currentStr + e.label));
+            }
+            dfs('root', '');
+            
+            if (paths.length === 1 && paths[0].length === 4) {
+                l1_playerMbti = paths[0];
+            } else {
+                l1_playerMbti = null;
             }
 
+            // Must have 6 correct drops AND a single drawn MBTI path
+            if(correctCount === 6 && l1_playerMbti) {
+                l1_isCompleted = true;
+                stopTimer();
+            }
+        }
+
+        function renderLevel1() {
+            if(currentView !== 'level1') return;
+            const app = document.getElementById('app');
+
+            const leaves = l1_treeData.nodes.filter(n => n.level === 4);
+            
             app.innerHTML = `
             <div class="flex flex-col h-screen overflow-hidden">
-                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between">
-                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回選單</button>
+                <!-- 頂部區塊 -->
+                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between shrink-0">
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回大廳</button>
                     <div class="font-bold text-xl text-blue-800">關卡一：MBTI 決策樹</div>
                     <div id="l1-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">計時：${formatTime(timeElapsed)}</div>
                 </div>
-                <div class="p-4 bg-slate-50 flex gap-4 items-center overflow-x-auto border-b">
-                    <span class="font-bold text-emerald-700 whitespace-nowrap">任務：將對應的人格拖曳至樹狀結構底部</span>
-                    ${['ISFJ', 'ESFJ', 'ISTJ', 'ENFP', 'ISFP', 'ESTJ'].filter(id => !Object.values(l1_dropped).includes(id)).map(id => `
-                        <div draggable="true" ondragstart="drag(event, 'mbti', '${id}')" class="bg-blue-100 border-2 border-blue-300 text-blue-800 px-3 py-1 rounded-md cursor-grab active:cursor-grabbing font-bold flex-shrink-0 hover:shadow-md transition-shadow">${id}</div>
-                    `).join('')}
-                    ${Object.values(l1_dropped).length === 6 ? '<span class="text-slate-400 italic font-bold">人格方塊已全部放置</span>' : ''}
+
+                <!-- 資訊與工具列 -->
+                <div class="bg-slate-50 flex flex-col md:flex-row border-b h-48 shrink-0">
+                    <!-- 左側：說明文字 -->
+                    <div class="w-full md:w-2/3 p-4 overflow-y-auto border-r border-slate-200 text-sm">
+                        <div class="font-bold text-slate-700 mb-2">MBTI 四個維度：</div>
+                        <div class="grid grid-cols-2 gap-2 mb-4 text-xs">
+                            <div class="bg-white p-2 rounded border"><b>E(外向)</b>: 專注外部/社交充電 <br/> <b>I(內向)</b>: 專注內心/獨處反思</div>
+                            <div class="bg-white p-2 rounded border"><b>S(實感)</b>: 依賴五官/重視事實 <br/> <b>N(直覺)</b>: 重視想像力/未來可能</div>
+                            <div class="bg-white p-2 rounded border"><b>T(思考)</b>: 邏輯客觀/追求合理 <br/> <b>F(情感)</b>: 價值觀/人際和諧</div>
+                            <div class="bg-white p-2 rounded border"><b>J(判斷)</b>: 井然有序/有計劃 <br/> <b>P(感知)</b>: 彈性靈活/保留選擇</div>
+                        </div>
+                        <div class="font-bold text-slate-700 mb-2">最常見的 6 個人格：</div>
+                        <div class="space-y-1 text-xs">
+                            ${MBTI_DESCS.map(d => `<div><span class="font-bold text-blue-700">${d.title}</span>：${d.desc}</div>`).join('')}
+                        </div>
+                    </div>
+
+                    <!-- 右側：任務與工具 -->
+                    <div class="w-full md:w-1/3 p-4 flex flex-col bg-slate-100 overflow-y-auto">
+                        <div class="mb-4">
+                            <span class="font-bold text-emerald-700 block mb-2">任務 1：拖曳六大人格至樹葉對應位置</span>
+                            <div class="flex flex-wrap gap-2">
+                                ${MBTI_DESCS.map(d => d.id).filter(id => !Object.values(l1_dropped).includes(id)).map(id => `
+                                    <div draggable="true" ondragstart="drag(event, 'mbti', '${id}')" class="bg-blue-100 border-2 border-blue-400 text-blue-900 px-3 py-1 rounded-md cursor-grab active:cursor-grabbing font-bold shadow-sm hover:shadow-md transition-shadow">${id}</div>
+                                `).join('')}
+                                ${Object.values(l1_dropped).length === 6 ? '<span class="text-slate-400 italic font-bold">人格方塊已全部放置</span>' : ''}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="font-bold text-rose-700 block mb-2">任務 2：點擊線條畫出你的性格路徑</span>
+                            <div class="flex gap-2">
+                                <button onclick="setL1DrawMode('pen')" class="px-3 py-1.5 rounded-md flex items-center text-sm font-bold transition-all ${l1_drawMode === 'pen' ? 'bg-red-500 text-white shadow' : 'bg-white border text-slate-600'}">
+                                    ${Icons.Pencil} <span class="ml-1">紅筆</span>
+                                </button>
+                                <button onclick="setL1DrawMode('eraser')" class="px-3 py-1.5 rounded-md flex items-center text-sm font-bold transition-all ${l1_drawMode === 'eraser' ? 'bg-slate-700 text-white shadow' : 'bg-white border text-slate-600'}">
+                                    ${Icons.Eraser} <span class="ml-1">橡皮擦</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="flex-1 relative bg-slate-50 overflow-auto p-10 flex justify-center items-center">
+
+                <!-- 決策樹互動區 -->
+                <div class="flex-1 relative overflow-auto bg-white p-6 flex justify-center items-start">
                     ${l1_isCompleted ? `
-                        <div class="absolute top-10 left-1/2 transform -translate-x-1/2 z-20 bg-green-100 border-2 border-green-500 text-green-800 px-8 py-4 rounded-2xl shadow-xl flex flex-col items-center animate-bounce">
-                            <div class="text-green-600 mb-2">${Icons.CheckCircle}</div>
-                            <h3 class="text-2xl font-bold">恭喜 ${l1_playerName} 完成 MBTI 挑戰！</h3>
-                            <p class="text-lg mt-1">過關耗時：${formatTime(timeElapsed)}</p>
+                        <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 bg-green-100 border-4 border-green-500 text-green-800 px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-4 scale-150">${Icons.CheckCircle}</div>
+                            <h3 class="text-3xl font-extrabold mb-2">任務完成！</h3>
+                            <p class="text-xl font-bold mb-1">玩家：<span class="text-blue-700">${globalPlayerName}</span></p>
+                            <p class="text-xl font-bold mb-4">分數 (耗時)：<span class="text-red-600">${formatTime(timeElapsed)}</span></p>
+                            <div class="bg-white px-6 py-3 rounded-xl border-2 border-green-300 shadow-inner">
+                                <span class="text-lg text-slate-600">你的 MBTI 性格：</span>
+                                <span class="text-3xl font-black text-green-700 ml-2 tracking-wider">${l1_playerMbti}</span>
+                            </div>
                         </div>
+                        <div class="fixed inset-0 bg-black/20 z-40 pointer-events-none"></div>
                     ` : ''}
-                    <div class="w-[1000px] h-[500px] relative bg-white border-2 border-slate-200 shadow-md rounded-2xl">
-                        <!-- 樹狀圖背景裝飾 -->
-                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-slate-300 font-bold text-2xl tracking-widest opacity-50 pointer-events-none">
-                            MBTI DECISION TREE
-                        </div>
-                        <div class="absolute bottom-12 w-full flex justify-around px-4">
-                            ${[0,2,7,8,10,11].map(index => `
-                                <div class="flex flex-col items-center">
-                                    <div class="text-sm font-bold text-slate-500 mb-2 bg-slate-100 px-3 py-1 rounded-full border">目標: ${l1_targets[index]}</div>
-                                    <div ondragover="allowDrop(event)" ondrop="l1_drop(event, ${index})" 
-                                        class="w-20 h-12 border-2 flex items-center justify-center font-bold text-lg rounded-lg shadow-sm transition-colors
-                                        ${l1_dropped[index] ? 'bg-blue-50 border-blue-500 text-blue-800' : 'bg-white border-dashed border-slate-300 text-slate-300'}
-                                        ${l1_dropped[index] === l1_targets[index] ? 'bg-green-100 border-green-500 text-green-700' : ''}
-                                        ${l1_dropped[index] && l1_dropped[index] !== l1_targets[index] ? 'bg-red-50 border-red-400 text-red-600' : ''}
-                                        ">
-                                        ${l1_dropped[index] || '放置區'}
-                                    </div>
-                                </div>
+
+                    <div class="w-[1200px] h-[480px] relative">
+                        <!-- SVG 連線 -->
+                        <svg width="100%" height="100%" class="absolute inset-0">
+                            ${l1_treeData.edges.map(edge => {
+                                const fromNode = l1_treeData.nodes.find(n => n.id === edge.from);
+                                const toNode = l1_treeData.nodes.find(n => n.id === edge.to);
+                                const color = l1_edgeColors[edge.id] || '#1e293b';
+                                const isRed = color === '#ef4444';
+                                const midX = (fromNode.x + toNode.x) / 2;
+                                const midY = (fromNode.y + toNode.y) / 2;
+
+                                return `
+                                <g onclick="l1_clickEdge('${edge.id}')" style="cursor:pointer;" class="group">
+                                    <line x1="${fromNode.x}" y1="${fromNode.y}" x2="${toNode.x}" y2="${toNode.y}" stroke="${color}" stroke-width="${isRed ? 6 : 2}" class="transition-all duration-300" />
+                                    <line x1="${fromNode.x}" y1="${fromNode.y}" x2="${toNode.x}" y2="${toNode.y}" stroke="transparent" stroke-width="25" />
+                                    <circle cx="${midX}" cy="${midY}" r="12" fill="white" stroke="${color}" stroke-width="2" class="group-hover:scale-110 transition-transform" />
+                                    <text x="${midX}" y="${midY}" text-anchor="middle" dy="4" font-size="12" font-weight="bold" fill="${color}">${edge.label}</text>
+                                </g>`;
+                            }).join('')}
+                            
+                            ${l1_treeData.nodes.filter(n => n.level < 4).map(node => `
+                                <circle cx="${node.x}" cy="${node.y}" r="6" fill="#3b82f6" />
                             `).join('')}
-                        </div>
+                        </svg>
+
+                        <!-- 樹葉節點 -->
+                        ${leaves.map((node) => {
+                            // Convert path (e.g. LLRL) to index 0-15
+                            const binStr = node.path.replace(/L/g, '0').replace(/R/g, '1');
+                            const index = parseInt(binStr, 2);
+                            
+                            const placedId = l1_dropped[index];
+                            const targetId = l1_targets[index];
+                            const isTargetBox = targetId !== undefined;
+                            
+                            let classes = 'bg-white border-dashed border-slate-300 text-slate-300';
+                            if (placedId) {
+                                classes = placedId === targetId 
+                                    ? 'bg-green-100 border-solid border-green-500 text-green-800' 
+                                    : 'bg-red-50 border-solid border-red-400 text-red-600';
+                            } else if (!isTargetBox) {
+                                // Already showing predefined MBTI for non-targets
+                                classes = 'bg-slate-100 border-solid border-slate-200 text-slate-500';
+                            }
+
+                            const displayText = isTargetBox ? (placedId || '?') : l1_all_16[index];
+
+                            return `
+                            <div class="absolute transform -translate-x-1/2" style="left: ${node.x}px; top: ${node.y}px;">
+                                <div class="text-[10px] text-slate-400 text-center mb-1 font-mono tracking-tighter">${node.path}</div>
+                                <div ondragover="allowDrop(event)" ondrop="l1_drop(event, ${index})" 
+                                    class="w-[64px] h-[32px] flex items-center justify-center text-sm font-bold rounded border-2 shadow-sm transition-all ${classes}">
+                                    ${displayText}
+                                </div>
+                            </div>
+                            `;
+                        }).join('')}
                     </div>
                 </div>
             </div>`;
         }
+
 
         // ================= 關卡二：字彙字典樹 =================
         const TRIE_WORDS = ['act', 'actor', 'action', 'air', 'airport', 'airpods', 'ant', 'any', 'angry'];
@@ -275,7 +446,6 @@
             if(l2_isCompleted) return;
             l2_inputs[id] = val.toLowerCase();
             
-            // 單獨更新該 Input 的樣式，避免重新渲染整個頁面導致焦點丟失
             const el = document.getElementById(`l2-input-${id}`);
             const node = TRIE_NODES.find(n => n.id === id);
             
@@ -284,47 +454,45 @@
                 el.className = `w-10 h-10 text-center font-bold text-xl rounded-full border-2 focus:outline-none transition-all ${isFilled ? 'bg-emerald-100 border-emerald-500 text-emerald-700 shadow-emerald-200 shadow-md' : 'bg-white border-slate-300 focus:border-emerald-400'}`;
             }
 
-            // 檢查是否全對
             let correct = true;
             for(let n of TRIE_NODES) {
                 if(!n.root) {
-                    if((l2_inputs[n.id] || '') !== n.char) {
-                        correct = false;
-                        break;
-                    }
+                    if((l2_inputs[n.id] || '') !== n.char) { correct = false; break; }
                 }
             }
 
             if(correct && TRIE_NODES.length > 1) {
                 l2_isCompleted = true;
                 stopTimer();
-                renderLevel2(); // 全對時重新渲染顯示過關訊息
+                renderLevel2(); 
             }
         }
 
         function renderLevel2() {
+            if(currentView !== 'level2') return;
             const app = document.getElementById('app');
             app.innerHTML = `
             <div class="flex flex-col h-screen overflow-hidden">
                 <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between z-10">
-                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回選單</button>
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回大廳</button>
                     <div class="flex gap-3 text-lg font-bold text-emerald-800">
                         ${TRIE_WORDS.map(w => `<span class="bg-emerald-100 px-3 py-1 rounded-full shadow-sm">${w}</span>`).join('')}
                     </div>
                     <div id="l2-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">計時：${formatTime(timeElapsed)}</div>
                 </div>
                 
-                <div class="flex-1 bg-slate-50 relative overflow-auto p-10 flex justify-center">
+                <div class="flex-1 bg-slate-50 relative overflow-auto p-10 flex justify-center items-center">
                     ${l2_isCompleted ? `
-                        <div class="absolute top-10 left-1/2 transform -translate-x-1/2 z-20 bg-green-100 border-2 border-green-500 text-green-800 px-8 py-4 rounded-2xl shadow-xl flex flex-col items-center animate-bounce">
-                            <div class="text-green-600 mb-2">${Icons.CheckCircle}</div>
-                            <h3 class="text-2xl font-bold">字典樹建構完成！</h3>
-                            <p class="text-lg mt-1">耗時：${formatTime(timeElapsed)}</p>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-green-100 border-4 border-green-500 text-green-800 px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-4 scale-150">${Icons.CheckCircle}</div>
+                            <h3 class="text-3xl font-extrabold mb-2">任務完成！</h3>
+                            <p class="text-xl font-bold mb-1">玩家：<span class="text-blue-700">${globalPlayerName}</span></p>
+                            <p class="text-xl font-bold">分數 (耗時)：<span class="text-red-600">${formatTime(timeElapsed)}</span></p>
                         </div>
+                        <div class="fixed inset-0 bg-black/20 z-10 pointer-events-none"></div>
                     ` : ''}
 
                     <div class="w-[1000px] h-[800px] relative bg-white rounded-3xl shadow-lg border border-slate-200">
-                        <!-- 連線 -->
                         <svg width="100%" height="100%" class="absolute inset-0 pointer-events-none">
                             ${TRIE_NODES.filter(n => !n.root).map(node => {
                                 const parent = TRIE_NODES.find(n => n.id === node.p);
@@ -332,12 +500,10 @@
                             }).join('')}
                         </svg>
 
-                        <!-- Root 節點 -->
                         <div class="absolute transform -translate-x-1/2 -translate-y-1/2 w-12 h-12 bg-slate-800 rounded-full flex items-center justify-center text-white font-bold shadow-md" style="left: 500px; top: 50px;">
                             Root
                         </div>
 
-                        <!-- 字母輸入框 -->
                         ${TRIE_NODES.filter(n => !n.root).map(node => {
                             const val = l2_inputs[node.id] || '';
                             const isFilled = val === node.char;
@@ -399,13 +565,11 @@
             const val = parseInt(ev.dataTransfer.getData("val"), 10);
             if(isNaN(val)) return;
 
-            // 移除已存在的相同數字
             for(let key in l3_placedNodes) {
                 if(l3_placedNodes[key] === val) delete l3_placedNodes[key];
             }
             l3_placedNodes[slotId] = val;
 
-            // 檢查是否完成
             let correctCount = 0;
             for(let node of BST_NODES) {
                 if(l3_placedNodes[node.id] === node.val) correctCount++;
@@ -418,13 +582,14 @@
         }
 
         function renderLevel3() {
+            if(currentView !== 'level3') return;
             const app = document.getElementById('app');
             const poolNumbers = BST_NUMBERS.filter(num => !Object.values(l3_placedNodes).includes(num));
 
             app.innerHTML = `
             <div class="flex flex-col h-screen overflow-hidden">
                 <div class="bg-white p-4 shadow-sm border-b flex flex-col md:flex-row items-center justify-between gap-4 z-10">
-                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center whitespace-nowrap">${Icons.ArrowLeft} 返回選單</button>
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center whitespace-nowrap">${Icons.ArrowLeft} 返回大廳</button>
                     
                     <div class="flex-1 flex justify-center items-center gap-2 overflow-x-auto px-4">
                         <span class="font-bold text-amber-700 whitespace-nowrap mr-2">拖曳數字池 (左小右大)：</span>
@@ -440,13 +605,15 @@
                     <div id="l3-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg whitespace-nowrap">計時：${formatTime(timeElapsed)}</div>
                 </div>
                 
-                <div class="flex-1 bg-slate-50 relative overflow-auto p-10 flex justify-center">
+                <div class="flex-1 bg-slate-50 relative overflow-auto p-10 flex justify-center items-center">
                     ${l3_isCompleted ? `
-                        <div class="absolute top-10 left-1/2 transform -translate-x-1/2 z-20 bg-green-100 border-2 border-green-500 text-green-800 px-8 py-4 rounded-2xl shadow-xl flex flex-col items-center animate-bounce">
-                            <div class="text-green-600 mb-2">${Icons.CheckCircle}</div>
-                            <h3 class="text-2xl font-bold">二元搜尋樹建構完成！</h3>
-                            <p class="text-lg mt-1">耗時：${formatTime(timeElapsed)}</p>
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-green-100 border-4 border-green-500 text-green-800 px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-4 scale-150">${Icons.CheckCircle}</div>
+                            <h3 class="text-3xl font-extrabold mb-2">任務完成！</h3>
+                            <p class="text-xl font-bold mb-1">玩家：<span class="text-blue-700">${globalPlayerName}</span></p>
+                            <p class="text-xl font-bold">分數 (耗時)：<span class="text-red-600">${formatTime(timeElapsed)}</span></p>
                         </div>
+                        <div class="fixed inset-0 bg-black/20 z-10 pointer-events-none"></div>
                     ` : ''}
 
                     <div class="w-[1000px] h-[700px] relative bg-white rounded-3xl shadow-lg border border-slate-200">
@@ -483,7 +650,7 @@
         // ================= 關卡四：二元樹走訪 (Level 4) =================
         let l4_treeData = null;
         let l4_phases = ['pre', 'in', 'post'];
-        let l4_currentPhase = 0; // 0=pre, 1=in, 2=post
+        let l4_currentPhase = 0; 
         let l4_userSequence = [];
         let l4_isCompleted = false;
         
@@ -518,9 +685,7 @@
                         parent.right = letter;
                         added = true;
                     }
-                    if (added) {
-                        nodes.push({ id: letter, left: null, right: null, p: parent.id });
-                    }
+                    if (added) { nodes.push({ id: letter, left: null, right: null, p: parent.id }); }
                 }
             });
 
@@ -637,7 +802,7 @@
             <div class="flex flex-col h-screen overflow-hidden bg-slate-100">
                 <div class="bg-white p-4 shadow-sm shrink-0 border-b flex items-center justify-between">
                     <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">
-                        ${Icons.ArrowLeft} 返回選單
+                        ${Icons.ArrowLeft} 返回大廳
                     </button>
                     <div class="font-bold text-xl text-violet-800 flex items-center">
                         ${Icons.Network} <span class="ml-2">關卡四：二元樹走訪</span>
@@ -652,9 +817,19 @@
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col lg:flex-row overflow-auto p-6 gap-6">
+                <div class="flex-1 flex flex-col lg:flex-row overflow-auto p-6 gap-6 relative">
+                    ${l4_isCompleted ? `
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-green-100 border-4 border-green-500 text-green-800 px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-4 scale-150">${Icons.CheckCircle}</div>
+                            <h3 class="text-3xl font-extrabold mb-2">任務完成！</h3>
+                            <p class="text-xl font-bold mb-1">玩家：<span class="text-blue-700">${globalPlayerName}</span></p>
+                            <p class="text-xl font-bold">總成績 (耗時)：<span class="text-red-600">${formatTime(timeElapsed)}</span></p>
+                        </div>
+                        <div class="fixed inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                    ` : ''}
+
                     <!-- 左側：教學動畫區 -->
-                    <div class="w-full lg:w-1/3 bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex flex-col">
+                    <div class="w-full lg:w-1/3 bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex flex-col z-0">
                         <h2 class="text-2xl font-bold text-slate-800 mb-4 border-b pb-2">教學演示</h2>
                         
                         <div class="flex-1 relative bg-slate-50 rounded-xl border-2 border-dashed border-slate-300 mb-6 flex items-center justify-center min-h-[250px]">
@@ -699,16 +874,8 @@
                     </div>
 
                     <!-- 右側：實戰測驗區 -->
-                    <div class="w-full lg:w-2/3 bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex flex-col relative overflow-hidden">
+                    <div class="w-full lg:w-2/3 bg-white rounded-2xl shadow-md border border-slate-200 p-6 flex flex-col relative overflow-hidden z-0">
                         
-                        ${l4_isCompleted ? `
-                        <div class="absolute top-10 left-1/2 transform -translate-x-1/2 z-20 bg-green-100 border-2 border-green-500 text-green-800 px-8 py-4 rounded-2xl shadow-xl flex flex-col items-center animate-bounce">
-                            <div class="text-green-600 mb-2">${Icons.CheckCircle}</div>
-                            <h3 class="text-2xl font-bold">挑戰成功！三種走訪皆完成</h3>
-                            <p class="text-lg mt-1">總耗時：${formatTime(timeElapsed)}</p>
-                        </div>
-                        ` : ''}
-
                         <!-- 任務進度標籤 -->
                         <div class="flex gap-2 mb-4">
                             ${[0, 1, 2].map(i => `
@@ -774,8 +941,8 @@
             app.innerHTML = html;
         }
 
-        // 預設啟動
-        renderMenu();
+        // 預設啟動登入畫面
+        renderLogin();
 
     </script>
 </body>

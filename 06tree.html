@@ -63,6 +63,8 @@
             if (view === 'level2') initLevel2();
             if (view === 'level3') initLevel3();
             if (view === 'level4') initLevel4();
+            if (view === 'level5') initLevel5();
+            if (view === 'level6') initLevel6();
         }
 
         // 圖示 (SVG Strings)
@@ -73,7 +75,9 @@
             RotateCcw: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`,
             Network: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="16" y="16" width="6" height="6" rx="1"/><rect x="2" y="16" width="6" height="6" rx="1"/><rect x="9" y="2" width="6" height="6" rx="1"/><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"/><path d="M12 12V8"/></svg>`,
             Pencil: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/></svg>`,
-            Eraser: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>`
+            Eraser: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3c-1-1-1-2.5 0-3.4l9.6-9.6c1-1 2.5-1 3.4 0l5.6 5.6c1 1 1 2.5 0 3.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg>`,
+            Map: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></svg>`,
+            Route: `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="19" r="3"></circle><path d="M9 19h8.5a3.5 3.5 0 0 0 0-7h-11a3.5 3.5 0 0 1 0-7H15"></path><circle cx="18" cy="5" r="3"></circle></svg>`
         };
 
         // ================= 拖曳事件全局處理 =================
@@ -122,11 +126,11 @@
         function renderMenu() {
             document.getElementById('app').innerHTML = `
                 <div class="flex flex-col items-center justify-center min-h-screen p-6 bg-gradient-to-br from-indigo-100 to-purple-100">
-                    <div class="bg-white p-10 rounded-3xl shadow-xl max-w-3xl w-full text-center">
+                    <div class="bg-white p-10 rounded-3xl shadow-xl max-w-5xl w-full text-center">
                         <h1 class="text-4xl font-extrabold text-slate-800 mb-2">學習大廳</h1>
                         <p class="text-blue-600 font-bold text-xl mb-8">歡迎挑戰，${globalPlayerName} 同學！請自由選擇關卡：</p>
                         
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             <button onclick="changeView('level1')" class="flex flex-col items-center justify-center bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-700 p-6 rounded-2xl transition-all duration-300 group shadow border border-blue-100">
                                 <h2 class="text-xl font-bold mb-2">關卡一：MBTI 決策樹</h2>
                                 <p class="text-sm opacity-80 text-center">探索性格維度與決策分支</p>
@@ -139,9 +143,17 @@
                                 <h2 class="text-xl font-bold mb-2">關卡三：二元搜尋樹</h2>
                                 <p class="text-sm opacity-80 text-center">運用左小右大的規則排列數值</p>
                             </button>
-                            <button onclick="changeView('level4')" class="flex flex-col items-center justify-center bg-violet-50 hover:bg-violet-600 hover:text-white text-violet-700 p-6 rounded-2xl transition-all duration-300 group shadow-md border-2 border-violet-300 hover:border-transparent">
+                            <button onclick="changeView('level4')" class="flex flex-col items-center justify-center bg-violet-50 hover:bg-violet-600 hover:text-white text-violet-700 p-6 rounded-2xl transition-all duration-300 group shadow border border-violet-100">
                                 <h2 class="text-xl font-bold mb-2 flex items-center gap-2">${Icons.Network} 關卡四：二元樹走訪</h2>
                                 <p class="text-sm opacity-80 text-center">前中後序隨機樹走訪實戰</p>
+                            </button>
+                            <button onclick="changeView('level5')" class="flex flex-col items-center justify-center bg-rose-50 hover:bg-rose-600 hover:text-white text-rose-700 p-6 rounded-2xl transition-all duration-300 group shadow border border-rose-100">
+                                <h2 class="text-xl font-bold mb-2 flex items-center gap-2">${Icons.Map} 關卡五：最小生成樹</h2>
+                                <p class="text-sm opacity-80 text-center">規劃連接所有景點的最佳路線</p>
+                            </button>
+                            <button onclick="changeView('level6')" class="flex flex-col items-center justify-center bg-teal-50 hover:bg-teal-600 hover:text-white text-teal-700 p-6 rounded-2xl transition-all duration-300 group shadow border border-teal-100">
+                                <h2 class="text-xl font-bold mb-2 flex items-center gap-2">${Icons.Route} 關卡六：最短路徑</h2>
+                                <p class="text-sm opacity-80 text-center">找出指定兩點之間的最短距離</p>
                             </button>
                         </div>
                     </div>
@@ -939,6 +951,329 @@
             </div>`;
             
             app.innerHTML = html;
+        }
+
+        // ================= 關卡五：最小生成樹 (Level 5) =================
+        const L5_NODES = [
+            { id: 'A', x: 200, y: 200 }, { id: 'B', x: 400, y: 100 },
+            { id: 'C', x: 400, y: 300 }, { id: 'D', x: 600, y: 150 },
+            { id: 'E', x: 600, y: 350 }, { id: 'F', x: 800, y: 200 },
+            { id: 'G', x: 800, y: 400 }, { id: 'H', x: 1000, y: 300 }
+        ];
+        // MST expected distance: 22
+        // MST Edges: B-C(2), E-F(2), C-D(3), F-G(3), A-C(4), D-F(4), G-H(4)
+        const L5_EDGES = [
+            { id: 'e1', from: 'A', to: 'B', w: 5 }, { id: 'e2', from: 'A', to: 'C', w: 4 },
+            { id: 'e3', from: 'B', to: 'C', w: 2 }, { id: 'e4', from: 'B', to: 'D', w: 6 },
+            { id: 'e5', from: 'C', to: 'D', w: 3 }, { id: 'e6', from: 'C', to: 'E', w: 8 },
+            { id: 'e7', from: 'D', to: 'E', w: 5 }, { id: 'e8', from: 'D', to: 'F', w: 4 },
+            { id: 'e9', from: 'E', to: 'F', w: 2 }, { id: 'e10', from: 'E', to: 'G', w: 7 },
+            { id: 'e11', from: 'F', to: 'G', w: 3 }, { id: 'e12', from: 'F', to: 'H', w: 6 },
+            { id: 'e13', from: 'G', to: 'H', w: 4 }
+        ];
+        const L5_TARGET_EDGES = ['e2', 'e3', 'e5', 'e8', 'e9', 'e11', 'e13'];
+        const L5_TARGET_DIST = 22;
+
+        let l5_isCompleted = false;
+        let l5_edgeColors = {};
+        let l5_drawMode = 'pen';
+        let l5_errorMsg = '';
+
+        function initLevel5() {
+            l5_isCompleted = false;
+            l5_edgeColors = {};
+            l5_drawMode = 'pen';
+            l5_errorMsg = '';
+            renderLevel5();
+            startTimer(updateL5Time);
+        }
+
+        function updateL5Time() {
+            const timeEl = document.getElementById('l5-time');
+            if(timeEl) timeEl.innerText = `計時：${formatTime(timeElapsed)}`;
+        }
+
+        function setL5DrawMode(mode) {
+            l5_drawMode = mode;
+            renderLevel5();
+        }
+
+        function l5_clickEdge(edgeId) {
+            if(l5_isCompleted) return;
+            l5_edgeColors[edgeId] = l5_drawMode === 'pen' ? '#ef4444' : '#94a3b8';
+            renderLevel5();
+        }
+
+        function submitL5() {
+            if (l5_isCompleted) return;
+            const inputVal = parseInt(document.getElementById('l5-dist-input').value, 10);
+            const selectedEdges = Object.keys(l5_edgeColors).filter(k => l5_edgeColors[k] === '#ef4444');
+            
+            const isEdgesCorrect = selectedEdges.length === L5_TARGET_EDGES.length && 
+                                   selectedEdges.every(id => L5_TARGET_EDGES.includes(id));
+            const isDistCorrect = inputVal === L5_TARGET_DIST;
+
+            if (isEdgesCorrect && isDistCorrect) {
+                l5_isCompleted = true;
+                l5_errorMsg = '';
+                stopTimer();
+                renderLevel5();
+            } else {
+                l5_errorMsg = '路徑或距離不正確，請再檢查看看！';
+                renderLevel5();
+                setTimeout(() => { l5_errorMsg = ''; renderLevel5(); }, 3000);
+            }
+        }
+
+        function renderLevel5() {
+            if(currentView !== 'level5') return;
+            const app = document.getElementById('app');
+
+            app.innerHTML = `
+            <div class="flex flex-col h-screen overflow-hidden bg-slate-100">
+                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between shrink-0 z-10">
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回大廳</button>
+                    <div class="font-bold text-xl text-rose-800 flex items-center">
+                        ${Icons.Map} <span class="ml-2">關卡五：最小生成樹</span>
+                    </div>
+                    <div id="l5-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg flex items-center">
+                        計時：${formatTime(timeElapsed)}
+                    </div>
+                </div>
+
+                <div class="bg-rose-50 p-4 border-b border-rose-200 flex flex-col md:flex-row items-center justify-between gap-4 shrink-0 z-10">
+                    <div>
+                        <h3 class="font-bold text-rose-800">任務說明：</h3>
+                        <p class="text-sm text-rose-700">規劃一條旅遊路線，必須連接<span class="font-bold">所有 8 個城市</span>，並且總距離最短。</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex gap-2 bg-white p-1 rounded-lg shadow-sm border">
+                            <button onclick="setL5DrawMode('pen')" class="px-3 py-1.5 rounded-md flex items-center text-sm font-bold transition-all ${l5_drawMode === 'pen' ? 'bg-red-500 text-white shadow' : 'bg-transparent text-slate-600'}">
+                                ${Icons.Pencil} <span class="ml-1">紅筆</span>
+                            </button>
+                            <button onclick="setL5DrawMode('eraser')" class="px-3 py-1.5 rounded-md flex items-center text-sm font-bold transition-all ${l5_drawMode === 'eraser' ? 'bg-slate-700 text-white shadow' : 'bg-transparent text-slate-600'}">
+                                ${Icons.Eraser} <span class="ml-1">橡皮擦</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-700">總距離:</span>
+                            <input id="l5-dist-input" type="number" class="w-20 p-2 border-2 border-slate-300 rounded text-center font-bold focus:border-rose-500 outline-none" placeholder="?">
+                        </div>
+                        <button onclick="submitL5()" class="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg shadow transition-colors ${l5_errorMsg ? 'animate-shake' : ''}">
+                            提交答案
+                        </button>
+                    </div>
+                </div>
+
+                ${l5_errorMsg ? `<div class="bg-red-500 text-white text-center py-2 font-bold shrink-0 z-10">${l5_errorMsg}</div>` : ''}
+
+                <div class="flex-1 relative overflow-auto bg-white p-6 flex justify-center items-center">
+                    ${l5_isCompleted ? `
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-green-100 border-4 border-green-500 text-green-800 px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-4 scale-150">${Icons.CheckCircle}</div>
+                            <h3 class="text-3xl font-extrabold mb-2">任務完成！</h3>
+                            <p class="text-xl font-bold mb-1">玩家：<span class="text-blue-700">${globalPlayerName}</span></p>
+                            <p class="text-xl font-bold">分數 (耗時)：<span class="text-red-600">${formatTime(timeElapsed)}</span></p>
+                        </div>
+                        <div class="fixed inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                    ` : ''}
+
+                    <div class="w-[1200px] h-[550px] relative border-2 border-slate-200 rounded-2xl bg-slate-50 shadow-inner overflow-hidden">
+                        <svg width="100%" height="100%" class="absolute inset-0">
+                            <!-- Edges -->
+                            ${L5_EDGES.map(edge => {
+                                const n1 = L5_NODES.find(n => n.id === edge.from);
+                                const n2 = L5_NODES.find(n => n.id === edge.to);
+                                const color = l5_edgeColors[edge.id] || '#94a3b8';
+                                const isRed = color === '#ef4444';
+                                const midX = (n1.x + n2.x) / 2;
+                                const midY = (n1.y + n2.y) / 2;
+                                return `
+                                <g onclick="l5_clickEdge('${edge.id}')" class="cursor-pointer group">
+                                    <line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="${color}" stroke-width="${isRed ? 6 : 3}" class="transition-all duration-300" />
+                                    <!-- Transparent hit area -->
+                                    <line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="transparent" stroke-width="25" />
+                                    <circle cx="${midX}" cy="${midY}" r="14" fill="white" stroke="${color}" stroke-width="2" class="group-hover:scale-110 transition-transform"/>
+                                    <text x="${midX}" y="${midY}" text-anchor="middle" dy="5" font-size="14" font-weight="bold" fill="${isRed ? '#ef4444' : '#475569'}">${edge.w}</text>
+                                </g>
+                                `;
+                            }).join('')}
+                            
+                            <!-- Nodes -->
+                            ${L5_NODES.map(node => `
+                                <circle cx="${node.x}" cy="${node.y}" r="22" fill="#fff" stroke="#cbd5e1" stroke-width="4" />
+                                <text x="${node.x}" y="${node.y}" text-anchor="middle" dy="6" font-size="18" font-weight="bold" fill="#334155">${node.id}</text>
+                            `).join('')}
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            `;
+        }
+
+        // ================= 關卡六：最短路徑 (Level 6) =================
+        const L6_NODES = [
+            { id: 'A', x: 200, y: 200 }, { id: 'B', x: 400, y: 100 },
+            { id: 'C', x: 400, y: 300 }, { id: 'D', x: 600, y: 150 },
+            { id: 'E', x: 600, y: 350 }, { id: 'F', x: 800, y: 200 },
+            { id: 'G', x: 800, y: 400 }, { id: 'H', x: 1000, y: 300 }
+        ];
+        // Shortest Path A to H: A-B(3), B-C(2), C-D(1), D-E(2), E-G(3), G-H(2) -> Dist: 13
+        const L6_EDGES = [
+            { id: 'e1', from: 'A', to: 'B', w: 3 }, { id: 'e2', from: 'A', to: 'C', w: 6 },
+            { id: 'e3', from: 'B', to: 'C', w: 2 }, { id: 'e4', from: 'B', to: 'D', w: 5 },
+            { id: 'e5', from: 'C', to: 'D', w: 1 }, { id: 'e6', from: 'C', to: 'E', w: 4 }, // Changed target node C-F to C-E for coordinate mapping
+            { id: 'e7', from: 'D', to: 'E', w: 2 }, { id: 'e8', from: 'D', to: 'F', w: 4 },
+            { id: 'e9', from: 'E', to: 'F', w: 1 }, { id: 'e10', from: 'E', to: 'G', w: 3 },
+            { id: 'e11', from: 'F', to: 'G', w: 2 }, { id: 'e12', from: 'F', to: 'H', w: 5 },
+            { id: 'e13', from: 'G', to: 'H', w: 2 }
+        ];
+        const L6_TARGET_EDGES = ['e1', 'e3', 'e5', 'e7', 'e10', 'e13'];
+        const L6_TARGET_DIST = 13;
+
+        let l6_isCompleted = false;
+        let l6_edgeColors = {};
+        let l6_drawMode = 'pen';
+        let l6_errorMsg = '';
+
+        function initLevel6() {
+            l6_isCompleted = false;
+            l6_edgeColors = {};
+            l6_drawMode = 'pen';
+            l6_errorMsg = '';
+            renderLevel6();
+            startTimer(updateL6Time);
+        }
+
+        function updateL6Time() {
+            const timeEl = document.getElementById('l6-time');
+            if(timeEl) timeEl.innerText = `計時：${formatTime(timeElapsed)}`;
+        }
+
+        function setL6DrawMode(mode) {
+            l6_drawMode = mode;
+            renderLevel6();
+        }
+
+        function l6_clickEdge(edgeId) {
+            if(l6_isCompleted) return;
+            l6_edgeColors[edgeId] = l6_drawMode === 'pen' ? '#ef4444' : '#94a3b8';
+            renderLevel6();
+        }
+
+        function submitL6() {
+            if (l6_isCompleted) return;
+            const inputVal = parseInt(document.getElementById('l6-dist-input').value, 10);
+            const selectedEdges = Object.keys(l6_edgeColors).filter(k => l6_edgeColors[k] === '#ef4444');
+            
+            const isEdgesCorrect = selectedEdges.length === L6_TARGET_EDGES.length && 
+                                   selectedEdges.every(id => L6_TARGET_EDGES.includes(id));
+            const isDistCorrect = inputVal === L6_TARGET_DIST;
+
+            if (isEdgesCorrect && isDistCorrect) {
+                l6_isCompleted = true;
+                l6_errorMsg = '';
+                stopTimer();
+                renderLevel6();
+            } else {
+                l6_errorMsg = '路徑或距離不正確，請再檢查看看！';
+                renderLevel6();
+                setTimeout(() => { l6_errorMsg = ''; renderLevel6(); }, 3000);
+            }
+        }
+
+        function renderLevel6() {
+            if(currentView !== 'level6') return;
+            const app = document.getElementById('app');
+
+            app.innerHTML = `
+            <div class="flex flex-col h-screen overflow-hidden bg-slate-100">
+                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between shrink-0 z-10">
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回大廳</button>
+                    <div class="font-bold text-xl text-teal-800 flex items-center">
+                        ${Icons.Route} <span class="ml-2">關卡六：最短路徑</span>
+                    </div>
+                    <div id="l6-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg flex items-center">
+                        計時：${formatTime(timeElapsed)}
+                    </div>
+                </div>
+
+                <div class="bg-teal-50 p-4 border-b border-teal-200 flex flex-col md:flex-row items-center justify-between gap-4 shrink-0 z-10">
+                    <div>
+                        <h3 class="font-bold text-teal-800">任務說明：</h3>
+                        <p class="text-sm text-teal-700">規劃一條從 <span class="font-bold bg-green-200 px-1 rounded">城市 A</span> 出發，抵達 <span class="font-bold bg-red-200 px-1 rounded">城市 H</span> 的最短開車路線。(不需經過所有城市)</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex gap-2 bg-white p-1 rounded-lg shadow-sm border">
+                            <button onclick="setL6DrawMode('pen')" class="px-3 py-1.5 rounded-md flex items-center text-sm font-bold transition-all ${l6_drawMode === 'pen' ? 'bg-red-500 text-white shadow' : 'bg-transparent text-slate-600'}">
+                                ${Icons.Pencil} <span class="ml-1">紅筆</span>
+                            </button>
+                            <button onclick="setL6DrawMode('eraser')" class="px-3 py-1.5 rounded-md flex items-center text-sm font-bold transition-all ${l6_drawMode === 'eraser' ? 'bg-slate-700 text-white shadow' : 'bg-transparent text-slate-600'}">
+                                ${Icons.Eraser} <span class="ml-1">橡皮擦</span>
+                            </button>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold text-slate-700">總距離:</span>
+                            <input id="l6-dist-input" type="number" class="w-20 p-2 border-2 border-slate-300 rounded text-center font-bold focus:border-teal-500 outline-none" placeholder="?">
+                        </div>
+                        <button onclick="submitL6()" class="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-lg shadow transition-colors ${l6_errorMsg ? 'animate-shake' : ''}">
+                            提交答案
+                        </button>
+                    </div>
+                </div>
+
+                ${l6_errorMsg ? `<div class="bg-red-500 text-white text-center py-2 font-bold shrink-0 z-10">${l6_errorMsg}</div>` : ''}
+
+                <div class="flex-1 relative overflow-auto bg-white p-6 flex justify-center items-center">
+                    ${l6_isCompleted ? `
+                        <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-20 bg-green-100 border-4 border-green-500 text-green-800 px-10 py-8 rounded-3xl shadow-2xl flex flex-col items-center animate-bounce">
+                            <div class="text-green-600 mb-4 scale-150">${Icons.CheckCircle}</div>
+                            <h3 class="text-3xl font-extrabold mb-2">任務完成！</h3>
+                            <p class="text-xl font-bold mb-1">玩家：<span class="text-blue-700">${globalPlayerName}</span></p>
+                            <p class="text-xl font-bold">分數 (耗時)：<span class="text-red-600">${formatTime(timeElapsed)}</span></p>
+                        </div>
+                        <div class="fixed inset-0 bg-black/20 z-10 pointer-events-none"></div>
+                    ` : ''}
+
+                    <div class="w-[1200px] h-[550px] relative border-2 border-slate-200 rounded-2xl bg-slate-50 shadow-inner overflow-hidden">
+                        <svg width="100%" height="100%" class="absolute inset-0">
+                            <!-- Edges -->
+                            ${L6_EDGES.map(edge => {
+                                const n1 = L6_NODES.find(n => n.id === edge.from);
+                                const n2 = L6_NODES.find(n => n.id === edge.to);
+                                const color = l6_edgeColors[edge.id] || '#94a3b8';
+                                const isRed = color === '#ef4444';
+                                const midX = (n1.x + n2.x) / 2;
+                                const midY = (n1.y + n2.y) / 2;
+                                return `
+                                <g onclick="l6_clickEdge('${edge.id}')" class="cursor-pointer group">
+                                    <line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="${color}" stroke-width="${isRed ? 6 : 3}" class="transition-all duration-300" />
+                                    <!-- Transparent hit area -->
+                                    <line x1="${n1.x}" y1="${n1.y}" x2="${n2.x}" y2="${n2.y}" stroke="transparent" stroke-width="25" />
+                                    <circle cx="${midX}" cy="${midY}" r="14" fill="white" stroke="${color}" stroke-width="2" class="group-hover:scale-110 transition-transform"/>
+                                    <text x="${midX}" y="${midY}" text-anchor="middle" dy="5" font-size="14" font-weight="bold" fill="${isRed ? '#ef4444' : '#475569'}">${edge.w}</text>
+                                </g>
+                                `;
+                            }).join('')}
+                            
+                            <!-- Nodes -->
+                            ${L6_NODES.map(node => {
+                                let fill = '#fff';
+                                let stroke = '#cbd5e1';
+                                let textColor = '#334155';
+                                if (node.id === 'A') { fill = '#bbf7d0'; stroke = '#22c55e'; textColor = '#166534'; } // Start Node
+                                if (node.id === 'H') { fill = '#fecaca'; stroke = '#ef4444'; textColor = '#991b1b'; } // End Node
+
+                                return `
+                                <circle cx="${node.x}" cy="${node.y}" r="22" fill="${fill}" stroke="${stroke}" stroke-width="4" />
+                                <text x="${node.x}" y="${node.y}" text-anchor="middle" dy="6" font-size="18" font-weight="bold" fill="${textColor}">${node.id}</text>
+                                `;
+                            }).join('')}
+                        </svg>
+                    </div>
+                </div>
+            </div>
+            `;
         }
 
         // 預設啟動登入畫面

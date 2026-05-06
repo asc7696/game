@@ -1,0 +1,549 @@
+<!doctype html>
+<html class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MBTI Decision Tree Game</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lucide@0.263.0/dist/umd/lucide.min.js"></script>
+  <script src="/_sdk/element_sdk.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&amp;family=Noto+Sans+TC:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Noto Sans TC', 'JetBrains Mono', sans-serif; }
+    
+    .tree-node {
+      width: 60px; height: 60px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700; font-size: 16px;
+      transition: all 0.3s ease;
+      user-select: none;
+      border: 3px solid;
+    }
+    
+    .node-root { border-color: #ff6b6b; background: #fff5f5; color: #c92a2a; }
+    .node-decision { border-color: #4c6ef5; background: #f0f4ff; color: #364fc7; }
+    .node-leaf-empty { border-color: #adb5bd; background: #f8f9fa; color: #495057; }
+    .node-leaf-selected { border-color: #51cf66; background: #f1fae4; color: #2b8a3e; box-shadow: 0 0 20px rgba(81,207,102,0.6); }
+    
+    .personality-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      border: 2px solid #764ba2;
+      border-radius: 12px;
+      padding: 12px;
+      text-align: center;
+      cursor: grab;
+      transition: all 0.3s ease;
+      user-select: none;
+      color: white;
+    }
+    
+    .personality-card:hover { transform: translateY(-4px); box-shadow: 0 8px 16px rgba(102, 126, 234, 0.4); }
+    
+    .personality-code { font-weight: 700; font-size: 14px; }
+    .personality-name { font-size: 12px; margin-top: 4px; opacity: 0.95; }
+    
+    .edge { stroke: #4c6ef5; stroke-width: 2.5; opacity: 0.6; }
+    .drawn-line { stroke: #ff0000; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+    
+    .drawing-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      cursor: crosshair;
+      background: transparent;
+    }
+    
+    .drawing-canvas.erasing {
+      cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2"><path d="M20.71 7.71L12 16.42 3.29 7.71a6 6 0 0 1 8.48-8.48l8.48 8.48 8.48-8.48a6 6 0 0 1-8.48 8.48zM3.71 20.71L12 12l8.29 8.71a6 6 0 0 1-8.48 8.48l-8.48-8.48-8.48 8.48a6 6 0 0 1 8.48-8.48z"/></svg>') 12 12, auto;
+    }
+    
+    .tool-button {
+      padding: 10px 16px;
+      border-radius: 8px;
+      border: 2px solid;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    
+    .tool-button.pen { border-color: #ff0000; background: white; color: #ff0000; }
+    .tool-button.pen.active { background: #ff0000; color: white; }
+    .tool-button.eraser { border-color: #666; background: white; color: #666; }
+    .tool-button.eraser.active { background: #666; color: white; }
+    .tool-button.clear { border-color: #ff6b6b; background: white; color: #ff6b6b; }
+    .tool-button.clear:hover { background: #ff6b6b; color: white; }
+    
+    .tool-button:hover:not(.clear) { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    
+    .trie-container { overflow: auto; background: linear-gradient(135deg, #f5f7ff 0%, #fef5f5 100%); position: relative; }
+    svg { overflow: visible; position: relative; z-index: 1; }
+    
+    .status-badge { 
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+    .status-badge.incomplete { background: linear-gradient(135deg, #4c6ef5 0%, #364fc7 100%); color: white; }
+    .status-badge.complete { background: linear-gradient(135deg, #51cf66 0%, #2b8a3e 100%); color: white; }
+    
+    .dimension-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #000;
+      text-anchor: middle;
+    }
+    
+    @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .toast { animation: slideDown 0.3s ease; }
+    
+    @keyframes popIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
+    .result-modal { animation: popIn 0.4s ease; }
+  </style>
+  <script src="/_sdk/data_sdk.js" type="text/javascript"></script>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full">
+  <div id="app" class="h-full w-full bg-gradient-to-br from-blue-50 to-red-50 text-gray-800 flex flex-col overflow-auto">
+   <!-- Input Modal -->
+   <div id="inputModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50">
+    <div class="bg-slate-800 border border-slate-600 rounded-lg p-8 shadow-xl max-w-md w-full mx-4">
+     <h2 class="text-2xl font-bold text-blue-600 mb-2">🧠 MBTI 決策樹</h2>
+     <p class="text-sm text-slate-600 mb-6">開始前請輸入您的姓名</p>
+     <div class="mb-6">
+      <label class="block text-sm font-semibold text-slate-700 mb-2">姓名</label> <input id="playerNameInput" type="text" class="w-full bg-white border-2 border-blue-300 rounded px-3 py-2 text-blue-700 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200" placeholder="輸入您的名字...">
+     </div>
+     <div class="mb-6 p-4 bg-blue-50 rounded border border-blue-200">
+      <p class="text-xs font-semibold text-blue-700 mb-2">📋 玩法說明：</p>
+      <ul class="text-xs text-blue-600 space-y-1 leading-relaxed">
+       <li>✓ 選擇紅筆工具</li>
+       <li>✓ 在決策樹上畫線追蹤您的選擇</li>
+       <li>✓ 從根部開始，逐層選擇維度</li>
+       <li>✓ 找到您的性格類型！</li>
+      </ul>
+     </div><button id="startBtn" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 rounded-lg transition shadow-lg">開始遊戲</button>
+    </div>
+   </div><!-- Result Modal -->
+   <div id="resultModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden">
+    <div class="result-modal bg-white border-2 border-blue-300 rounded-lg p-8 shadow-xl max-w-md w-full mx-4 text-center">
+     <div id="resultIcon" class="text-6xl mb-4"></div>
+     <h2 id="resultTitle" class="text-3xl font-bold text-blue-600 mb-2">您的性格類型</h2>
+     <div class="mb-6 space-y-3">
+      <div class="bg-blue-50 rounded p-4 border-2 border-blue-200">
+       <p class="text-sm text-slate-600">玩家</p>
+       <p id="resultPlayer" class="text-xl font-bold text-blue-700">--</p>
+      </div>
+      <div class="bg-purple-50 rounded p-4 border-2 border-purple-200">
+       <p class="text-sm text-slate-600">您的 MBTI</p>
+       <p id="resultMBTI" class="text-2xl font-bold text-purple-700 font-mono">--</p>
+      </div>
+     </div><button id="restartBtn" class="w-full bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 rounded-lg transition shadow-lg">重新遊戲</button>
+    </div>
+   </div><!-- Header -->
+   <header class="p-4 border-b-2 border-blue-300 flex items-center justify-between shrink-0 bg-white shadow-sm">
+    <div>
+     <h1 id="title" class="text-2xl font-bold text-blue-600">🧠 MBTI 決策樹</h1>
+     <p class="text-xs text-slate-600 mt-1">用紅筆畫出您的決策路線</p>
+    </div>
+    <div class="flex flex-col items-end gap-2">
+     <p id="playerDisplay" class="text-sm font-semibold text-blue-700">玩家：--</p>
+    </div>
+   </header><!-- Toast -->
+   <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 hidden"></div><!-- Main content -->
+   <div class="flex flex-1 min-h-0 gap-4 p-4">
+    <!-- Drawing Tools -->
+    <aside class="w-32 shrink-0 flex flex-col gap-2">
+     <div class="p-3 bg-white rounded-lg border-2 border-gray-200 shadow-md">
+      <p class="text-xs font-bold text-gray-700 mb-2">工具</p>
+      <div class="space-y-2"><button id="penBtn" class="tool-button pen active w-full" title="紅筆">✏️ 紅筆</button> <button id="eraserBtn" class="tool-button eraser w-full" title="橡皮擦">🗑️ 橡皮擦</button> <button id="clearBtn" class="tool-button clear w-full" title="清除全部">🔄 清除</button>
+      </div>
+     </div>
+    </aside><!-- Center: MBTI Tree -->
+    <main class="flex-1 trie-container relative min-h-0 rounded-lg border-2 border-blue-300 shadow-md">
+     <svg id="treeSvg" width="100%" height="100%" style="min-height: 600px;"></svg>
+     <canvas id="drawingCanvas" class="drawing-canvas"></canvas>
+    </main>
+   </div>
+  </div>
+  <script>
+    const PERSONALITIES = [
+      { code: 'ISTJ', name: 'Inspector\n管理者', e: 'I', s: 'S', t: 'T', j: 'J' },
+      { code: 'ISTP', name: 'Crafter\n工匠', e: 'I', s: 'S', t: 'T', j: 'P' },
+      { code: 'ISFJ', name: 'Protector\n守護者', e: 'I', s: 'S', t: 'F', j: 'J' },
+      { code: 'ISFP', name: 'Artist\n藝術家', e: 'I', s: 'S', t: 'F', j: 'P' },
+      { code: 'INFJ', name: 'Advocate\n擁護者', e: 'I', s: 'N', t: 'F', j: 'J' },
+      { code: 'INFP', name: 'Mediator\n調停者', e: 'I', s: 'N', t: 'F', j: 'P' },
+      { code: 'INTJ', name: 'Architect\n建築師', e: 'I', s: 'N', t: 'T', j: 'J' },
+      { code: 'INTP', name: 'Thinker\n邏輯思考者', e: 'I', s: 'N', t: 'T', j: 'P' },
+      { code: 'ESTP', name: 'Persuader\n說服者', e: 'E', s: 'S', t: 'T', j: 'P' },
+      { code: 'ESTJ', name: 'Director\n指揮者', e: 'E', s: 'S', t: 'T', j: 'J' },
+      { code: 'ESFP', name: 'Performer\n表演者', e: 'E', s: 'S', t: 'F', j: 'P' },
+      { code: 'ESFJ', name: 'Caregiver\n照顧者', e: 'E', s: 'S', t: 'F', j: 'J' },
+      { code: 'ENFP', name: 'Champion\n活動家', e: 'E', s: 'N', t: 'F', j: 'P' },
+      { code: 'ENFJ', name: 'Giver\n教育者', e: 'E', s: 'N', t: 'F', j: 'J' },
+      { code: 'ENTP', name: 'Debater\n辯論家', e: 'E', s: 'N', t: 'T', j: 'P' },
+      { code: 'ENTJ', name: 'Commander\n指揮官', e: 'E', s: 'N', t: 'T', j: 'J' }
+    ];
+
+    // Game state
+    let playerName = '';
+    let gameActive = false;
+    let currentTool = 'pen'; // 'pen' or 'eraser'
+    let isDrawing = false;
+    let selectedPersonality = null;
+    let drawnPath = []; // Array of letters to track path
+
+    // Tree structure with dimension labels
+    const treeStructure = {
+      id: 'root',
+      label: 'Start',
+      x: 400,
+      y: 40,
+      children: [
+        {
+          id: 'i-branch',
+          label: 'I',
+          dimension: 'I',
+          x: 250,
+          y: 120,
+          children: [
+            { id: 'is', label: 'S', dimension: 'S', x: 180, y: 200, children: [
+              { id: 'ist', label: 'T', dimension: 'T', x: 130, y: 280, children: [
+                { id: 'istj', label: 'J', dimension: 'J', isLeaf: true, code: 'ISTJ', x: 100, y: 360 },
+                { id: 'istp', label: 'P', dimension: 'P', isLeaf: true, code: 'ISTP', x: 160, y: 360 }
+              ]},
+              { id: 'isf', label: 'F', dimension: 'F', x: 230, y: 280, children: [
+                { id: 'isfj', label: 'J', dimension: 'J', isLeaf: true, code: 'ISFJ', x: 200, y: 360 },
+                { id: 'isfp', label: 'P', dimension: 'P', isLeaf: true, code: 'ISFP', x: 260, y: 360 }
+              ]}
+            ]},
+            { id: 'in', label: 'N', dimension: 'N', x: 320, y: 200, children: [
+              { id: 'int', label: 'T', dimension: 'T', x: 270, y: 280, children: [
+                { id: 'intj', label: 'J', dimension: 'J', isLeaf: true, code: 'INTJ', x: 240, y: 360 },
+                { id: 'intp', label: 'P', dimension: 'P', isLeaf: true, code: 'INTP', x: 300, y: 360 }
+              ]},
+              { id: 'inf', label: 'F', dimension: 'F', x: 370, y: 280, children: [
+                { id: 'infj', label: 'J', dimension: 'J', isLeaf: true, code: 'INFJ', x: 340, y: 360 },
+                { id: 'infp', label: 'P', dimension: 'P', isLeaf: true, code: 'INFP', x: 400, y: 360 }
+              ]}
+            ]}
+          ]
+        },
+        {
+          id: 'e-branch',
+          label: 'E',
+          dimension: 'E',
+          x: 550,
+          y: 120,
+          children: [
+            { id: 'es', label: 'S', dimension: 'S', x: 480, y: 200, children: [
+              { id: 'est', label: 'T', dimension: 'T', x: 430, y: 280, children: [
+                { id: 'estp', label: 'P', dimension: 'P', isLeaf: true, code: 'ESTP', x: 400, y: 360 },
+                { id: 'estj', label: 'J', dimension: 'J', isLeaf: true, code: 'ESTJ', x: 460, y: 360 }
+              ]},
+              { id: 'esf', label: 'F', dimension: 'F', x: 530, y: 280, children: [
+                { id: 'esfj', label: 'J', dimension: 'J', isLeaf: true, code: 'ESFJ', x: 500, y: 360 },
+                { id: 'esfp', label: 'P', dimension: 'P', isLeaf: true, code: 'ESFP', x: 560, y: 360 }
+              ]}
+            ]},
+            { id: 'en', label: 'N', dimension: 'N', x: 620, y: 200, children: [
+              { id: 'ent', label: 'T', dimension: 'T', x: 570, y: 280, children: [
+                { id: 'entp', label: 'P', dimension: 'P', isLeaf: true, code: 'ENTP', x: 540, y: 360 },
+                { id: 'entj', label: 'J', dimension: 'J', isLeaf: true, code: 'ENTJ', x: 600, y: 360 }
+              ]},
+              { id: 'enf', label: 'F', dimension: 'F', x: 670, y: 280, children: [
+                { id: 'enfp', label: 'P', dimension: 'P', isLeaf: true, code: 'ENFP', x: 640, y: 360 },
+                { id: 'enfj', label: 'J', dimension: 'J', isLeaf: true, code: 'ENFJ', x: 700, y: 360 }
+              ]}
+            ]}
+          ]
+        }
+      ]
+    };
+
+    const nodePositions = {};
+    function collectNodes(node) {
+      nodePositions[node.id] = { x: node.x, y: node.y, label: node.label, code: node.code || null };
+      if (node.children) {
+        node.children.forEach(collectNodes);
+      }
+    }
+    collectNodes(treeStructure);
+
+    // DOM elements
+    const svg = document.getElementById('treeSvg');
+    const canvas = document.getElementById('drawingCanvas');
+    const ctx = canvas.getContext('2d');
+    const inputModal = document.getElementById('inputModal');
+    const resultModal = document.getElementById('resultModal');
+    const playerNameInput = document.getElementById('playerNameInput');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const playerDisplay = document.getElementById('playerDisplay');
+    const toastEl = document.getElementById('toast');
+    const resultIcon = document.getElementById('resultIcon');
+    const resultTitle = document.getElementById('resultTitle');
+    const resultPlayer = document.getElementById('resultPlayer');
+    const resultMBTI = document.getElementById('resultMBTI');
+    const penBtn = document.getElementById('penBtn');
+    const eraserBtn = document.getElementById('eraserBtn');
+    const clearBtn = document.getElementById('clearBtn');
+
+    function resizeCanvas() {
+      const rect = canvas.parentElement.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+    }
+
+    function renderTree() {
+      let svgContent = '';
+
+      // Draw edges
+      function drawEdges(node) {
+        if (!node.children) return;
+        node.children.forEach(child => {
+          svgContent += `<line x1="${node.x}" y1="${node.y}" x2="${child.x}" y2="${child.y}" class="edge"/>`;
+          drawEdges(child);
+        });
+      }
+
+      // Draw nodes
+      function drawNodes(node, isRoot = false) {
+        let nodeClass = 'node-root';
+        if (node.isLeaf) {
+          nodeClass = selectedPersonality && selectedPersonality.code === node.code ? 'node-leaf-selected' : 'node-leaf-empty';
+        } else if (!isRoot) {
+          nodeClass = 'node-decision';
+        }
+
+        svgContent += `<circle cx="${node.x}" cy="${node.y}" r="30" class="tree-node ${nodeClass}"/>`;
+        svgContent += `<text x="${node.x}" y="${node.y}" class="dimension-label" dominant-baseline="middle">${node.label}</text>`;
+
+        if (node.children) {
+          node.children.forEach(child => drawNodes(child));
+        }
+      }
+
+      drawEdges(treeStructure);
+      drawNodes(treeStructure, true);
+
+      svg.innerHTML = svgContent;
+    }
+
+    function showToast(msg, colorClass) {
+      toastEl.innerHTML = `<div class="toast bg-white border-2 px-4 py-3 rounded-lg ${colorClass} text-sm font-semibold shadow-md">${msg}</div>`;
+      toastEl.classList.remove('hidden');
+      setTimeout(() => toastEl.classList.add('hidden'), 2000);
+    }
+
+    function getClosestNode(x, y, radius = 40) {
+      let closest = null;
+      let minDist = radius;
+      Object.entries(nodePositions).forEach(([id, pos]) => {
+        const dist = Math.sqrt((pos.x - x) ** 2 + (pos.y - y) ** 2);
+        if (dist < minDist) {
+          minDist = dist;
+          closest = { id, ...pos };
+        }
+      });
+      return closest;
+    }
+
+    function handleDrawingStart(e) {
+      if (!gameActive || currentTool !== 'pen') return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const node = getClosestNode(x, y, 35);
+      if (node && node.label !== 'Start') {
+        isDrawing = true;
+        drawnPath.push(node.label);
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+      }
+    }
+
+    function handleDrawingMove(e) {
+      if (!isDrawing || currentTool !== 'pen') return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      ctx.lineTo(x, y);
+      ctx.strokeStyle = '#ff0000';
+      ctx.lineWidth = 3;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+
+    function handleDrawingEnd(e) {
+      if (!isDrawing) return;
+      isDrawing = false;
+
+      // Check if the path spells a valid MBTI
+      const pathStr = drawnPath.join('').toUpperCase();
+      const mbti = PERSONALITIES.find(p => p.code === pathStr);
+
+      if (mbti) {
+        selectedPersonality = mbti;
+        renderTree();
+        showToast(`✓ 您是 ${mbti.code}！`, 'text-emerald-600 bg-emerald-100 border-emerald-300');
+        setTimeout(() => {
+          endGame();
+        }, 1500);
+      } else {
+        showToast('✗ 路線不完整或錯誤', 'text-red-600 bg-red-100 border-red-300');
+        drawnPath = [];
+      }
+    }
+
+    function handleErasing(e) {
+      if (currentTool !== 'eraser') return;
+      const rect = canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+
+      // Simple eraser - clear a circular area
+      const eraserSize = 20;
+      for (let i = 0; i < data.length; i += 4) {
+        const pixelIndex = i / 4;
+        const px = pixelIndex % canvas.width;
+        const py = Math.floor(pixelIndex / canvas.width);
+
+        const dist = Math.sqrt((px - x) ** 2 + (py - y) ** 2);
+        if (dist < eraserSize) {
+          data[i + 3] = 0; // Set alpha to 0
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    function clearCanvas() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      drawnPath = [];
+      selectedPersonality = null;
+      renderTree();
+      showToast('✓ 已清除所有線條', 'text-blue-600 bg-blue-100 border-blue-300');
+    }
+
+    function endGame() {
+      if (selectedPersonality) {
+        resultIcon.textContent = '🎉';
+        resultPlayer.textContent = playerName;
+        resultMBTI.textContent = selectedPersonality.code;
+        resultModal.classList.remove('hidden');
+      }
+    }
+
+    function startGame() {
+      const name = playerNameInput.value.trim();
+      if (!name) {
+        showToast('請輸入姓名！', 'text-red-600 bg-red-100 border-red-300');
+        return;
+      }
+
+      playerName = name;
+      playerDisplay.textContent = `玩家：${playerName}`;
+      inputModal.classList.add('hidden');
+      gameActive = true;
+
+      resizeCanvas();
+      renderTree();
+    }
+
+    function restartGame() {
+      resultModal.classList.add('hidden');
+      inputModal.classList.remove('hidden');
+      playerNameInput.value = '';
+      currentTool = 'pen';
+      selectedPersonality = null;
+      drawnPath = [];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      penBtn.classList.add('active');
+      eraserBtn.classList.remove('active');
+      renderTree();
+    }
+
+    // Event listeners
+    startBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', restartGame);
+    playerNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') startGame(); });
+
+    penBtn.addEventListener('click', () => {
+      currentTool = 'pen';
+      penBtn.classList.add('active');
+      eraserBtn.classList.remove('active');
+      canvas.classList.remove('erasing');
+    });
+
+    eraserBtn.addEventListener('click', () => {
+      currentTool = 'eraser';
+      eraserBtn.classList.add('active');
+      penBtn.classList.remove('active');
+      canvas.classList.add('erasing');
+    });
+
+    clearBtn.addEventListener('click', clearCanvas);
+
+    // Drawing events
+    canvas.addEventListener('mousedown', handleDrawingStart);
+    canvas.addEventListener('mousemove', (e) => {
+      if (currentTool === 'pen') handleDrawingMove(e);
+      else if (currentTool === 'eraser') handleErasing(e);
+    });
+    canvas.addEventListener('mouseup', handleDrawingEnd);
+    canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+    renderTree();
+    lucide.createIcons();
+
+    // Element SDK
+    const defaultConfig = {
+      game_title: '🧠 MBTI 決策樹',
+      background_color: '#f8f9ff',
+      surface_color: '#ffffff',
+      text_color: '#1e293b',
+      primary_color: '#3b82f6',
+      secondary_color: '#8b5cf6',
+      font_family: 'Noto Sans TC',
+      font_size: 16
+    };
+
+    window.elementSdk.init({
+      defaultConfig,
+      onConfigChange: async (config) => {
+        const title = config.game_title || defaultConfig.game_title;
+        document.getElementById('title').textContent = title;
+        const font = config.font_family || defaultConfig.font_family;
+        document.body.style.fontFamily = `${font}, 'JetBrains Mono', sans-serif`;
+        const size = config.font_size || defaultConfig.font_size;
+        document.body.style.fontSize = size + 'px';
+      },
+      mapToCapabilities: (config) => ({
+        recolorables: [
+          { get: () => config.primary_color || defaultConfig.primary_color, set: (v) => { config.primary_color = v; window.elementSdk.setConfig({primary_color:v}); }},
+          { get: () => config.secondary_color || defaultConfig.secondary_color, set: (v) => { config.secondary_color = v; window.elementSdk.setConfig({secondary_color:v}); }}
+        ],
+        borderables: [],
+        fontEditable: { get: () => config.font_family || defaultConfig.font_family, set: (v) => { config.font_family = v; window.elementSdk.setConfig({font_family:v}); }},
+        fontSizeable: { get: () => config.font_size || defaultConfig.font_size, set: (v) => { config.font_size = v; window.elementSdk.setConfig({font_size:v}); }}
+      }),
+      mapToEditPanelValues: (config) => new Map([
+        ['game_title', config.game_title || defaultConfig.game_title]
+      ])
+    });
+  </script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9f741343d1f38466',t:'MTc3ODAyOTUxMi4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>

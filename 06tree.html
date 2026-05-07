@@ -468,8 +468,8 @@
                     desc.innerHTML = `計算 Mid = (${low} + ${high}) / 2 = ${mid}。<br>比較 ${n[mid]} 與 ${target}`;
                     await new Promise(r => setTimeout(r, 1500));
                     if (n[mid] === target) { draw(low, high, mid, true); desc.innerHTML = `<span class="text-green-600">找到了！總比較次數：${comp} 次</span>`; return; } 
-                    else if (n[mid] < target) { desc.innerHTML = `${n[mid]} 小於 ${target}，Low = Mid = ${mid}`; low = mid; } 
-                    else { desc.innerHTML = `${n[mid]} 大於 ${target}，High = Mid = ${mid}`; high = mid; }
+                    else if (n[mid] < target) { desc.innerHTML = `${n[mid]} 小於 ${target}，Low = Mid + 1 = ${mid+1}`; low = mid + 1; } 
+                    else { desc.innerHTML = `${n[mid]} 大於 ${target}，High = Mid - 1 = ${mid-1}`; high = mid - 1; }
                     prevMid = mid;
                     await new Promise(r => setTimeout(r, 1200));
                 }

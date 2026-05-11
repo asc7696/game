@@ -747,14 +747,12 @@
             window.renderSPInner();
         }
 
-        // ================= 第七章：硬體 =================
-       // --- 7-1 修復後的完整區塊 ---
+// ================= 第七章：硬體修復版 =================
 
-// 1. 初始化狀態（確保不會在渲染時被重置）
-if (!window.hDrops) window.hDrops = {};
+// --- 7-1 元件配對修復 ---
+if (!window.hDrops) window.hDrops = {}; // 狀態保護
 
 function renderHardwareMatch(el) {
-    // 啟動計時器 (維持原邏輯)
     startTimer('down', 180, () => { 
         const t = document.getElementById('h1-time'); 
         if (t) t.innerText = formatTime(timeSeconds); 
@@ -763,141 +761,207 @@ function renderHardwareMatch(el) {
     const COMPS = { "gpu": "顯示卡/顯示晶片", "ram": "RAM", "hdd": "硬碟", "nic": "網路卡/網路晶片", "cpu": "CPU", "mon": "螢幕", "cam": "攝像頭" };
     const FUNCS = { "gpu": "處理繪圖指令，負責螢幕畫面輸出", "ram": "暫存執行中的程式與資料", "hdd": "永久儲存作業系統與檔案", "nic": "負責外部網路連線", "cpu": "電腦的大腦，負責執行指令", "mon": "顯示畫面輸出結果給使用者", "cam": "捕捉影像，供視訊會議使用" };
 
-    // 定義內部刷新函數，避免重複啟動計時器
     window.renderCh7L1Inner = () => {
-        const poolEl = document.getElementById('h1-pool');
-        const gridEl = document.getElementById('h1-grid');
-        if (!poolEl || !gridEl) return;
-
-        // 更新元件池
-        poolEl.innerHTML = Object.keys(COMPS)
-            .filter(id => !Object.values(window.hDrops).includes(id))
-            .map(id => `<div draggable="true" ondragstart="drag(event, 'comp', '${id}')" ondragend="this.style.opacity='1'" class="px-6 py-3 bg-white border-2 border-indigo-400 text-indigo-900 rounded-xl font-black cursor-grab active:cursor-grabbing shadow hover:-translate-y-1 transition-transform">${COMPS[id]}</div>`)
-            .join('');
-
-        // 更新目標區
-        gridEl.innerHTML = Object.entries(FUNCS).map(([id, desc]) => {
-            const placed = window.hDrops[id];
-            return `
-                <div class="bg-slate-50 p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center gap-3 text-center">
-                    <p class="font-bold text-slate-700 h-10">${desc}</p>
-                    <div ondragover="allowDrop(event)" ondragleave="this.classList.remove('active')" ondrop="window.hCh7L1Drop(event, '${id}')" 
-                         class="w-full h-14 drop-zone font-bold text-blue-600 transition-colors flex items-center justify-center rounded-lg border-2 border-dashed ${placed ? 'bg-indigo-100 border-indigo-500 border-solid' : 'bg-white border-slate-300'}" 
-                         id="h-target-${id}">
-                        ${placed ? COMPS[placed] : '請拖入元件'}
+        if (currentView !== 'ch7_l1') return; // 仿照 7-2 的鎖定機制
+        
+        el.innerHTML = `
+            <div class="p-6 max-w-6xl mx-auto">
+                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-black text-slate-800">關卡一：元件與功能交叉配對</h1>
+                    <div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="h1-time">${formatTime(timeSeconds)}</span></div>
+                </div>
+                
+                <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 mb-8">
+                    <h2 class="font-bold mb-4 text-lg">待選元件池 (往下拖曳)：</h2>
+                    <div id="h1-pool" class="flex flex-wrap gap-4 p-6 bg-indigo-50 border-2 border-indigo-100 rounded-2xl">
+                        ${Object.keys(COMPS)
+                            .filter(id => !Object.values(window.hDrops).includes(id))
+                            .map(id => `<div draggable="true" ondragstart="drag(event, 'comp', '${id}')" class="px-6 py-3 bg-white border-2 border-indigo-400 text-indigo-900 rounded-xl font-black cursor-grab shadow hover:-translate-y-1 transition-transform">${COMPS[id]}</div>`)
+                            .join('')}
                     </div>
-                </div>`;
-        }).join('');
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
+                    <div id="h1-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                        ${Object.entries(FUNCS).map(([id, desc]) => {
+                            const placed = window.hDrops[id];
+                            return `
+                                <div class="bg-slate-50 p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center gap-3 text-center">
+                                    <p class="font-bold text-slate-700 h-10 text-sm">${desc}</p>
+                                    <div ondragover="allowDrop(event)" ondrop="window.hCh7L1Drop(event, '${id}')" 
+                                         class="w-full h-14 drop-zone font-bold transition-all flex items-center justify-center rounded-lg border-2 border-dashed ${placed ? 'bg-indigo-100 border-indigo-500 border-solid text-indigo-700' : 'bg-white border-slate-300 text-slate-400'}">
+                                        ${placed ? COMPS[placed] : '請拖入元件'}
+                                    </div>
+                                </div>`;
+                        }).join('')}
+                    </div>
+                    <button onclick="window.submitCh7L1()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xl shadow-lg transition-colors">提交答案</button>
+                </div>
+            </div>`;
     };
 
-    // 放置邏輯
     window.hCh7L1Drop = (ev, slotId) => {
         ev.preventDefault();
-        const type = ev.dataTransfer.getData("type");
-        const compId = ev.dataTransfer.getData("id");
-        if (type === 'comp') {
-            // 如果該元件已在其他位置，先移除它
-            for (let k in window.hDrops) { if (window.hDrops[k] === compId) delete window.hDrops[k]; }
-            // 放入新位置
-            window.hDrops[slotId] = compId;
-            window.renderCh7L1Inner();
-        }
+        const id = ev.dataTransfer.getData("id");
+        for (let k in window.hDrops) { if (window.hDrops[k] === id) delete window.hDrops[k]; }
+        window.hDrops[slotId] = id;
+        window.renderCh7L1Inner();
     };
 
-    // 提交邏輯
     window.submitCh7L1 = () => {
         let correct = 0;
-        const total = Object.keys(FUNCS).length;
-        for (let id in FUNCS) { if (window.hDrops[id] === id) correct++; }
-        if (correct === total) {
-            alert("太棒了！全數正確！");
-            studentScores.ch7_1 = 100;
-        } else {
-            alert(`完成度：${correct} / ${total}。再檢查看看吧！`);
-        }
+        Object.keys(FUNCS).forEach(id => { if (window.hDrops[id] === id) correct++; });
+        if (correct === 7) { stopTimer(); showResult(true); } 
+        else { alert(`配對錯誤！目前正確數：${correct}/7`); }
     };
 
-    // 初始主結構渲染
-    el.innerHTML = `
-        <div class="p-6 max-w-6xl mx-auto">
-            <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
-            <div class="flex justify-between items-center mb-6">
-                <h1 class="text-3xl font-black text-slate-800">關卡一：元件與功能交叉配對</h1>
-                <div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="h1-time">03:00</span></div>
-            </div>
-            
-            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 mb-8">
-                <h2 class="font-bold mb-4 text-lg">待選元件池 (往下拖曳)：</h2>
-                <div id="h1-pool" class="flex flex-wrap gap-4 p-6 bg-indigo-50 border-2 border-indigo-100 rounded-2xl">
-                    </div>
-            </div>
-
-            <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
-                <div id="h1-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                    </div>
-                <button onclick="window.submitCh7L1()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xl shadow-lg transition-colors">提交答案</button>
-            </div>
-        </div>
-    `;
-
-    // 執行第一次內部渲染
     window.renderCh7L1Inner();
 }
-        function renderLaptopBattle(el) {
-            startTimer('down', 180, () => { const t = document.getElementById('h2-time'); if (t) t.innerText = formatTime(timeSeconds); });
-            const specs = [ { id: "cpu", n: "CPU", a: "i7-13700H", b: "i5-12500H", w: "A" }, { id: "ram", n: "記憶體", a: "8GB", b: "16GB", w: "B" }, { id: "hdd", n: "硬碟", a: "512GB SSD", b: "1TB SSD", w: "B" }, { id: "gpu", n: "顯示卡", a: "RTX 4060", b: "RTX 3050", w: "A" }, { id: "net", n: "網路卡", a: "1Gbps", b: "2.5Gbps", w: "B" }, { id: "wifi", n: "WiFi", a: "WiFi 6E", b: "WiFi 5", w: "A" }, { id: "res", n: "螢幕解析度", a: "1080p", b: "2K (1440p)", w: "B" } ];
-            window.lbDrops = {};
-            window.renderLBInner = () => {
-                const app = document.getElementById('app'); if(currentView !== 'ch7_l2') return;
-                app.innerHTML = `
-                    <div class="p-6 max-w-5xl mx-auto"><button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button><div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-black text-slate-800">關卡二：規格大比拚【提示：把勝拖曳到優規前面】</h1><div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="h2-time">${formatTime(timeSeconds)}</span></div></div>
-                    <div class="flex justify-center mb-8"><div draggable="true" ondragstart="drag(event, 'win', 'win')" class="bg-red-500 text-white font-black text-4xl w-24 h-24 rounded-full flex items-center justify-center shadow-xl cursor-grab active:cursor-grabbing border-4 border-white animate-pulse">勝</div></div>
-                    <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
-                        <div class="flex bg-slate-800 text-white font-bold p-4 text-center"><div class="flex-1 text-xl text-blue-300">電腦 A</div><div class="w-32 text-slate-400">項目</div><div class="flex-1 text-xl text-emerald-300">電腦 B</div></div>
-                        ${specs.map(s => `<div class="flex border-b border-slate-100 items-stretch bg-white hover:bg-slate-50"><div class="flex-1 flex justify-end items-center gap-4 p-3"><span class="font-bold text-slate-700">${s.a}</span><div ondragover="allowDrop(event)" ondrop="window.hCh7L2Drop(event, '${s.id}', 'A')" class="w-12 h-12 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center transition-colors ${window.lbDrops[s.id]==='A'?'bg-red-50 border-red-500 border-solid shadow-inner':'bg-slate-50'}">${window.lbDrops[s.id]==='A'?'<span class="text-red-500 font-black text-2xl">勝</span>':''}</div></div><div class="w-32 flex items-center justify-center bg-slate-100 font-bold text-sm text-slate-500 border-x border-slate-200">${s.n}</div><div class="flex-1 flex justify-start items-center gap-4 p-3"><div ondragover="allowDrop(event)" ondrop="window.hCh7L2Drop(event, '${s.id}', 'B')" class="w-12 h-12 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center transition-colors ${window.lbDrops[s.id]==='B'?'bg-red-50 border-red-500 border-solid shadow-inner':'bg-slate-50'}">${window.lbDrops[s.id]==='B'?'<span class="text-red-500 font-black text-2xl">勝</span>':''}</div><span class="font-bold text-slate-700">${s.b}</span></div></div>`).join('')}
-                        <div class="p-6"><button onclick="window.submitCh7L2()" class="w-full py-4 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl font-black text-xl shadow transition-colors">提交答案</button></div>
-                    </div></div>
-                `;
-            };
-            window.hCh7L2Drop = (ev, rId, side) => { ev.preventDefault(); window.lbDrops[rId] = side; window.renderLBInner(); };
-            window.submitCh7L2 = () => { if (isCountingDown && timeSeconds <= 0) return; const wins = { cpu: "A", ram: "B", hdd: "B", gpu: "A", net: "B", wifi: "A", res: "B" }; let ok=true; Object.entries(wins).forEach(([id, w]) => { if(window.lbDrops[id]!==w) ok=false; }); if(ok && Object.keys(window.lbDrops).length===7) { stopTimer(); showResult(true); } else alert("比較有誤！請注意 i7>i5, 16GB>8GB, 2.5Gbps>1Gbps, 2K>1080p。"); };
-            window.renderLBInner();
-        }
 
-        function renderIndustry(el) {
-            startTimer('down', 180, () => { const t = document.getElementById('h3-time'); if (t) t.innerText = formatTime(timeSeconds); window.renderIndAnim(); });
-            const DRAGS = [{ id: 'mediatek', name: '聯發科', type: 'comp' }, { id: 'tsmc', name: '台積電', type: 'comp' }, { id: 'ase', name: '日月光', type: 'comp' }, { id: 'foxconn', name: '鴻海', type: 'comp' }, { id: 'ic_eng', name: 'IC設計工程師', type: 'role' }, { id: 'pe_eng', name: '製程工程師', type: 'role' }, { id: 'test_eng', name: '測試工程師', type: 'role' }];
-            const STAGES = [{ id: 'up', title: '上游：IC 設計', sub: '畫設計圖', s: ['up_comp', 'up_role'] }, { id: 'mid', title: '中游：晶圓製造', sub: '蓋建築物', s: ['mid_comp', 'mid_role'] }, { id: 'down', title: '下游：封裝測試', sub: '裝潢與驗收', s: ['down_comp', 'down_role'] }, { id: 'ems', title: '最下游：系統組裝', sub: '整機組裝', s: ['ems_comp'] }];
-            window.iDrops = {};
+// --- 7-2 規格大比拚 (結構微調與穩定) ---
+if (!window.lbDrops) window.lbDrops = {};
 
-            window.renderIndInner = () => {
-                const app = document.getElementById('app'); if(currentView !== 'ch7_l3') return;
-                app.innerHTML = `
-                    <div class="flex flex-col h-screen overflow-hidden bg-slate-100"><div class="bg-white p-4 shadow-sm border-b flex items-center justify-between shrink-0"><button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回大廳</button><div class="font-bold text-xl text-fuchsia-800">關卡三：認識電子產業</div><div id="h3-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">倒數：${formatTime(timeSeconds)}</div></div>
-                    <div class="bg-white p-4 border-b border-slate-200 shrink-0 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">手機誕生之旅 (自動播放)</h3><div id="ind-anim" class="max-w-4xl mx-auto py-2"></div></div>
-                    <div class="flex-1 overflow-auto p-6 bg-slate-50 flex flex-col items-center">
-                        <div class="w-full max-w-6xl mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200"><div class="font-bold text-slate-500 mb-3 text-sm">可拖曳選項：</div><div class="flex flex-wrap gap-3 justify-center">${DRAGS.filter(d => !Object.values(window.iDrops).includes(d.id)).map(d => `<div draggable="true" ondragstart="drag(event, 'ind', '${d.id}')" class="px-5 py-2 rounded-xl font-bold cursor-grab shadow border-2 ${d.type==='comp'?'bg-blue-100 border-blue-300 text-blue-800':'bg-orange-100 border-orange-300 text-orange-800'}">${d.name}</div>`).join('')}</div></div>
-                        <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">${STAGES.map((st, i) => `<div class="bg-white rounded-2xl shadow-md border-t-8 ${['border-blue-400', 'border-emerald-400', 'border-amber-400', 'border-rose-400'][i]} p-5 flex flex-col"><h3 class="text-xl font-black text-slate-800 text-center mb-1">${st.title}</h3><div class="text-center font-bold text-fuchsia-600 mb-6">${st.sub}</div><div class="mt-auto space-y-4">${st.s.map(slot => { const did = window.iDrops[slot]; const itm = did ? DRAGS.find(d=>d.id===did) : null; return `<div><div class="text-xs font-bold text-slate-400 mb-1">${slot.includes('comp')?'代表廠商':'負責職位'}</div><div ondragover="allowDrop(event)" ondrop="window.dropInd(event, '${slot}')" class="w-full h-14 border-2 border-dashed rounded-xl flex items-center justify-center font-bold text-sm transition-colors ${did?(itm.type==='comp'?'bg-blue-50 border-blue-400 text-blue-800':'bg-orange-50 border-orange-400 text-orange-800'):'border-slate-300 bg-slate-50'}">${did?itm.name:'拖曳至此'}</div></div>`; }).join('')}</div></div>`).join('')}</div>
-                        <button onclick="window.submitInd()" class="w-full max-w-6xl py-4 bg-fuchsia-600 text-white rounded-2xl font-black text-xl shadow">提交配對</button>
-                    </div></div>
-                `;
-                window.renderIndAnim();
-            };
+function renderLaptopBattle(el) {
+    startTimer('down', 180, () => { const t = document.getElementById('h2-time'); if (t) t.innerText = formatTime(timeSeconds); });
+    const specs = [ { id: "cpu", n: "CPU", a: "i7-13700H", b: "i5-12500H", w: "A" }, { id: "ram", n: "記憶體", a: "8GB", b: "16GB", w: "B" }, { id: "hdd", n: "硬碟", a: "512GB SSD", b: "1TB SSD", w: "B" }, { id: "gpu", n: "顯示卡", a: "RTX 4060", b: "RTX 3050", w: "A" }, { id: "net", n: "網路卡", a: "1Gbps", b: "2.5Gbps", w: "B" }, { id: "wifi", n: "WiFi", a: "WiFi 6E", b: "WiFi 5", w: "A" }, { id: "res", n: "螢幕解析度", a: "1080p", b: "2K (1440p)", w: "B" } ];
 
-            window.renderIndAnim = () => {
-                const anim = document.getElementById('ind-anim'); if(!anim) return;
-                const step = (180 - timeSeconds) % 4;
-                const descs = ["【設計】聯發科繪製手機大腦 (CPU) 設計圖", "【製造】台積電將設計圖印製在矽晶圓上", "【封測】日月光切割、包裝保護並測試", "【組裝】鴻海將晶片、螢幕組裝完成手機！"];
-                anim.innerHTML = `<div class="flex justify-between items-center relative mb-4"><div class="absolute top-1/2 left-0 right-0 h-1 bg-fuchsia-200 -z-10 -translate-y-1/2"></div><div class="absolute top-1/2 left-0 h-1 bg-fuchsia-500 -z-10 -translate-y-1/2 transition-all duration-500" style="width: ${(step/3)*100}%"></div>${[1,2,3,4].map((v, i) => `<div class="w-10 h-10 flex items-center justify-center rounded-full font-black border-4 transition-all duration-500 ${step===i?'border-fuchsia-500 bg-white text-fuchsia-600 scale-125 shadow-md':'border-fuchsia-200 bg-slate-50 text-slate-400'}">${v}</div>`).join('')}</div><div class="bg-fuchsia-50 text-fuchsia-800 px-6 py-2 rounded-lg font-bold text-center border border-fuchsia-100 shadow-sm">${descs[step]}</div>`;
-            };
+    window.renderLBInner = () => {
+        if(currentView !== 'ch7_l2') return;
+        el.innerHTML = `
+            <div class="p-6 max-w-5xl mx-auto">
+                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500">${Icons.ArrowLeft} 返回大廳</button>
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-black text-slate-800">關卡二：規格大比拚</h1>
+                    <div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="h2-time">${formatTime(timeSeconds)}</span></div>
+                </div>
+                <div class="flex justify-center mb-8">
+                    <div draggable="true" ondragstart="drag(event, 'win', 'win')" class="bg-red-500 text-white font-black text-4xl w-24 h-24 rounded-full flex items-center justify-center shadow-xl cursor-grab active:scale-95 border-4 border-white animate-pulse">勝</div>
+                </div>
+                <div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100">
+                    <div class="flex bg-slate-800 text-white font-bold p-4 text-center">
+                        <div class="flex-1 text-xl text-blue-300">電腦 A</div><div class="w-32 text-slate-400">項目</div><div class="flex-1 text-xl text-emerald-300">電腦 B</div>
+                    </div>
+                    ${specs.map(s => `
+                        <div class="flex border-b border-slate-100 items-stretch hover:bg-slate-50 transition-colors">
+                            <div class="flex-1 flex justify-end items-center gap-4 p-3">
+                                <span class="font-bold text-slate-700">${s.a}</span>
+                                <div ondragover="allowDrop(event)" ondrop="window.hCh7L2Drop(event, '${s.id}', 'A')" class="w-12 h-12 border-2 border-dashed rounded-lg flex items-center justify-center ${window.lbDrops[s.id]==='A'?'bg-red-50 border-red-500 border-solid shadow-inner':'bg-slate-50 border-slate-300'}">
+                                    ${window.lbDrops[s.id]==='A'?'<span class="text-red-500 font-black text-xl">勝</span>':''}
+                                </div>
+                            </div>
+                            <div class="w-32 flex items-center justify-center bg-slate-100 font-bold text-sm text-slate-500 border-x border-slate-200">${s.n}</div>
+                            <div class="flex-1 flex justify-start items-center gap-4 p-3">
+                                <div ondragover="allowDrop(event)" ondrop="window.hCh7L2Drop(event, '${s.id}', 'B')" class="w-12 h-12 border-2 border-dashed rounded-lg flex items-center justify-center ${window.lbDrops[s.id]==='B'?'bg-red-50 border-red-500 border-solid shadow-inner':'bg-slate-50 border-slate-300'}">
+                                    ${window.lbDrops[s.id]==='B'?'<span class="text-red-500 font-black text-xl">勝</span>':''}
+                                </div>
+                                <span class="font-bold text-slate-700">${s.b}</span>
+                            </div>
+                        </div>`).join('')}
+                    <div class="p-6"><button onclick="window.submitCh7L2()" class="w-full py-4 bg-sky-600 hover:bg-sky-700 text-white rounded-2xl font-black text-xl shadow transition-colors">提交答案</button></div>
+                </div>
+            </div>`;
+    };
+    window.hCh7L2Drop = (ev, rId, side) => { ev.preventDefault(); window.lbDrops[rId] = side; window.renderLBInner(); };
+    window.submitCh7L2 = () => {
+        const wins = { cpu: "A", ram: "B", hdd: "B", gpu: "A", net: "B", wifi: "A", res: "B" };
+        let ok = Object.entries(wins).every(([id, w]) => window.lbDrops[id] === w);
+        if(ok) { stopTimer(); showResult(true); } 
+        else alert("比較有誤！請檢查 CPU 世代、RAM 大小、硬碟容量與解析度。");
+    };
+    window.renderLBInner();
+}
 
-            window.dropInd = (ev, slot) => { ev.preventDefault(); const id = ev.dataTransfer.getData("id"); for(let k in window.iDrops) { if(window.iDrops[k]===id) delete window.iDrops[k]; } window.iDrops[slot]=id; window.renderIndInner(); };
-            window.submitInd = () => { const tgts = { 'up_comp': 'mediatek', 'up_role': 'ic_eng', 'mid_comp': 'tsmc', 'mid_role': 'pe_eng', 'down_comp': 'ase', 'down_role': 'test_eng', 'ems_comp': 'foxconn' }; let ok=true; for(let k in tgts){ if(window.iDrops[k]!==tgts[k]) ok=false; } if(ok && Object.keys(window.iDrops).length===7){ stopTimer(); showResult(true); } else alert("配對有誤，請回想一下分工喔！"); };
-            window.renderIndInner();
-        }
+// --- 7-3 電子產業 (配置最佳化) ---
+if (!window.iDrops) window.iDrops = {};
 
-        // 預設啟動
-        render();
+function renderIndustry(el) {
+    startTimer('down', 180, () => { 
+        const t = document.getElementById('h3-time'); 
+        if (t) t.innerText = formatTime(timeSeconds); 
+        window.renderIndAnim(); 
+    });
+    const DRAGS = [{ id: 'mediatek', name: '聯發科', type: 'comp' }, { id: 'tsmc', name: '台積電', type: 'comp' }, { id: 'ase', name: '日月光', type: 'comp' }, { id: 'foxconn', name: '鴻海', type: 'comp' }, { id: 'ic_eng', name: 'IC設計師', type: 'role' }, { id: 'pe_eng', name: '製程工程師', type: 'role' }, { id: 'test_eng', name: '測試工程師', type: 'role' }];
+    const STAGES = [{ id: 'up', title: '上游：IC 設計', sub: '畫設計圖', s: ['up_comp', 'up_role'] }, { id: 'mid', title: '中游：晶圓製造', sub: '蓋建築物', s: ['mid_comp', 'mid_role'] }, { id: 'down', title: '下游：封裝測試', sub: '裝潢與驗收', s: ['down_comp', 'down_role'] }, { id: 'ems', title: '系統組裝', sub: '整機組裝', s: ['ems_comp'] }];
+
+    window.renderIndInner = () => {
+        if(currentView !== 'ch7_l3') return;
+        el.innerHTML = `
+            <div class="flex flex-col h-screen overflow-hidden bg-slate-100">
+                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between shrink-0">
+                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 rounded-lg flex items-center">${Icons.ArrowLeft} 返回大廳</button>
+                    <div class="font-bold text-xl text-fuchsia-800">關卡三：電子產業供應鏈</div>
+                    <div id="h3-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono">${formatTime(timeSeconds)}</div>
+                </div>
+                
+                <div class="bg-white p-4 border-b shrink-0 shadow-sm">
+                    <div id="ind-anim" class="max-w-4xl mx-auto"></div>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center gap-6">
+                    <div class="w-full max-w-6xl bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
+                        <div class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">待選項目：</div>
+                        <div class="flex flex-wrap gap-2 justify-center">
+                            ${DRAGS.filter(d => !Object.values(window.iDrops).includes(d.id)).map(d => `
+                                <div draggable="true" ondragstart="drag(event, 'ind', '${d.id}')" class="px-4 py-2 rounded-xl font-bold cursor-grab shadow-sm border-2 ${d.type==='comp'?'bg-blue-100 border-blue-300 text-blue-800':'bg-orange-100 border-orange-300 text-orange-800'}">
+                                    ${d.name}
+                                </div>`).join('')}
+                        </div>
+                    </div>
+
+                    <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-4">
+                        ${STAGES.map((st, i) => `
+                            <div class="bg-white rounded-2xl shadow-md border-t-8 ${['border-blue-400', 'border-emerald-400', 'border-amber-400', 'border-rose-400'][i]} p-4 flex flex-col">
+                                <h3 class="font-black text-slate-800 text-center">${st.title}</h3>
+                                <div class="text-center text-xs font-bold text-fuchsia-600 mb-4">${st.sub}</div>
+                                <div class="space-y-3">
+                                    ${st.s.map(slot => {
+                                        const did = window.iDrops[slot];
+                                        const itm = did ? DRAGS.find(d=>d.id===did) : null;
+                                        return `
+                                            <div ondragover="allowDrop(event)" ondrop="window.dropInd(event, '${slot}')" class="w-full h-12 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all ${did?'bg-slate-50 border-solid border-slate-400':'border-slate-200 bg-slate-50'}">
+                                                <span class="text-[10px] text-slate-400 font-bold">${slot.includes('comp')?'廠商':'職位'}</span>
+                                                <span class="font-bold text-sm">${did?itm.name:'(拖入)'}</span>
+                                            </div>`;
+                                    }).join('')}
+                                </div>
+                            </div>`).join('')}
+                    </div>
+                    <button onclick="window.submitInd()" class="w-full max-w-6xl py-4 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-2xl font-black text-xl shadow-lg transition-colors shrink-0">提交配對結果</button>
+                </div>
+            </div>`;
+        window.renderIndAnim();
+    };
+
+    window.renderIndAnim = () => {
+        const anim = document.getElementById('ind-anim'); if(!anim) return;
+        const step = Math.floor((180 - timeSeconds) / 10) % 4; // 每10秒切換一次動畫
+        const descs = ["聯發科繪製 CPU 設計圖", "台積電進行晶圓製造", "日月光完成封裝測試", "鴻海進行最終組裝"];
+        anim.innerHTML = `
+            <div class="flex justify-between items-center relative mb-2 px-10">
+                <div class="absolute top-1/2 left-10 right-10 h-1 bg-slate-100 -z-10 -translate-y-1/2"></div>
+                ${[0,1,2,3].map(i => `<div class="w-8 h-8 flex items-center justify-center rounded-full font-bold border-2 ${step===i?'bg-fuchsia-500 text-white border-fuchsia-500 scale-110 shadow-lg':'bg-white text-slate-300 border-slate-100'} transition-all">${i+1}</div>`).join('')}
+            </div>
+            <p class="text-center text-sm font-bold text-fuchsia-600 animate-pulse">${descs[step]}</p>`;
+    };
+
+    window.dropInd = (ev, slot) => {
+        ev.preventDefault();
+        const id = ev.dataTransfer.getData("id");
+        for(let k in window.iDrops) { if(window.iDrops[k]===id) delete window.iDrops[k]; }
+        window.iDrops[slot]=id;
+        window.renderIndInner();
+    };
+
+    window.submitInd = () => {
+        const tgts = { 'up_comp': 'mediatek', 'up_role': 'ic_eng', 'mid_comp': 'tsmc', 'mid_role': 'pe_eng', 'down_comp': 'ase', 'down_role': 'test_eng', 'ems_comp': 'foxconn' };
+        let ok = Object.entries(tgts).every(([k, v]) => window.iDrops[k] === v);
+        if(ok) { stopTimer(); showResult(true); } 
+        else alert("配對有誤，請依照：設計(上) -> 製造(中) -> 封測(下) -> 組裝(末) 的順序檢查！");
+    };
+
+    window.renderIndInner();
+}
     </script>
 
 

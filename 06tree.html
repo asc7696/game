@@ -872,96 +872,43 @@ function renderLaptopBattle(el) {
     window.renderLBInner();
 }
 
-// --- 7-3 電子產業 (配置最佳化) ---
+// --- 7-3 電子產業 (修復優化版) ---
 if (!window.iDrops) window.iDrops = {};
 
-function renderIndustry(el) {
-    startTimer('down', 180, () => { 
-        const t = document.getElementById('h3-time'); 
-        if (t) t.innerText = formatTime(timeSeconds); 
-        window.renderIndAnim(); 
-    });
-    const DRAGS = [{ id: 'mediatek', name: '聯發科', type: 'comp' }, { id: 'tsmc', name: '台積電', type: 'comp' }, { id: 'ase', name: '日月光', type: 'comp' }, { id: 'foxconn', name: '鴻海', type: 'comp' }, { id: 'ic_eng', name: 'IC設計師', type: 'role' }, { id: 'pe_eng', name: '製程工程師', type: 'role' }, { id: 'test_eng', name: '測試工程師', type: 'role' }];
-    const STAGES = [{ id: 'up', title: '上游：IC 設計', sub: '畫設計圖', s: ['up_comp', 'up_role'] }, { id: 'mid', title: '中游：晶圓製造', sub: '蓋建築物', s: ['mid_comp', 'mid_role'] }, { id: 'down', title: '下游：封裝測試', sub: '裝潢與驗收', s: ['down_comp', 'down_role'] }, { id: 'ems', title: '系統組裝', sub: '整機組裝', s: ['ems_comp'] }];
+        function renderIndustry(el) {
+            startTimer('down', 180, () => { const t = document.getElementById('h3-time'); if (t) t.innerText = formatTime(timeSeconds); window.renderIndAnim(); });
+            const DRAGS = [{ id: 'mediatek', name: '聯發科', type: 'comp' }, { id: 'tsmc', name: '台積電', type: 'comp' }, { id: 'ase', name: '日月光', type: 'comp' }, { id: 'foxconn', name: '鴻海', type: 'comp' }, { id: 'ic_eng', name: 'IC設計工程師', type: 'role' }, { id: 'pe_eng', name: '製程工程師', type: 'role' }, { id: 'test_eng', name: '測試工程師', type: 'role' }];
+            const STAGES = [{ id: 'up', title: '上游：IC 設計', sub: '畫設計圖', s: ['up_comp', 'up_role'] }, { id: 'mid', title: '中游：晶圓製造', sub: '蓋建築物', s: ['mid_comp', 'mid_role'] }, { id: 'down', title: '下游：封裝測試', sub: '裝潢與驗收', s: ['down_comp', 'down_role'] }, { id: 'ems', title: '最下游：系統組裝', sub: '整機組裝', s: ['ems_comp'] }];
+            window.iDrops = {};
 
-    window.renderIndInner = () => {
-        if(currentView !== 'ch7_l3') return;
-        el.innerHTML = `
-            <div class="flex flex-col h-screen overflow-hidden bg-slate-100">
-                <div class="bg-white p-4 shadow-sm border-b flex items-center justify-between shrink-0">
-                    <button onclick="changeView('menu')" class="p-2 bg-slate-100 rounded-lg flex items-center">${Icons.ArrowLeft} 返回大廳</button>
-                    <div class="font-bold text-xl text-fuchsia-800">關卡三：電子產業供應鏈</div>
-                    <div id="h3-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono">${formatTime(timeSeconds)}</div>
-                </div>
-                
-                <div class="bg-white p-4 border-b shrink-0 shadow-sm">
-                    <div id="ind-anim" class="max-w-4xl mx-auto"></div>
-                </div>
+            window.renderIndInner = () => {
+                const app = document.getElementById('app'); if(currentView !== 'ch7_l3') return;
+                app.innerHTML = `
+                    <div class="flex flex-col h-screen overflow-hidden bg-slate-100"><div class="bg-white p-4 shadow-sm border-b flex items-center justify-between shrink-0"><button onclick="changeView('menu')" class="p-2 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center">${Icons.ArrowLeft} 返回大廳</button><div class="font-bold text-xl text-fuchsia-800">關卡三：認識電子產業</div><div id="h3-time" class="p-2 px-4 bg-slate-800 text-white rounded-lg font-mono text-lg">倒數：${formatTime(timeSeconds)}</div></div>
+                    <div class="bg-white p-4 border-b border-slate-200 shrink-0 shadow-sm"><h3 class="font-bold text-slate-700 mb-2">手機誕生之旅 (自動播放)</h3><div id="ind-anim" class="max-w-4xl mx-auto py-2"></div></div>
+                    <div class="flex-1 overflow-auto p-6 bg-slate-50 flex flex-col items-center">
+                        <div class="w-full max-w-6xl mb-6 bg-white p-4 rounded-2xl shadow-sm border border-slate-200"><div class="font-bold text-slate-500 mb-3 text-sm">可拖曳選項：</div><div class="flex flex-wrap gap-3 justify-center">${DRAGS.filter(d => !Object.values(window.iDrops).includes(d.id)).map(d => `<div draggable="true" ondragstart="drag(event, 'ind', '${d.id}')" class="px-5 py-2 rounded-xl font-bold cursor-grab shadow border-2 ${d.type==='comp'?'bg-blue-100 border-blue-300 text-blue-800':'bg-orange-100 border-orange-300 text-orange-800'}">${d.name}</div>`).join('')}</div></div>
+                        <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">${STAGES.map((st, i) => `<div class="bg-white rounded-2xl shadow-md border-t-8 ${['border-blue-400', 'border-emerald-400', 'border-amber-400', 'border-rose-400'][i]} p-5 flex flex-col"><h3 class="text-xl font-black text-slate-800 text-center mb-1">${st.title}</h3><div class="text-center font-bold text-fuchsia-600 mb-6">${st.sub}</div><div class="mt-auto space-y-4">${st.s.map(slot => { const did = window.iDrops[slot]; const itm = did ? DRAGS.find(d=>d.id===did) : null; return `<div><div class="text-xs font-bold text-slate-400 mb-1">${slot.includes('comp')?'代表廠商':'負責職位'}</div><div ondragover="allowDrop(event)" ondrop="window.dropInd(event, '${slot}')" class="w-full h-14 border-2 border-dashed rounded-xl flex items-center justify-center font-bold text-sm transition-colors ${did?(itm.type==='comp'?'bg-blue-50 border-blue-400 text-blue-800':'bg-orange-50 border-orange-400 text-orange-800'):'border-slate-300 bg-slate-50'}">${did?itm.name:'拖曳至此'}</div></div>`; }).join('')}</div></div>`).join('')}</div>
+                        <button onclick="window.submitInd()" class="w-full max-w-6xl py-4 bg-fuchsia-600 text-white rounded-2xl font-black text-xl shadow">提交配對</button>
+                    </div></div>
+                `;
+                window.renderIndAnim();
+            };
 
-                <div class="flex-1 overflow-y-auto p-6 flex flex-col items-center gap-6">
-                    <div class="w-full max-w-6xl bg-white p-4 rounded-2xl shadow-sm border border-indigo-100">
-                        <div class="text-xs font-bold text-slate-400 mb-2 uppercase tracking-widest">待選項目：</div>
-                        <div class="flex flex-wrap gap-2 justify-center">
-                            ${DRAGS.filter(d => !Object.values(window.iDrops).includes(d.id)).map(d => `
-                                <div draggable="true" ondragstart="drag(event, 'ind', '${d.id}')" class="px-4 py-2 rounded-xl font-bold cursor-grab shadow-sm border-2 ${d.type==='comp'?'bg-blue-100 border-blue-300 text-blue-800':'bg-orange-100 border-orange-300 text-orange-800'}">
-                                    ${d.name}
-                                </div>`).join('')}
-                        </div>
-                    </div>
+            window.renderIndAnim = () => {
+                const anim = document.getElementById('ind-anim'); if(!anim) return;
+                const step = (180 - timeSeconds) % 4;
+                const descs = ["【設計】聯發科繪製手機大腦 (CPU) 設計圖", "【製造】台積電將設計圖印製在矽晶圓上", "【封測】日月光切割、包裝保護並測試", "【組裝】鴻海將晶片、螢幕組裝完成手機！"];
+                anim.innerHTML = `<div class="flex justify-between items-center relative mb-4"><div class="absolute top-1/2 left-0 right-0 h-1 bg-fuchsia-200 -z-10 -translate-y-1/2"></div><div class="absolute top-1/2 left-0 h-1 bg-fuchsia-500 -z-10 -translate-y-1/2 transition-all duration-500" style="width: ${(step/3)*100}%"></div>${[1,2,3,4].map((v, i) => `<div class="w-10 h-10 flex items-center justify-center rounded-full font-black border-4 transition-all duration-500 ${step===i?'border-fuchsia-500 bg-white text-fuchsia-600 scale-125 shadow-md':'border-fuchsia-200 bg-slate-50 text-slate-400'}">${v}</div>`).join('')}</div><div class="bg-fuchsia-50 text-fuchsia-800 px-6 py-2 rounded-lg font-bold text-center border border-fuchsia-100 shadow-sm">${descs[step]}</div>`;
+            };
 
-                    <div class="w-full max-w-6xl grid grid-cols-1 md:grid-cols-4 gap-4">
-                        ${STAGES.map((st, i) => `
-                            <div class="bg-white rounded-2xl shadow-md border-t-8 ${['border-blue-400', 'border-emerald-400', 'border-amber-400', 'border-rose-400'][i]} p-4 flex flex-col">
-                                <h3 class="font-black text-slate-800 text-center">${st.title}</h3>
-                                <div class="text-center text-xs font-bold text-fuchsia-600 mb-4">${st.sub}</div>
-                                <div class="space-y-3">
-                                    ${st.s.map(slot => {
-                                        const did = window.iDrops[slot];
-                                        const itm = did ? DRAGS.find(d=>d.id===did) : null;
-                                        return `
-                                            <div ondragover="allowDrop(event)" ondrop="window.dropInd(event, '${slot}')" class="w-full h-12 border-2 border-dashed rounded-xl flex flex-col items-center justify-center transition-all ${did?'bg-slate-50 border-solid border-slate-400':'border-slate-200 bg-slate-50'}">
-                                                <span class="text-[10px] text-slate-400 font-bold">${slot.includes('comp')?'廠商':'職位'}</span>
-                                                <span class="font-bold text-sm">${did?itm.name:'(拖入)'}</span>
-                                            </div>`;
-                                    }).join('')}
-                                </div>
-                            </div>`).join('')}
-                    </div>
-                    <button onclick="window.submitInd()" class="w-full max-w-6xl py-4 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded-2xl font-black text-xl shadow-lg transition-colors shrink-0">提交配對結果</button>
-                </div>
-            </div>`;
-        window.renderIndAnim();
-    };
+            window.dropInd = (ev, slot) => { ev.preventDefault(); const id = ev.dataTransfer.getData("id"); for(let k in window.iDrops) { if(window.iDrops[k]===id) delete window.iDrops[k]; } window.iDrops[slot]=id; window.renderIndInner(); };
+            window.submitInd = () => { const tgts = { 'up_comp': 'mediatek', 'up_role': 'ic_eng', 'mid_comp': 'tsmc', 'mid_role': 'pe_eng', 'down_comp': 'ase', 'down_role': 'test_eng', 'ems_comp': 'foxconn' }; let ok=true; for(let k in tgts){ if(window.iDrops[k]!==tgts[k]) ok=false; } if(ok && Object.keys(window.iDrops).length===7){ stopTimer(); showResult(true); } else alert("配對有誤，請回想一下分工喔！"); };
+            window.renderIndInner();
+        }
 
-    window.renderIndAnim = () => {
-        const anim = document.getElementById('ind-anim'); if(!anim) return;
-        const step = Math.floor((180 - timeSeconds) / 10) % 4; // 每10秒切換一次動畫
-        const descs = ["聯發科繪製 CPU 設計圖", "台積電進行晶圓製造", "日月光完成封裝測試", "鴻海進行最終組裝"];
-        anim.innerHTML = `
-            <div class="flex justify-between items-center relative mb-2 px-10">
-                <div class="absolute top-1/2 left-10 right-10 h-1 bg-slate-100 -z-10 -translate-y-1/2"></div>
-                ${[0,1,2,3].map(i => `<div class="w-8 h-8 flex items-center justify-center rounded-full font-bold border-2 ${step===i?'bg-fuchsia-500 text-white border-fuchsia-500 scale-110 shadow-lg':'bg-white text-slate-300 border-slate-100'} transition-all">${i+1}</div>`).join('')}
-            </div>
-            <p class="text-center text-sm font-bold text-fuchsia-600 animate-pulse">${descs[step]}</p>`;
-    };
-
-    window.dropInd = (ev, slot) => {
-        ev.preventDefault();
-        const id = ev.dataTransfer.getData("id");
-        for(let k in window.iDrops) { if(window.iDrops[k]===id) delete window.iDrops[k]; }
-        window.iDrops[slot]=id;
-        window.renderIndInner();
-    };
-
-    window.submitInd = () => {
-        const tgts = { 'up_comp': 'mediatek', 'up_role': 'ic_eng', 'mid_comp': 'tsmc', 'mid_role': 'pe_eng', 'down_comp': 'ase', 'down_role': 'test_eng', 'ems_comp': 'foxconn' };
-        let ok = Object.entries(tgts).every(([k, v]) => window.iDrops[k] === v);
-        if(ok) { stopTimer(); showResult(true); } 
-        else alert("配對有誤，請依照：設計(上) -> 製造(中) -> 封測(下) -> 組裝(末) 的順序檢查！");
-    };
-
-    window.renderIndInner();
-}
+        // 預設啟動
+        render();
     </script>
 
 

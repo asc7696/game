@@ -59,7 +59,7 @@
             return `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
         }
 
-        function startTimer(mode = 'up', duration = 300, callback) {
+        function startTimer(mode = 'up', duration = 600, callback) {
             clearInterval(timerInterval);
             initialDuration = duration;
             if (mode === 'down') { timeSeconds = duration; isCountingDown = true; } else { timeSeconds = 0; isCountingDown = false; }

@@ -489,7 +489,7 @@
             let o1 = (a1==='3'); let o2 = (a2==='3');
             document.getElementById('q4-1-icon').innerText = o1 ? '✅' : '❌'; document.getElementById('q4-2-icon').innerText = o2 ? '✅' : '❌';
             if (o1 && o2) { setTimeout(() => { stopTimer(); showResult(true); }, 500); }
-            else { alert("答案有誤！試著在紙上畫出 Low, Mid, High 的範圍變化。\n45 的 mid 依序是 4, 6, 7 (3次)。\n15 的 mid 依序是 4, 2, 3 (3次)。"); }
+            else { alert("答案有誤！試著在紙上畫出 Low, Mid, High 的範圍變化。\n 每一次會砍半，中間值的計算方式 是 Mid = (Low + High)/2 取整數 "); }
         };
 
         function renderChallenge(el) {

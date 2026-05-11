@@ -905,7 +905,7 @@
             window.submitSP = () => { const sels = Object.keys(window.spE).filter(k => window.spE[k]==='pen'); const okEdges = sels.length === 6 && sels.every(id => tgts.includes(id)); if(okEdges && document.getElementById('sp-ans').value === '12'){ stopTimer(); showResult(true); } else { window.spStatus = 'error'; window.renderSPInner(); alert("計算或連線錯誤喔！綠色是正確的路段，橘色是錯誤的路段。"); } };
             window.renderSPInner();
         }
-		
+//  6-5字典樹		
 function renderTrieModule(el) {
     // 1. 初始化狀態與計時
     if (typeof startTimer === 'function') startTimer('up');
@@ -1068,30 +1068,31 @@ function renderTrieModule(el) {
     // 啟動渲染
     window.renderTMInner();
 }
+
+//6-6 二元搜尋樹
 function renderBSTModule(el) {
-    // 1. 初始化狀態與計時
     if (typeof startTimer === 'function') startTimer('up');
     
-    window.bstStep = 0; // 動畫步驟
-    window.bstAns = {}; // 挑戰答案
-    window.bstStatus = 'normal'; // 挑戰狀態
+    window.bstStep = 0; 
+    window.bstAns = {}; 
+    window.bstStatus = 'normal'; 
 
-    // 動畫數據：{50, 30, 70, 20, 40}
+    // 動畫數據：優化座標，x 範圍調整在 0-800 之間，配合 viewBox
     const animSteps = [
-        { label: "1. 插入 50 (作為根節點)", nodes: [{id:'n1', v:50, x:450, y:50}] },
-        { label: "2. 插入 30 (30 < 50，放左邊)", nodes: [{id:'n1', v:50, x:450, y:50},{id:'n2', v:30, x:300, y:130, p:'n1'}] },
-        { label: "3. 插入 70 (70 > 50，放右邊)", nodes: [{id:'n1', v:50, x:450, y:50},{id:'n2', v:30, x:300, y:130, p:'n1'},{id:'n3', v:70, x:600, y:130, p:'n1'}] },
-        { label: "4. 插入 20 (20 < 50 -> 20 < 30，放 30 左邊)", nodes: [{id:'n1', v:50, x:450, y:50},{id:'n2', v:30, x:300, y:130, p:'n1'},{id:'n3', v:70, x:600, y:130, p:'n1'},{id:'n4', v:20, x:220, y:210, p:'n2'}] },
-        { label: "5. 插入 40 (40 < 50 -> 40 > 30，放 30 右邊)", nodes: [{id:'n1', v:50, x:450, y:50},{id:'n2', v:30, x:300, y:130, p:'n1'},{id:'n3', v:70, x:600, y:130, p:'n1'},{id:'n4', v:20, x:220, y:210, p:'n2'},{id:'n5', v:40, x:380, y:210, p:'n2'}]}
+        { label: "1. 插入 50 (作為根節點)", nodes: [{id:'n1', v:50, x:400, y:50}] },
+        { label: "2. 插入 30 (30 < 50，放左邊)", nodes: [{id:'n1', v:50, x:400, y:50},{id:'n2', v:30, x:250, y:130, p:'n1'}] },
+        { label: "3. 插入 70 (70 > 50，放右邊)", nodes: [{id:'n1', v:50, x:400, y:50},{id:'n2', v:30, x:250, y:130, p:'n1'},{id:'n3', v:70, x:550, y:130, p:'n1'}] },
+        { label: "4. 插入 20 (20 < 30，放左下)", nodes: [{id:'n1', v:50, x:400, y:50},{id:'n2', v:30, x:250, y:130, p:'n1'},{id:'n3', v:70, x:550, y:130, p:'n1'},{id:'n4', v:20, x:180, y:210, p:'n2'}] },
+        { label: "5. 插入 40 (40 > 30，放右下)", nodes: [{id:'n1', v:50, x:400, y:50},{id:'n2', v:30, x:250, y:130, p:'n1'},{id:'n3', v:70, x:550, y:130, p:'n1'},{id:'n4', v:20, x:180, y:210, p:'n2'},{id:'n5', v:40, x:320, y:210, p:'n2'}]}
     ];
 
-    // 挑戰數據：數值集 {45, 25, 65, 15, 35}
+    // 挑戰數據：{45, 25, 65, 15, 35}
     const challengeNodes = [
-        { id: 'c1', ans: '45', x: 450, y: 50 }, // Root
-        { id: 'c2', ans: '25', x: 300, y: 130, p: 'c1' }, // Left
-        { id: 'c3', ans: '65', x: 600, y: 130, p: 'c1' }, // Right
-        { id: 'c4', ans: '15', x: 220, y: 210, p: 'c2' }, // Left-Left
-        { id: 'c5', ans: '35', x: 380, y: 210, p: 'c2' }  // Left-Right
+        { id: 'c1', ans: '45', x: 400, y: 50 }, 
+        { id: 'c2', ans: '25', x: 250, y: 130, p: 'c1' }, 
+        { id: 'c3', ans: '65', x: 550, y: 130, p: 'c1' }, 
+        { id: 'c4', ans: '15', x: 180, y: 210, p: 'c2' }, 
+        { id: 'c5', ans: '35', x: 320, y: 210, p: 'c2' }
     ];
 
     window.renderBSTInner = () => {
@@ -1099,50 +1100,55 @@ function renderBSTModule(el) {
         if(typeof currentView !== 'undefined' && currentView !== 'ch6_l6') return;
 
         app.innerHTML = `
-            <div class="p-6 max-w-6xl mx-auto">
-                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500">${Icons.ArrowLeft} 返回選單</button>
-                <h1 class="text-3xl font-black mb-6 text-emerald-700">關卡六：二元搜尋樹 (BST)</h1>
+            <div class="p-4 max-w-4xl mx-auto pb-20">
+                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-emerald-600 transition-colors">
+                    ${Icons.ArrowLeft || '←'} 返回選單
+                </button>
+                <h1 class="text-2xl md:text-3xl font-black mb-6 text-emerald-700">關卡六：二元搜尋樹 (BST)</h1>
 
-                <div class="bg-white p-8 rounded-3xl shadow-lg mb-8 border-t-8 border-emerald-500">
-                    <div class="flex justify-between items-center mb-6">
+                <!-- 一、動畫演示區 -->
+                <div class="bg-white p-4 md:p-6 rounded-3xl shadow-lg mb-8 border-t-8 border-emerald-500">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                         <div>
                             <h3 class="text-xl font-bold text-emerald-600">一、逐步觀察 BST 建構</h3>
-                            <p class="text-slate-500 font-bold">規則：左小右大。依序插入：{50, 30, 70, 20, 40}</p>
+                            <p class="text-slate-500 text-sm font-bold">規則：左小右大。數值：{50, 30, 70, 20, 40}</p>
                         </div>
-                        <div class="flex gap-2 items-center">
-                            <button onclick="window.moveBST(-1)" class="px-4 py-2 bg-slate-100 rounded-xl font-bold text-slate-600 hover:bg-slate-200 transition-colors">上一步</button>
-                            <button onclick="window.moveBST(1)" class="px-4 py-2 bg-emerald-500 rounded-xl font-bold text-white hover:bg-emerald-600 transition-colors">下一步</button>
+                        <div class="flex gap-2 w-full md:w-auto">
+                            <button onclick="window.moveBST(-1)" class="flex-1 md:flex-none px-4 py-2 bg-slate-100 rounded-xl font-bold text-slate-600 hover:bg-slate-200">上一步</button>
+                            <button onclick="window.moveBST(1)" class="flex-1 md:flex-none px-4 py-2 bg-emerald-500 rounded-xl font-bold text-white hover:bg-emerald-600 shadow-md">下一步</button>
                         </div>
                     </div>
                     
-                    <div class="bg-emerald-50 border border-emerald-100 p-4 rounded-2xl mb-4 text-center font-black text-emerald-700">
-                        當前進度：${animSteps[window.bstStep].label}
+                    <div class="bg-emerald-50 border border-emerald-100 p-3 rounded-2xl mb-4 text-center font-black text-emerald-700 text-sm md:text-base">
+                        ${animSteps[window.bstStep].label}
                     </div>
 
-                    <div class="w-full h-[300px] relative border-2 border-slate-100 rounded-2xl bg-slate-50/50 overflow-hidden">
-                        <svg width="100%" height="100%" class="absolute inset-0">
+                    <!-- 使用 viewBox 確保響應式，不再被截斷 -->
+                    <div class="w-full aspect-[8/3] md:h-[300px] relative border-2 border-slate-100 rounded-2xl bg-slate-50/50">
+                        <svg viewBox="0 0 800 300" preserveAspectRatio="xMidYMid meet" class="w-full h-full">
                             ${animSteps[window.bstStep].nodes.filter(n => n.p).map(n => {
                                 const p = animSteps[window.bstStep].nodes.find(pn => pn.id === n.p);
                                 return `<line x1="${p.x}" y1="${p.y}" x2="${n.x}" y2="${n.y}" stroke="#94a3b8" stroke-width="3" />`;
                             }).join('')}
                             ${animSteps[window.bstStep].nodes.map(n => `
                                 <g>
-                                    <circle cx="${n.x}" cy="${n.y}" r="22" fill="white" stroke="#10b981" stroke-width="4" />
-                                    <text x="${n.x}" y="${n.y}" text-anchor="middle" dy="6" font-weight="bold" fill="#064e3b">${n.v}</text>
+                                    <circle cx="${n.x}" cy="${n.y}" r="25" fill="white" stroke="#10b981" stroke-width="4" />
+                                    <text x="${n.x}" y="${n.y}" text-anchor="middle" dy="8" font-weight="bold" fill="#064e3b" font-size="18">${n.v}</text>
                                 </g>
                             `).join('')}
                         </svg>
                     </div>
                 </div>
 
-                <div class="bg-white p-8 rounded-3xl shadow-lg border-t-8 border-blue-500">
+                <!-- 二、挑戰任務區 -->
+                <div class="bg-white p-4 md:p-6 rounded-3xl shadow-lg border-t-8 border-blue-500">
                     <div class="mb-6">
                         <h3 class="text-xl font-bold text-blue-600">二、挑戰任務</h3>
-                        <p class="text-slate-500 font-bold">請將數值集 <span class="text-blue-600">{45, 25, 65, 15, 35}</span> 填入下方正確的節點中。</p>
+                        <p class="text-slate-500 text-sm font-bold">請將數值 <span class="text-blue-600">{45, 25, 65, 15, 35}</span> 填入正確位置。</p>
                     </div>
 
-                    <div class="w-full h-[350px] relative border-2 border-slate-100 rounded-2xl bg-blue-50/30 overflow-hidden mb-6">
-                        <svg width="100%" height="100%" class="absolute inset-0">
+                    <div class="w-full aspect-[8/3] md:h-[350px] relative border-2 border-slate-100 rounded-2xl bg-blue-50/30 mb-6">
+                        <svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid meet" class="w-full h-full">
                             ${challengeNodes.filter(n => n.p).map(n => {
                                 const p = challengeNodes.find(pn => pn.id === n.p);
                                 return `<line x1="${p.x}" y1="${p.y}" x2="${n.x}" y2="${n.y}" stroke="#cbd5e1" stroke-width="3" />`;
@@ -1154,10 +1160,12 @@ function renderBSTModule(el) {
                                 let borderColor = isErr ? '#ef4444' : (isCorrect ? '#22c55e' : '#94a3b8');
                                 
                                 return `
-                                    <foreignObject x="${n.x-20}" y="${n.y-20}" width="40" height="40">
-                                        <input type="number" value="${window.bstAns[n.id]||''}" 
-                                        oninput="window.bstAns['${n.id}']=this.value; if(window.bstStatus==='error') { window.bstStatus='normal'; window.renderBSTInner(); }"
-                                        style="width:40px; height:40px; text-align:center; font-weight:bold; border:3px solid ${borderColor}; border-radius:50%; outline:none; font-size:16px;">
+                                    <foreignObject x="${n.x-25}" y="${n.y-25}" width="50" height="50">
+                                        <div xmlns="http://www.w3.org/1999/xhtml" style="width:100%; height:100%;">
+                                            <input type="number" value="${window.bstAns[n.id]||''}" 
+                                            oninput="window.bstAns['${n.id}']=this.value; if(window.bstStatus==='error') { window.bstStatus='normal'; window.renderBSTInner(); }"
+                                            style="width:46px; height:46px; text-align:center; font-weight:bold; border:4px solid ${borderColor}; border-radius:50%; outline:none; font-size:18px; background: white;">
+                                        </div>
                                     </foreignObject>
                                 `;
                             }).join('')}
@@ -1165,7 +1173,7 @@ function renderBSTModule(el) {
                     </div>
 
                     <div class="flex items-center justify-center">
-                        <button onclick="window.submitBST()" class="px-12 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xl rounded-2xl shadow-xl transition-all transform hover:scale-105 active:scale-95">提交驗證挑戰</button>
+                        <button onclick="window.submitBST()" class="w-full md:w-auto px-12 py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xl rounded-2xl shadow-xl transition-all transform active:scale-95">提交驗證挑戰</button>
                     </div>
                 </div>
             </div>
@@ -1183,7 +1191,6 @@ function renderBSTModule(el) {
     window.submitBST = () => {
         let isAllCorrect = true;
         let missing = false;
-        
         challengeNodes.forEach(n => {
             const val = (window.bstAns[n.id] || '').trim();
             if(!val) missing = true;
@@ -1198,7 +1205,7 @@ function renderBSTModule(el) {
         } else {
             window.bstStatus = 'error';
             window.renderBSTInner();
-            alert("有些數字放錯位置了！請遵循「左小右大」的原則重新檢查。");
+            alert("有些數字放錯位置了！請記得：左子節點 < 父節點 < 右子節點。");
         }
     };
 

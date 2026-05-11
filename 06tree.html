@@ -799,7 +799,7 @@
         function renderIndustry(el) {
             startTimer('down', 180, () => { const t = document.getElementById('h3-time'); if (t) t.innerText = formatTime(timeSeconds); window.renderIndAnim(); });
             const DRAGS = [{ id: 'mediatek', name: '聯發科', type: 'comp' }, { id: 'tsmc', name: '台積電', type: 'comp' }, { id: 'ase', name: '日月光', type: 'comp' }, { id: 'foxconn', name: '鴻海', type: 'comp' }, { id: 'ic_eng', name: 'IC設計工程師', type: 'role' }, { id: 'pe_eng', name: '製程工程師', type: 'role' }, { id: 'test_eng', name: '測試工程師', type: 'role' }];
-            const STAGES = [{ id: 'up', title: '上游：IC 設計', sub: '畫設計圖', s: ['up_comp', 'up_role'] }, { id: 'mid', title: '中游：晶圓製造', sub: '蓋建築物', s: ['mid_comp', 'mid_role'] }, { id: 'down', title: '下游：封裝測試', sub: '裝潢與驗收', s: ['down_comp', 'down_role'] }, { id: 'ems', title: '最下游：系統組裝', sub: '整機銷售', s: ['ems_comp'] }];
+            const STAGES = [{ id: 'up', title: '上游：IC 設計', sub: '畫設計圖', s: ['up_comp', 'up_role'] }, { id: 'mid', title: '中游：晶圓製造', sub: '蓋建築物', s: ['mid_comp', 'mid_role'] }, { id: 'down', title: '下游：封裝測試', sub: '裝潢與驗收', s: ['down_comp', 'down_role'] }, { id: 'ems', title: '最下游：系統組裝', sub: '整機組裝', s: ['ems_comp'] }];
             window.iDrops = {};
 
             window.renderIndInner = () => {

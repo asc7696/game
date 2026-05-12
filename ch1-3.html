@@ -35,7 +35,7 @@
         let currentAnimation = null;
 
         let unlockedLevels = {
-		    ch1_l1: true, ch1_l2: true,
+		    ch1_l1: true, ch1_l2: true, ch1_13: true,
             ch4_l1: true, ch4_l2: true, ch4_l3: true, ch4_l4: true, ch4_l5: true,
             ch5_l1: true, ch5_l2: true, ch5_l3: true, ch5_l4: true, ch5_l5: true, ch5_l6: true,
             ch6_l1: true, ch6_l2: true, ch6_l3: true, ch6_l4: true,ch6_l5: true,ch6_l6: true,
@@ -46,7 +46,7 @@
         let studentScores = { "1號 示範學生": { ch4_l1: { time: 85, date: "2024/05/20 14:30:12" } } };
 
         const LEVEL_NAMES = {
-		    ch1_l1: "1-1 程式設計的概念", ch1_l2: "1-2 Python 程式語言簡介",
+		    ch1_l1: "1-1 程式設計的概念", ch1_l2: "1-2 Python 程式語言簡介", ch1_l3: "數值運算",
         
             ch4_l1: "4-1 氣泡排序法", ch4_l2: "4-2 選擇排序法", ch4_l3: "4-3 循序搜尋法", ch4_l4: "4-4 二元搜尋法", ch4_l5: "4-5 排序與搜尋挑戰",
             ch5_l1: "5-1 分而治之演算法", ch5_l2: "5-2 函式定義與呼叫", ch5_l3: "5-3 遞迴函數概念", ch5_l4: "5-4 階乘推導", ch5_l5: "5-5 費氏級數推導", ch5_l6: "5-6 遞迴牛刀小試",
@@ -132,6 +132,7 @@
             
             else if (currentView === 'ch1_l1') renderConceptModule(app);
             else if (currentView === 'ch1_l2') renderPythonModule(app);
+			else if (currentView === 'ch1_l3') renderArithmeticLogic(app);
             
 			else if (currentView === 'ch4_l1') renderBubbleSort(app);
             else if (currentView === 'ch4_l2') renderSelectionSort(app);
@@ -219,6 +220,7 @@
                             <div class="space-y-2">
                                 <button ${btnAction('ch1_l1')} class="${btnClass('ch1_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch1_l1']}</span>${lockIcon('ch1_l1')}</button>
                                 <button ${btnAction('ch1_l2')} class="${btnClass('ch1_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch1_l2']}</span>${lockIcon('ch1_l2')}</button>
+                                <button ${btnAction('ch1_l3')} class="${btnClass('ch1_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch1_l3']}</span>${lockIcon('ch1_l3')}</button>
                                
                             </div>
                         </div>
@@ -511,14 +513,158 @@ function renderPythonModule(el) {
 
     window.renderPYInner();
 }
+// 1-3
+// --- 1-3 數值運算關卡 ---
+if (!window.ch1l3Inputs) window.ch1l3Inputs = { q1: "", q2: "", q3: "" };
 
+function renderArithmeticLogic(el) {
+    // 1. 啟動計時器：500 秒
+    startTimer('down', 1000, () => { 
+        const t = document.getElementById('h13-time'); 
+        if (t) t.innerText = formatTime(timeSeconds); 
+    });
+
+    window.renderCh1L3Inner = () => {
+        if (currentView !== 'ch1_l3') return; 
+
+        el.innerHTML = `
+            <div class="p-6 max-w-6xl mx-auto">
+                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
+                
+                <div class="flex justify-between items-center mb-6">
+                    <h1 class="text-3xl font-black text-slate-800">關卡 1-3：數值、關係與邏輯運算</h1>
+                    <div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="h13-time">${formatTime(timeSeconds)}</span></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div class="bg-blue-50 p-4 rounded-2xl border border-blue-200">
+                        <h3 class="font-bold text-blue-700 mb-2">算術運算</h3>
+                        <ul class="text-sm space-y-1 text-slate-600">
+                            <li><code class="bg-white px-1">**</code> 次方</li>
+                            <li><code class="bg-white px-1">%</code> 取餘數 (如 10%3=1)</li>
+                            <li><code class="bg-white px-1">//</code> 整數除法 (如 7//2=3)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-2xl border border-green-200">
+                        <h3 class="font-bold text-green-700 mb-2">關係運算</h3>
+                        <ul class="text-sm space-y-1 text-slate-600">
+                            <li><code class="bg-white px-1">==</code> 等於 / <code class="bg-white px-1">!=</code> 不等於</li>
+                            <li>結果必為 <span class="font-bold text-green-600">True</span> 或 <span class="font-bold text-red-600">False</span></li>
+                        </ul>
+                    </div>
+                    <div class="bg-purple-50 p-4 rounded-2xl border border-purple-200">
+                        <h3 class="font-bold text-purple-700 mb-2">邏輯運算</h3>
+                        <ul class="text-sm space-y-1 text-slate-600">
+                            <li><code class="bg-white px-1">and</code> 兩者皆真才為真</li>
+                            <li><code class="bg-white px-1">or</code> 其中之一為真即為真</li>
+                            <li><code class="bg-white px-1">not</code> 反轉真假值</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-100 mb-8">
+                    <h2 class="font-black text-xl text-slate-800 mb-4 flex items-center gap-2">
+                        <span class="bg-yellow-400 w-2 h-6 rounded-full"></span> 運算優先序逐步看
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <p class="font-mono text-lg text-blue-600">範例一：10 + 2 ** 3 * 2</p>
+                            <p class="text-sm text-slate-500">解析：次方優先 → 乘除 → 加減</p>
+                            <p class="mt-2 text-slate-700">1. 先算次方：2**3 = 8 <br> 2. 再算乘法：8 * 2 = 16 <br> 3. 最後加法：10 + 16 = <span class="font-bold text-orange-600">26</span></p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-xl">
+                            <p class="font-mono text-lg text-blue-600">範例二：15 % 4 == 3</p>
+                            <p class="text-sm text-slate-500">解析：先算術再比較</p>
+                            <p class="mt-2 text-slate-700">1. 15 除以 4 餘數為 3 <br> 2. 判斷 3 == 3 <br> 3. 結果為 <span class="font-bold text-green-600">True</span></p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-xl border-2 border-indigo-100">
+                    <h2 class="font-black text-xl text-indigo-700 mb-6">📝 挑戰練習：請計算出結果</h2>
+                    
+                    <div class="space-y-8">
+                        <div class="flex flex-col gap-2">
+                            <label class="font-bold text-slate-700">1. 計算 <code class="text-rose-500">30 - 5 * 2 ** 2 + 8</code> 的結果：</label>
+                            <div class="flex items-center gap-4">
+                                <input type="text" id="q13-1" value="${window.ch1l3Inputs.q1}" 
+                                    oninput="window.ch1l3Inputs.q1=this.value" 
+                                    placeholder="填寫數字"
+                                    class="w-40 p-3 border-2 border-slate-200 rounded-xl focus:border-indigo-500 outline-none font-mono text-xl">
+                                <span id="q13-1-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="font-bold text-slate-700">2. 判斷 <code class="text-rose-500">10 // 3 > 2 and 5 != 5</code> 的結果 (填 True/False)：</label>
+                            <div class="flex items-center gap-4">
+                                <input type="text" id="q13-2" value="${window.ch1l3Inputs.q2}" 
+                                    oninput="window.ch1l3Inputs.q2=this.value" 
+                                    placeholder="填 True 或 False"
+                                    class="w-40 p-3 border-2 border-slate-200 rounded-xl focus:border-indigo-500 outline-none font-bold">
+                                <span id="q13-2-feedback"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-2">
+                            <label class="font-bold text-slate-700">3. 計算 <code class="text-rose-500">20 % 7 * (3 + 2)</code> 的結果：</label>
+                            <div class="flex items-center gap-4">
+                                <input type="text" id="q13-3" value="${window.ch1l3Inputs.q3}" 
+                                    oninput="window.ch1l3Inputs.q3=this.value" 
+                                    placeholder="填寫數字"
+                                    class="w-40 p-3 border-2 border-slate-200 rounded-xl focus:border-indigo-500 outline-none font-mono text-xl">
+                                <span id="q13-3-feedback"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="window.submitCh1L3()" class="w-full mt-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-2xl shadow-lg transition-all active:scale-95">提交答案</button>
+                </div>
+            </div>`;
+    };
+
+    // 提交檢核邏輯
+    window.submitCh1L3 = () => {
+        const a1 = window.ch1l3Inputs.q1.trim();
+        const a2 = window.ch1l3Inputs.q2.trim().toLowerCase(); // 轉小寫方便比較
+        const a3 = window.ch1l3Inputs.q3.trim();
+
+        // 正確答案：Q1=18, Q2=false, Q3=30
+        let isQ1Correct = (a1 === "18");
+        let isQ2Correct = (a2 === "false");
+        let isQ3Correct = (a3 === "30");
+
+        // 更新回饋視覺 (不直接給解答，僅顯示對錯)
+        document.getElementById('q13-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 再想一下運算順序';
+        document.getElementById('q13-1-feedback').className = isQ1Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+        
+        document.getElementById('q13-2-feedback').innerHTML = isQ2Correct ? '✅ 正確' : '❌ 檢查邏輯閘運算';
+        document.getElementById('q13-2-feedback').className = isQ2Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+
+        document.getElementById('q13-3-feedback').innerHTML = isQ3Correct ? '✅ 正確' : '❌ 先處理括號內的運算';
+        document.getElementById('q13-3-feedback').className = isQ3Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+
+        if (isQ1Correct && isQ2Correct && isQ3Correct) {
+            stopTimer();
+            setTimeout(() => {
+                showResult(true); // 記錄成績並顯示成功畫面
+            }, 500);
+        } else {
+            // 抖動特效 (若已有此類別)
+            const btn = event.target;
+            btn.classList.add('animate-shake');
+            setTimeout(() => btn.classList.remove('animate-shake'), 400);
+        }
+    };
+
+    window.renderCh1L3Inner();
+}
+
+
+		
 
 //-------------------------------------------------
         // 預設啟動
-        render();
-		
+        render();		
     </script>
-
-
-
 </body></html>

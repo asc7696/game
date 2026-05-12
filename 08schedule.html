@@ -1,11 +1,119 @@
-function checkAnswer() {
-    const userAns = parseFloat(document.getElementById('quiz-ans').value);
-    const feedback = document.getElementById('quiz-feedback');
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>進程排程教學系統</title>
+    <style>
+        body { font-family: "Microsoft JhengHei", sans-serif; background: #f0f2f5; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
+        .gantt-chart { display: flex; height: 60px; border: 2px solid #333; margin: 20px 0; background: #eee; border-radius: 5px; overflow: hidden; }
+        .process-block { display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); border-right: 1px solid rgba(255,255,255,0.3); }
+        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
+        button { flex: 1; padding: 12px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; background: #5c67f2; color: white; }
+        button:hover { background: #4a54e1; }
+        .desc { background: #fff9db; padding: 15px; border-left: 5px solid #fcc419; margin-bottom: 20px; min-height: 50px; }
+        .quiz-box { background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #dee2e6; }
+        input { padding: 10px; width: 150px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px; }
+        #quiz-feedback { margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>作業系統排程教學</h1>
+    <p>數據：<strong>P1(6ms, 序3), P2(14ms, 序1), P3(8ms, 序2)</strong></p>
     
-    // 使用 Math.abs 避免浮點數誤差
-    if (Math.abs(userAns - currentAns) < 0.1) {
-        feedback.innerHTML = `<span style="color:green">正確！計算方式：(0 + 6 + 20) / 3 = 8.67ms</span>`;
-    } else {
-        feedback.innerHTML = `<span style="color:red">不正確。提示：P1等待0, P2等待6, P3等待20，再平均一次！</span>`;
+    <div class="controls">
+        <button onclick="updateDisplay('FCFS')">1. FCFS 模擬</button>
+        <button onclick="updateDisplay('SJF')">2. SJF 模擬</button>
+        <button onclick="updateDisplay('Priority')">3. Priority 模擬</button>
+    </div>
+
+    <div id="algo-desc" class="desc">點擊上方按鈕觀看不同演算法的排程動畫。</div>
+
+    <div id="gantt" class="gantt-chart"></div>
+
+    <div class="quiz-box">
+        <h3>測驗評量</h3>
+        <p id="quiz-q">請先點擊模擬按鈕...</p>
+        <input type="number" step="0.01" id="quiz-ans" placeholder="平均等待時間">
+        <button style="flex:none; width: 100px;" onclick="checkAnswer()">提交</button>
+        <div id="quiz-feedback"></div>
+    </div>
+</div>
+
+<script>
+    const processes = [
+        { id: 'P1', burst: 6, priority: 3, color: '#ff6b6b' },
+        { id: 'P2', burst: 14, priority: 1, color: '#4ecdc4' },
+        { id: 'P3', burst: 8, priority: 2, color: '#45b7d1' }
+    ];
+
+    let currentMode = '';
+    let correctAnswer = 0;
+
+    function updateDisplay(type) {
+        currentMode = type;
+        let sorted = [...processes];
+        let info = "";
+
+        if (type === 'FCFS') {
+            // 順序: P1, P2, P3
+            info = "<strong>先來先到 (FCFS):</strong> 按照編號順序執行。P2 雖然很久但必須等 P1 完成。";
+            correctAnswer = (0 + 6 + (6+14)) / 3; 
+        } else if (type === 'SJF') {
+            // 順序: P1(6), P3(8), P2(14)
+            sorted.sort((a, b) => a.burst - b.burst);
+            info = "<strong>最短工作優先 (SJF):</strong> 比較長度 (6, 14, 8)，所以順序改為 P1 -> P3 -> P2。";
+            correctAnswer = (0 + 6 + (6+8)) / 3;
+        } else if (type === 'Priority') {
+            // 順序: P2(序1), P3(序2), P1(序3)
+            sorted.sort((a, b) => a.priority - b.priority);
+            info = "<strong>優先權排序:</strong> 數字越小越優先。順序為 P2(序1) -> P3(序2) -> P1(序3)。";
+            correctAnswer = (0 + 14 + (14+8)) / 3;
+        }
+
+        document.getElementById('algo-desc').innerHTML = info;
+        document.getElementById('quiz-q').innerHTML = `請問在 <b>${type}</b> 模式下，這三個進程的<b>平均等待時間</b>是多少？ (四捨五入至小數點後兩位)`;
+        document.getElementById('quiz-feedback').innerText = "";
+        renderGantt(sorted);
     }
-}
+
+    function renderGantt(data) {
+        const gantt = document.getElementById('gantt');
+        gantt.innerHTML = "";
+        const totalBurst = 28; // 6 + 14 + 8
+
+        data.forEach(p => {
+            const block = document.createElement('div');
+            block.className = 'process-block';
+            block.style.backgroundColor = p.color;
+            block.style.width = "0%"; 
+            block.innerText = `${p.id}(${p.burst})`;
+            gantt.appendChild(block);
+
+            setTimeout(() => {
+                block.style.width = (p.burst / totalBurst * 100) + "%";
+            }, 50);
+        });
+    }
+
+    function checkAnswer() {
+        if (!currentMode) return alert("請先選擇一個演算法進行模擬！");
+        
+        const userAns = parseFloat(document.getElementById('quiz-ans').value);
+        const feedback = document.getElementById('quiz-feedback');
+        const target = Math.round(correctAnswer * 100) / 100;
+
+        if (Math.abs(userAns - target) < 0.1) {
+            feedback.innerHTML = `✅ 正確！平均等待時間為 ${target} ms。`;
+            feedback.style.color = "green";
+        } else {
+            feedback.innerHTML = `❌ 不正確。提示：目前順序下各工作的等待時間加起來再除以 3。`;
+            feedback.style.color = "red";
+        }
+    }
+</script>
+
+</body>
+</html>

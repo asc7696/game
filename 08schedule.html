@@ -1,113 +1,20 @@
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <title>工作排程模擬器</title>
-    <style>
-        body { font-family: sans-serif; line-height: 1.6; padding: 20px; background: #f4f4f9; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .gantt-chart { display: flex; height: 50px; border: 1px solid #ccc; margin-bottom: 20px; background: #eee; overflow: hidden; }
-        .process-block { display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: width 0.5s ease; }
-        .controls { margin-bottom: 20px; }
-        .quiz-section { margin-top: 30px; padding-top: 20px; border-top: 2px solid #ddd; }
-        button { padding: 10px 20px; cursor: pointer; background: #007bff; color: white; border: none; border-radius: 4px; }
-        button:hover { background: #0056b3; }
-        .desc { background: #e9ecef; padding: 15px; border-radius: 4px; margin-bottom: 15px; }
-    </style>
-</head>
-<body>
+const processes = [
+    { id: 'P1', burst: 6, priority: 3, color: '#ff6b6b' },
+    { id: 'P2', burst: 14, priority: 1, color: '#4ecdc4' }, // 數值小 = 優先權高
+    { id: 'P3', burst: 8, priority: 2, color: '#45b7d1' }
+];
 
-<div class="container">
-    <h1>作業系統排程教學</h1>
+// 修正測驗題目常數 q 與解答邏輯
+function generateQuiz() {
+    const q = "題目：假設有三個工作 P1(6ms), P2(14ms), P3(8ms)，若按「先來先到 (FCFS)」且順序為 P1->P2->P3，請計算其『平均等待時間』。";
     
-    <div class="controls">
-        <button onclick="simulate('FCFS')">先來先到 (FCFS)</button>
-        <button onclick="simulate('SJF')">最短工作優先 (SJF)</button>
-        <button onclick="simulate('Priority')">優先權排序</button>
-    </div>
+    // FCFS 計算過程：
+    // P1 等待 0
+    // P2 等待 6 (P1結束)
+    // P3 等待 6 + 14 = 20 (P1+P2結束)
+    // 平均 = (0 + 6 + 20) / 3 = 8.67
+    currentAns = (0 + 6 + 20) / 3;
+    currentAns = Math.round(currentAns * 100) / 100; // 取小數點後兩位
 
-    <div id="algo-desc" class="desc">請點擊上方按鈕開始模擬。</div>
-
-    <h3>甘特圖動畫模擬</h3>
-    <div id="gantt" class="gantt-chart"></div>
-
-    <div class="quiz-section">
-        <h2>互動小測驗</h2>
-        <p id="quiz-q">點擊按鈕產生題目...</p>
-        <input type="number" id="quiz-ans" placeholder="輸入平均等待時間">
-        <button onclick="checkAnswer()">提交答案</button>
-        <p id="quiz-feedback"></p>
-    </div>
-</div>
-
-<script>
-    const processes = [
-        { id: 'P1', burst: 6, priority: 3, color: '#ff6b6b' },
-        { id: 'P2', burst: 2, priority: 1, color: '#4ecdc4' },
-        { id: 'P3', burst: 8, priority: 4, color: '#45b7d1' },
-        { id: 'P4', burst: 3, priority: 2, color: '#f7d794' }
-    ];
-
-    function simulate(type) {
-        let sorted = [...processes];
-        let desc = "";
-
-        if (type === 'FCFS') {
-            desc = "<b>FCFS:</b> 依 P1->P2->P3->P4 順序執行。簡單直觀，但長任務在前會增加後續任務等待時間。";
-        } else if (type === 'SJF') {
-            sorted.sort((a, b) => a.burst - b.burst);
-            desc = "<b>SJF:</b> 挑選執行時間最短的 (P2, P4...) 先執行。這能最小化平均等待時間。";
-        } else if (type === 'Priority') {
-            sorted.sort((a, b) => a.priority - b.priority);
-            desc = "<b>Priority:</b> 依優先權（假設數字愈小愈優先）執行。P2 最優先。";
-        }
-
-        document.getElementById('algo-desc').innerHTML = desc;
-        renderGantt(sorted);
-    }
-
-    function renderGantt(data) {
-        const gantt = document.getElementById('gantt');
-        gantt.innerHTML = "";
-        const totalBurst = data.reduce((sum, p) => sum + p.burst, 0);
-
-        data.forEach(p => {
-            const block = document.createElement('div');
-            block.className = 'process-block';
-            block.style.backgroundColor = p.color;
-            block.style.width = "0%";
-            block.innerText = p.id;
-            gantt.appendChild(block);
-
-            // 動化效果
-            setTimeout(() => {
-                block.style.width = (p.burst / totalBurst * 100) + "%";
-            }, 100);
-        });
-    }
-
-    // 簡單測驗邏輯
-    let currentAns = 0;
-    function generateQuiz() {
-        const q = "若有三個進程，長度分別為 P1:10, P2:4, P3:1。在 FCFS 情況下，平均等待時間是多少？";
-        currentAns = (0 + 10 + 14) / 3; // (0 + P1完 + P2完) / 3
-        document.getElementById('quiz-q').innerText = q;
-    }
-
-    function checkAnswer() {
-        const userAns = parseFloat(document.getElementById('quiz-ans').value);
-        const feedback = document.getElementById('quiz-feedback');
-        if (userAns === currentAns) {
-            feedback.innerText = "正確！計算公式：(0 + 10 + 14) / 3 = 8";
-            feedback.style.color = "green";
-        } else {
-            feedback.innerText = "再試試看！提示：等待時間是該進程開始前的總和。";
-            feedback.style.color = "red";
-        }
-    }
-    
-    generateQuiz();
-</script>
-
-</body>
-</html>
+    document.getElementById('quiz-q').innerHTML = `<strong>${q}</strong>`;
+}

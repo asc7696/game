@@ -1289,52 +1289,55 @@ function initStudentInfo() {
 
 initStudentInfo();
 
-
 // =========================
 // 送成績
 // =========================
-
 async function submitScore(level, score, timeUsed, attempts) {
 
-  const data = {
+    const data = {
 
-    className:
-      localStorage.getItem("className"),
+        className:
+            localStorage.getItem("className"),
 
-    seatNumber:
-      localStorage.getItem("seatNumber"),
+        seatNumber:
+            localStorage.getItem("seatNumber"),
 
-    studentName:
-      localStorage.getItem("studentName"),
+        studentName:
+            localStorage.getItem("studentName"),
 
-    level: level,
-    score: score,
-    timeUsed: timeUsed,
-    attempts: attempts,
+        level: level,
+        score: score,
+        timeUsed: timeUsed,
+        attempts: attempts,
 
-    userAgent: navigator.userAgent
-  };
+        userAgent: navigator.userAgent
+    };
 
-  try {
+    console.log("送出資料", data);
 
-    const response = await fetch(GAS_URL, {
+    try {
 
-      method: "POST",
+        const response = await fetch(GAS_URL, {
 
-      body: JSON.stringify(data)
+            method: "POST",
 
-    });
+            body: JSON.stringify(data)
 
-const result = await response.text();
-console.log("成績已送出", result);
+        });
 
-  } catch (error) {
+        const result = await response.text();
 
-    console.error("送出失敗", error);
+        console.log("成績已送出", result);
 
-  }
+    } catch (error) {
+
+        console.error("送出失敗", error);
+
+    }
 }
-//--------------------?
+
+	
+	//--------------------?
 </script>
 
 

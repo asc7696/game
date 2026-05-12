@@ -6,14 +6,14 @@ const processes = [
 
 // 修正測驗題目常數 q 與解答邏輯
 function generateQuiz() {
-    const q = "題目：假設有三個工作 P1(6ms), P2(14ms), P3(8ms)，若按「先來先到 (FCFS)」且順序為 P1->P2->P3，請計算其『平均等待時間』。";
+    const q = "題目：假設有三個工作 P1(5ms), P2(14ms), P3(8ms)，若按「先來先到 (FCFS)」且順序為 P1->P2->P3，請計算其『平均等待時間』。";
     
     // FCFS 計算過程：
     // P1 等待 0
-    // P2 等待 6 (P1結束)
-    // P3 等待 6 + 14 = 20 (P1+P2結束)
-    // 平均 = (0 + 6 + 20) / 3 = 8.67
-    currentAns = (0 + 6 + 20) / 3;
+    // P2 等待 5 (P1結束)
+    // P3 等待 5 + 14 = 19 (P1+P2結束)
+    // 平均 = (0 + 5 + 19 / 3 = 8
+    currentAns = (0 + 5 + 19) / 3;
     currentAns = Math.round(currentAns * 100) / 100; // 取小數點後兩位
 
     document.getElementById('quiz-q').innerHTML = `<strong>${q}</strong>`;

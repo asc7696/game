@@ -542,7 +542,7 @@ function renderPythonModule(el) {
 
                 if(!document.getElementById('bs-exercises')) {
                     app.innerHTML = `<div class="p-6 max-w-6xl mx-auto"><button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回選單</button><div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-black text-slate-800">關卡一：氣泡排序法</h1><div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="b-timer">${formatTime(timeSeconds)}</span></div></div><div class="bg-white p-8 rounded-3xl shadow-lg mb-8 border border-slate-100"><h2 class="font-bold mb-2 text-xl text-orange-600">📖 演算法說明</h2><p class="text-slate-600 mb-6 leading-relaxed">氣泡排序法每次從數列的第一個元素開始，<b>兩兩相鄰比較</b>。如果順序不對，就把他們<b>交換位置</b>。一整個循環結束後，極值就會像泡泡一樣浮到數列的最後面 (進入已排序區)。</p><h2 class="font-bold mb-4 text-lg text-slate-800 border-t pt-6">🎬 動畫演示：[40, 60, 80, 30] 遞減排序 (大 ➔ 小)</h2><div class="flex flex-col lg:flex-row gap-8"><div class="lg:w-1/2 flex flex-col items-center bg-slate-50 p-6 rounded-2xl border border-slate-200"><div class="relative w-full h-[180px] mb-8" id="bubble-container"></div><div class="flex justify-center gap-6 text-sm font-bold w-full mb-4"><div class="bg-white px-6 py-3 rounded-full border shadow-sm flex-1 text-center">總比較: <span id="b-comp" class="text-blue-600 text-lg">0</span></div><div class="bg-white px-6 py-3 rounded-full border shadow-sm flex-1 text-center">總交換: <span id="b-swap" class="text-red-600 text-lg">0</span></div></div><div id="bubble-desc" class="text-center text-slate-600 font-medium h-6"></div><button onclick="startBubbleDemo()" class="mt-6 w-full py-3 bg-orange-500 text-white rounded-xl font-bold shadow-md">重新播放</button></div><div class="lg:w-1/2 bg-slate-800 text-slate-300 p-6 rounded-2xl font-mono text-sm shadow-inner flex flex-col"><div class="text-white font-bold mb-4 border-b border-slate-700 pb-2">📋 排序過程紀錄</div><div id="bubble-log" class="flex-1 overflow-y-auto space-y-2 pr-2 h-[200px]"></div></div></div></div><div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100"><div class="flex justify-between items-center mb-6"><h2 class="text-xl font-black text-slate-800">📝 實戰練習：完成變化表 (拖曳)</h2><div class="text-sm font-bold text-orange-600 bg-orange-50 px-4 py-1 rounded-full border border-orange-200">遞增排序 (小 ➔ 大)</div></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6 flex flex-col gap-4 items-center"><div class="w-full flex items-center gap-4"><span class="font-bold text-slate-700 w-36 text-right">數列數字池：</span><div class="flex gap-2 flex-wrap">${[15, 8, 20, 3, 12, 5].map(n => `<div draggable="true" ondragstart="drag(event, 'num', '${n}')" class="w-10 h-10 flex items-center justify-center bg-white border-2 border-blue-400 text-blue-700 rounded-lg font-bold cursor-move shadow hover:-translate-y-1 transition-transform">${n}</div>`).join('')}</div></div><div class="w-full flex items-center gap-4"><span class="font-bold text-slate-700 w-36 text-right">比較/交換次數池：</span><div class="flex gap-2 flex-wrap">${[5, 4, 3, 2, 1, 0].map(n => `<div draggable="true" ondragstart="drag(event, 'num', '${n}')" class="w-10 h-10 flex items-center justify-center bg-white border-2 border-rose-400 text-rose-700 rounded-lg font-bold cursor-move shadow hover:-translate-y-1 transition-transform">${n}</div>`).join('')}</div></div></div><div id="bs-exercises"></div><button onclick="submitBubble()" class="w-full py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-black text-xl shadow-lg mt-4">提交答案</button></div></div>`;
-                    setTimeout(startBubbleDemo, 100);
+                    setTimeout(startBubbleDemo, 1000);
                 }
                 document.getElementById('bs-exercises').innerHTML = exerciseRows;
             };
@@ -554,18 +554,18 @@ function renderPythonModule(el) {
             const draw = (activeI = -1, activeJ = -1) => {
                 if(!document.getElementById('bubble-container')) return; container.innerHTML = n.map((val, idx) => { const isSorted = sortedIndices.includes(idx); const isActive = (idx === activeI || idx === activeJ); const barColor = isSorted ? 'bg-green-500' : (isActive ? 'bg-yellow-400' : 'bg-orange-400'); const borderColor = isActive ? 'border-red-500 scale-110 z-10 shadow-xl' : 'border-transparent'; return `<div class="absolute bottom-0 flex flex-col items-center sort-item" style="width: 60px; transform: translateX(${20 + idx * 80}px)"><div class="w-full ${barColor} rounded-t-md" style="height: ${val * 1.5}px"></div><div class="w-full py-2 bg-slate-800 ${isSorted?'text-green-100':'text-white'} text-center font-bold border-2 ${borderColor} rounded-b-md">${val}</div>${isSorted ? `<div class="absolute -bottom-6 text-[10px] font-bold text-green-600">[已排序]</div>` : ''}</div>`; }).join('');
             };
-            draw(); await new Promise(r => setTimeout(r, 1000));
+            draw(); await new Promise(r => setTimeout(r, 1500));
             const runSort = async () => {
                 for (let i = 0; i < 3; i++) {
                     if(!document.getElementById('bubble-container')) return; let cycleComp = 0; let cycleSwp = 0; desc.innerHTML = `<span class="text-orange-600 font-bold">第 ${i+1} 循環開始</span>`;
                     for (let j = 0; j < 3 - i; j++) {
-                        if(!document.getElementById('bubble-container')) return; comp++; cycleComp++; compEl.innerText = comp; desc.innerText = `比較 ${n[j]} 與 ${n[j+1]} ...`; draw(j, j + 1); await new Promise(r => setTimeout(r, 800));
-                        if (n[j] < n[j+1]) { swp++; cycleSwp++; swpEl.innerText = swp; desc.innerHTML = `<span class="text-red-500 font-bold">交換！ (${n[j]} < ${n[j+1]})</span>`; [n[j], n[j+1]] = [n[j+1], n[j]]; draw(j, j+1); await new Promise(r => setTimeout(r, 800)); } 
-                        else { desc.innerText = `位置不變`; await new Promise(r => setTimeout(r, 600)); }
+                        if(!document.getElementById('bubble-container')) return; comp++; cycleComp++; compEl.innerText = comp; desc.innerText = `比較 ${n[j]} 與 ${n[j+1]} ...`; draw(j, j + 1); await new Promise(r => setTimeout(r, 1500));
+                        if (n[j] < n[j+1]) { swp++; cycleSwp++; swpEl.innerText = swp; desc.innerHTML = `<span class="text-red-500 font-bold">交換！ (${n[j]} < ${n[j+1]})</span>`; [n[j], n[j+1]] = [n[j+1], n[j]]; draw(j, j+1); await new Promise(r => setTimeout(r, 1500)); } 
+                        else { desc.innerText = `位置不變`; await new Promise(r => setTimeout(r, 1200)); }
                     }
                     sortedIndices.push(3 - i); draw(); 
                     let logStr = n.map((v, idx) => sortedIndices.includes(idx) ? `<div class="inline-flex flex-col items-center leading-none mx-1"><span class="text-white">${v}</span><span class="text-[10px] text-green-400 mt-1 font-bold">[已排序]</span></div>` : `<span class="text-white mx-1">${v}</span>`).join('');
-                    log.innerHTML += `<div class="border-l-2 border-slate-600 pl-3 py-1 mb-2"><span class="text-blue-300">第${i+1}循環末:</span><br><div class="flex items-start mt-1 h-8">${logStr}</div><span class="text-slate-400 text-xs block mt-1">此循環比較: ${cycleComp} 次 | 交換: ${cycleSwp} 次</span></div>`; log.scrollTop = log.scrollHeight; await new Promise(r => setTimeout(r, 800));
+                    log.innerHTML += `<div class="border-l-2 border-slate-600 pl-3 py-1 mb-2"><span class="text-blue-300">第${i+1}循環末:</span><br><div class="flex items-start mt-1 h-8">${logStr}</div><span class="text-slate-400 text-xs block mt-1">此循環比較: ${cycleComp} 次 | 交換: ${cycleSwp} 次</span></div>`; log.scrollTop = log.scrollHeight; await new Promise(r => setTimeout(r, 1500));
                 }
                 sortedIndices.push(0); draw(); desc.innerHTML = `<span class="text-green-600 font-black text-lg">排序完成！</span>`;
             }; runSort();
@@ -610,7 +610,7 @@ function renderPythonModule(el) {
 
                 if(!document.getElementById('ss-exercises')) {
                     app.innerHTML = `<div class="p-6 max-w-6xl mx-auto"><button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回選單</button><div class="flex justify-between items-center mb-6"><h1 class="text-3xl font-black text-slate-800">關卡二：選擇排序法</h1><div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="s-timer">${formatTime(timeSeconds)}</span></div></div><div class="bg-white p-8 rounded-3xl shadow-lg mb-8 border border-slate-100"><h2 class="font-bold mb-2 text-xl text-amber-600">📖 演算法說明</h2><p class="text-slate-600 mb-6 leading-relaxed">選擇排序法會在未排序區段中，<b>尋找極值</b>。找到後，將這個極值與未排序區段的<b>第一個數字交換</b>。</p><h2 class="font-bold mb-4 text-lg text-slate-800 border-t pt-6">🎬 動畫演示：[80, 60, 40, 30] 遞增排序 (小 ➔ 大)</h2><div class="flex flex-col lg:flex-row gap-8"><div class="lg:w-1/2 flex flex-col items-center bg-slate-50 p-6 rounded-2xl border border-slate-200"><div class="relative w-full h-[180px] mb-8" id="select-container"></div><div class="flex justify-center gap-6 text-sm font-bold w-full mb-4"><div class="bg-white px-6 py-3 rounded-full border shadow-sm flex-1 text-center">總比較: <span id="s-comp" class="text-blue-600 text-lg">0</span></div><div class="bg-white px-6 py-3 rounded-full border shadow-sm flex-1 text-center">總交換: <span id="s-swap" class="text-red-600 text-lg">0</span></div></div><div id="select-desc" class="text-center text-slate-600 font-medium h-6"></div><button onclick="startSelectionDemo()" class="mt-6 w-full py-3 bg-amber-500 text-white rounded-xl font-bold shadow-md">重新播放</button></div><div class="lg:w-1/2 bg-slate-800 text-slate-300 p-6 rounded-2xl font-mono text-sm shadow-inner flex flex-col"><div class="text-white font-bold mb-4 border-b border-slate-700 pb-2">📋 排序過程紀錄</div><div id="select-log" class="flex-1 overflow-y-auto space-y-2 pr-2 h-[200px]"></div></div></div></div><div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100"><div class="flex justify-between items-center mb-6"><h2 class="text-xl font-black text-slate-800">📝 實戰練習：完成變化表 (拖曳)</h2><div class="text-sm font-bold text-amber-600 bg-amber-50 px-4 py-1 rounded-full border border-amber-200">遞增排序 (小 ➔ 大)</div></div><div class="bg-blue-50 p-4 rounded-xl border border-blue-100 mb-6 flex flex-col gap-4 items-center"><div class="w-full flex items-center gap-4"><span class="font-bold text-slate-700 w-36 text-right">數列數字池：</span><div class="flex gap-2 flex-wrap justify-center">${[15, 8, 20, 3, 12, 5].map(n => `<div draggable="true" ondragstart="drag(event, 'num', '${n}')" class="w-10 h-10 flex items-center justify-center bg-white border-2 border-amber-400 text-amber-700 rounded-lg font-bold cursor-move shadow hover:-translate-y-1 transition-transform">${n}</div>`).join('')}</div></div><div class="w-full flex items-center gap-4"><span class="font-bold text-slate-700 w-36 text-right">比較/交換次數池：</span><div class="flex gap-2 flex-wrap justify-center">${[5, 4, 3, 2, 1, 0].map(n => `<div draggable="true" ondragstart="drag(event, 'num', '${n}')" class="w-10 h-10 flex items-center justify-center bg-white border-2 border-rose-400 text-rose-700 rounded-lg font-bold cursor-move shadow hover:-translate-y-1 transition-transform">${n}</div>`).join('')}</div></div></div><div id="ss-exercises"></div><button onclick="submitSelection()" class="w-full py-4 bg-green-600 hover:bg-green-700 text-white rounded-2xl font-black text-xl shadow-lg mt-4">提交答案</button></div></div>`;
-                    setTimeout(startSelectionDemo, 100);
+                    setTimeout(startSelectionDemo, 1000);
                 }
                 document.getElementById('ss-exercises').innerHTML = exerciseRows;
             };
@@ -622,18 +622,18 @@ function renderPythonModule(el) {
             const draw = (curIdx = -1, scanIdx = -1, minIdx = -1) => {
                 if(!document.getElementById('select-container')) return; container.innerHTML = n.map((val, idx) => { const isSorted = sortedIndices.includes(idx); let barColor = 'bg-amber-400'; let borderColor = 'border-transparent'; if (isSorted) barColor = 'bg-green-500'; else if (idx === minIdx) { barColor = 'bg-rose-500'; borderColor = 'border-rose-600 scale-110 z-10 shadow-xl'; } else if (idx === scanIdx) { barColor = 'bg-yellow-400'; borderColor = 'border-yellow-500 scale-105'; } else if (idx === curIdx) { barColor = 'bg-blue-400'; borderColor = 'border-blue-500'; } return `<div class="absolute bottom-0 flex flex-col items-center sort-item" style="width: 60px; transform: translateX(${20 + idx * 80}px)"><div class="w-full ${barColor} rounded-t-md" style="height: ${val * 1.5}px"></div><div class="w-full py-2 bg-slate-800 text-white text-center font-bold border-2 ${borderColor} rounded-b-md">${val}</div>${isSorted ? `<div class="absolute -bottom-6 text-[10px] font-bold text-green-600">[已排序]</div>` : ''}</div>`; }).join('');
             };
-            draw(); await new Promise(r => setTimeout(r, 1000));
+            draw(); await new Promise(r => setTimeout(r, 1500));
             const runSort = async () => {
                 for (let i = 0; i < 3; i++) {
-                    if(!document.getElementById('select-container')) return; let cycleComp = 0; let cycleSwp = 0; desc.innerHTML = `<span class="text-amber-600 font-bold">第 ${i+1} 循環開始</span>`; let minIdx = i; draw(i, -1, minIdx); await new Promise(r => setTimeout(r, 600));
+                    if(!document.getElementById('select-container')) return; let cycleComp = 0; let cycleSwp = 0; desc.innerHTML = `<span class="text-amber-600 font-bold">第 ${i+1} 循環開始</span>`; let minIdx = i; draw(i, -1, minIdx); await new Promise(r => setTimeout(r, 1200));
                     for (let j = i + 1; j < 4; j++) {
-                        if(!document.getElementById('select-container')) return; comp++; cycleComp++; compEl.innerText = comp; desc.innerText = `掃描 ${n[j]} ...`; draw(i, j, minIdx); await new Promise(r => setTimeout(r, 800));
-                        if (n[j] < n[minIdx]) { minIdx = j; desc.innerHTML = `<span class="text-rose-500 font-bold">發現更小的值: ${n[j]}</span>`; draw(i, -1, minIdx); await new Promise(r => setTimeout(r, 800)); }
+                        if(!document.getElementById('select-container')) return; comp++; cycleComp++; compEl.innerText = comp; desc.innerText = `掃描 ${n[j]} ...`; draw(i, j, minIdx); await new Promise(r => setTimeout(r, 1500));
+                        if (n[j] < n[minIdx]) { minIdx = j; desc.innerHTML = `<span class="text-rose-500 font-bold">發現更小的值: ${n[j]}</span>`; draw(i, -1, minIdx); await new Promise(r => setTimeout(r, 1500)); }
                     }
-                    if (minIdx !== i) { swp++; cycleSwp++; swpEl.innerText = swp; desc.innerHTML = `<span class="text-red-500 font-bold">交換位置！</span>`; [n[i], n[minIdx]] = [n[minIdx], n[i]]; draw(-1, -1, i); await new Promise(r => setTimeout(r, 800)); }
+                    if (minIdx !== i) { swp++; cycleSwp++; swpEl.innerText = swp; desc.innerHTML = `<span class="text-red-500 font-bold">交換位置！</span>`; [n[i], n[minIdx]] = [n[minIdx], n[i]]; draw(-1, -1, i); await new Promise(r => setTimeout(r, 1500)); }
                     sortedIndices.push(i); draw(); 
                     let logStr = n.map((v, idx) => sortedIndices.includes(idx) ? `<div class="inline-flex flex-col items-center leading-none mx-1"><span class="text-white">${v}</span><span class="text-[10px] text-green-400 mt-1 font-bold">[已排序]</span></div>` : `<span class="text-white mx-1">${v}</span>`).join('');
-                    log.innerHTML += `<div class="border-l-2 border-slate-600 pl-3 py-1 mb-2"><span class="text-blue-300">第${i+1}循環末:</span><br><div class="flex items-start mt-1 h-8">${logStr}</div><span class="text-slate-400 text-xs block mt-1">此循環比較: ${cycleComp} 次 | 交換: ${cycleSwp} 次</span></div>`; log.scrollTop = log.scrollHeight; await new Promise(r => setTimeout(r, 800));
+                    log.innerHTML += `<div class="border-l-2 border-slate-600 pl-3 py-1 mb-2"><span class="text-blue-300">第${i+1}循環末:</span><br><div class="flex items-start mt-1 h-8">${logStr}</div><span class="text-slate-400 text-xs block mt-1">此循環比較: ${cycleComp} 次 | 交換: ${cycleSwp} 次</span></div>`; log.scrollTop = log.scrollHeight; await new Promise(r => setTimeout(r, 1500));
                 }
                 sortedIndices.push(3); draw(); desc.innerHTML = `<span class="text-green-600 font-black text-lg">排序完成！</span>`;
             }; runSort();
@@ -663,7 +663,7 @@ function renderPythonModule(el) {
             const a1 = document.getElementById('q3-1').value.trim(); const a2 = document.getElementById('q3-2').value.trim();
             let o1 = (a1==='6'); let o2 = (a2==='10');
             document.getElementById('q3-1-icon').innerText = o1 ? '✅' : '❌'; document.getElementById('q3-2-icon').innerText = o2 ? '✅' : '❌';
-            if (o1 && o2) { setTimeout(() => { stopTimer(); showResult(true); }, 500); } 
+            if (o1 && o2) { setTimeout(() => { stopTimer(); showResult(true); }, 1000); } 
         };
 
         function renderBinarySearch(el) {
@@ -682,12 +682,12 @@ function renderPythonModule(el) {
                     if (mid === prevMid) { desc.innerHTML = `<span class="text-red-500">無法再縮小範圍，數字不存在！總比較次數：${comp} 次</span>`; break; }
                     comp++; draw(low, high, mid, false);
                     desc.innerHTML = `計算 Mid = (${low} + ${high}) / 2 = ${mid}。<br>比較 ${n[mid]} 與 ${target}`;
-                    await new Promise(r => setTimeout(r, 1500));
+                    await new Promise(r => setTimeout(r, 3000));
                     if (n[mid] === target) { draw(low, high, mid, true); desc.innerHTML = `<span class="text-green-600">找到了！總比較次數：${comp} 次</span>`; return; } 
                     else if (n[mid] < target) { desc.innerHTML = `${n[mid]} 小於 ${target}，Low = Mid + 1 = ${mid+1}`; low = mid + 1; } 
                     else { desc.innerHTML = `${n[mid]} 大於 ${target}，High = Mid - 1 = ${mid-1}`; high = mid - 1; }
                     prevMid = mid;
-                    await new Promise(r => setTimeout(r, 1200));
+                    await new Promise(r => setTimeout(r, 3000));
                 }
                 draw(-1, -1, -1, false);
                 if (prevMid !== -1 && n[prevMid] !== target) { desc.innerHTML = `<span class="text-red-500">無法再縮小範圍，數字不存在！總比較次數：${comp} 次</span>`; }
@@ -697,7 +697,7 @@ function renderPythonModule(el) {
             const a1 = document.getElementById('q4-1').value.trim(); const a2 = document.getElementById('q4-2').value.trim();
             let o1 = (a1==='3'); let o2 = (a2==='3');
             document.getElementById('q4-1-icon').innerText = o1 ? '✅' : '❌'; document.getElementById('q4-2-icon').innerText = o2 ? '✅' : '❌';
-            if (o1 && o2) { setTimeout(() => { stopTimer(); showResult(true); }, 500); }
+            if (o1 && o2) { setTimeout(() => { stopTimer(); showResult(true); }, 1000); }
             else { alert("答案有誤！試著在紙上畫出 Low, Mid, High 的範圍變化。\n 每一次會砍半，中間值的計算方式 是 Mid = (Low + High)/2 取整數 "); }
         };
 
@@ -793,7 +793,7 @@ function renderPythonModule(el) {
                 </div></div>
             `;
         }
-        window.playFactAnim = async () => { for (let i = 1; i <= 3; i++) { const el = document.getElementById(`f-${i}`); el.classList.remove('opacity-0'); el.classList.add('opacity-100', 'translate-y-2'); await new Promise(r => setTimeout(r, 800)); } };
+        window.playFactAnim = async () => { for (let i = 1; i <= 3; i++) { const el = document.getElementById(`f-${i}`); el.classList.remove('opacity-0'); el.classList.add('opacity-100', 'translate-y-2'); await new Promise(r => setTimeout(r, 1500)); } };
         window.hFactD = (ev, slot) => { ev.preventDefault(); const val = ev.dataTransfer.getData("id"); window.factD[slot] = val; document.getElementById(`fd-${slot}`).innerText = val; document.getElementById(`fd-${slot}`).classList.add('bg-blue-600', 'text-white'); };
         window.submitFactL4 = () => {
             const ans = document.getElementById('fact-final').value; const d = window.factD;
@@ -922,7 +922,7 @@ function renderPythonModule(el) {
                     window.renderTTInner();
                 } else {
                     const btn = document.getElementById(`tt-node-${id}`);
-                    if (btn) { btn.classList.add('bg-red-100', 'border-red-500', 'text-red-700', 'animate-shake'); setTimeout(() => { btn.classList.remove('bg-red-100', 'border-red-500', 'text-red-700', 'animate-shake'); }, 500); }
+                    if (btn) { btn.classList.add('bg-red-100', 'border-red-500', 'text-red-700', 'animate-shake'); setTimeout(() => { btn.classList.remove('bg-red-100', 'border-red-500', 'text-red-700', 'animate-shake'); }, 1000); }
                 }
             };
             window.renderTTInner();

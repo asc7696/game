@@ -1261,20 +1261,33 @@ function renderBSTModule(el) {
 }
 // ================= 第七章：硬體修復版 =================
 
-// --- 7-1 元件配對修復 ---
+// --- 7-1 元件配對修復 (縮減版：四項元件) ---
 if (!window.hDrops) window.hDrops = {}; // 狀態保護
 
 function renderHardwareMatch(el) {
-    startTimer('down', 180, () => { 
+    // 啟動倒數計時
+    startTimer('down', 300, () => { 
         const t = document.getElementById('h1-time'); 
         if (t) t.innerText = formatTime(timeSeconds); 
     });
 
-    const COMPS = { "gpu": "顯示卡/顯示晶片", "ram": "RAM", "hdd": "硬碟", "nic": "網路卡/網路晶片", "cpu": "CPU", "mon": "螢幕", "cam": "攝像頭" };
-    const FUNCS = { "gpu": "處理繪圖指令，負責螢幕畫面輸出", "ram": "暫存執行中的程式與資料", "hdd": "永久儲存作業系統與檔案", "nic": "負責外部網路連線", "cpu": "電腦的大腦，負責執行指令", "mon": "顯示畫面輸出結果給使用者", "cam": "捕捉影像，供視訊會議使用" };
+    // 定義縮減後的四個元件與功能
+    const COMPS = { 
+        "cpu": "CPU", 
+        "ram": "RAM", 
+        "hdd": "硬碟", 
+        "gpu": "顯示卡" 
+    };
+    
+    const FUNCS = { 
+        "cpu": "電腦的大腦，負責處理執行指令", 
+        "ram": "暫存執行中的程式與資料（揮發性記憶體）", 
+        "hdd": "長期永久儲存作業系統與個人檔案", 
+        "gpu": "專門處理繪圖運算，負責影像畫面輸出" 
+    };
 
     window.renderCh7L1Inner = () => {
-        if (currentView !== 'ch7_l1') return; // 仿照 7-2 的鎖定機制
+        if (currentView !== 'ch7_l1') return; 
         
         el.innerHTML = `
             <div class="p-6 max-w-6xl mx-auto">
@@ -1285,57 +1298,82 @@ function renderHardwareMatch(el) {
                 </div>
                 
                 <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100 mb-8">
-                    <h2 class="font-bold mb-4 text-lg">待選元件池 (往下拖曳)：</h2>
+                    <h2 class="font-bold mb-4 text-lg text-indigo-700">待選元件池 (請往下拖曳至正確功能框)：</h2>
                     <div id="h1-pool" class="flex flex-wrap gap-4 p-6 bg-indigo-50 border-2 border-indigo-100 rounded-2xl">
                         ${Object.keys(COMPS)
                             .filter(id => !Object.values(window.hDrops).includes(id))
-                            .map(id => `<div draggable="true" ondragstart="drag(event, 'comp', '${id}')" class="px-6 py-3 bg-white border-2 border-indigo-400 text-indigo-900 rounded-xl font-black cursor-grab shadow hover:-translate-y-1 transition-transform">${COMPS[id]}</div>`)
+                            .map(id => `<div draggable="true" ondragstart="drag(event, 'comp', '${id}')" class="px-8 py-4 bg-white border-2 border-indigo-400 text-indigo-900 rounded-xl font-black cursor-grab shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">${COMPS[id]}</div>`)
                             .join('')}
+                        ${Object.keys(COMPS).filter(id => !Object.values(window.hDrops).includes(id)).length === 0 ? '<span class="text-slate-400">元件已全部部署完成</span>' : ''}
                     </div>
                 </div>
 
                 <div class="bg-white p-8 rounded-3xl shadow-lg border border-slate-100">
-                    <div id="h1-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+                    <div id="h1-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
                         ${Object.entries(FUNCS).map(([id, desc]) => {
                             const placed = window.hDrops[id];
                             return `
-                                <div class="bg-slate-50 p-4 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center gap-3 text-center">
-                                    <p class="font-bold text-slate-700 h-10 text-sm">${desc}</p>
+                                <div class="bg-slate-50 p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col items-center gap-4 text-center">
+                                    <div class="flex items-center justify-center w-10 h-10 bg-slate-200 text-slate-600 rounded-full font-bold">?</div>
+                                    <p class="font-bold text-slate-700 h-12 flex items-center">${desc}</p>
                                     <div ondragover="allowDrop(event)" ondrop="window.hCh7L1Drop(event, '${id}')" 
-                                         class="w-full h-14 drop-zone font-bold transition-all flex items-center justify-center rounded-lg border-2 border-dashed ${placed ? 'bg-indigo-100 border-indigo-500 border-solid text-indigo-700' : 'bg-white border-slate-300 text-slate-400'}">
-                                        ${placed ? COMPS[placed] : '請拖入元件'}
+                                         class="w-full h-16 drop-zone font-bold transition-all flex items-center justify-center rounded-xl border-2 border-dashed ${placed ? 'bg-green-50 border-green-500 border-solid text-green-700' : 'bg-white border-slate-300 text-slate-400'}">
+                                         ${placed ? `
+                                            <div class="flex items-center gap-2">
+                                                <span>${COMPS[placed]}</span>
+                                                <button onclick="window.removeH1Drop('${id}')" class="text-xs bg-red-100 text-red-500 px-2 py-1 rounded hover:bg-red-200">移除</button>
+                                            </div>
+                                         ` : '請在此處放入元件'}
                                     </div>
                                 </div>`;
                         }).join('')}
                     </div>
-                    <button onclick="window.submitCh7L1()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xl shadow-lg transition-colors">提交答案</button>
+                    <button onclick="window.submitCh7L1()" class="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-xl shadow-lg transition-all active:scale-95">提交答案</button>
                 </div>
             </div>`;
     };
 
+    // 處理拖放邏輯
     window.hCh7L1Drop = (ev, slotId) => {
         ev.preventDefault();
         const id = ev.dataTransfer.getData("id");
+        // 如果該元件已經在其他格子，先移除它
         for (let k in window.hDrops) { if (window.hDrops[k] === id) delete window.hDrops[k]; }
+        // 放置新元件
         window.hDrops[slotId] = id;
         window.renderCh7L1Inner();
     };
 
+    // 移除已放置元件的功能
+    window.removeH1Drop = (slotId) => {
+        delete window.hDrops[slotId];
+        window.renderCh7L1Inner();
+    };
+
+    // 提交驗證
     window.submitCh7L1 = () => {
         let correct = 0;
-        Object.keys(FUNCS).forEach(id => { if (window.hDrops[id] === id) correct++; });
-        if (correct === 7) { stopTimer(); showResult(true); } 
-        else { alert(`配對錯誤！目前正確數：${correct}/7`); }
+        const total = Object.keys(FUNCS).length;
+        
+        Object.keys(FUNCS).forEach(id => { 
+            if (window.hDrops[id] === id) correct++; 
+        });
+
+        if (correct === total) { 
+            stopTimer(); 
+            showResult(true); // 呼叫勝利畫面
+        } else { 
+            alert(`配對尚未完全正確！目前正確數：${correct} / ${total}\n請再檢查一下每個元件的功能描述喔！`); 
+        }
     };
 
     window.renderCh7L1Inner();
 }
-
 // --- 7-2 規格大比拚 (結構微調與穩定) ---
 if (!window.lbDrops) window.lbDrops = {};
 
 function renderLaptopBattle(el) {
-    startTimer('down', 180, () => { const t = document.getElementById('h2-time'); if (t) t.innerText = formatTime(timeSeconds); });
+    startTimer('down', 400, () => { const t = document.getElementById('h2-time'); if (t) t.innerText = formatTime(timeSeconds); });
     const specs = [ { id: "cpu", n: "CPU", a: "i7-13700H", b: "i5-12500H", w: "A" }, { id: "ram", n: "記憶體", a: "8GB", b: "16GB", w: "B" }, { id: "hdd", n: "硬碟", a: "512GB SSD", b: "1TB SSD", w: "B" }, { id: "gpu", n: "顯示卡", a: "RTX 4060", b: "RTX 3050", w: "A" }, { id: "net", n: "網路卡", a: "1Gbps", b: "2.5Gbps", w: "B" }, { id: "wifi", n: "WiFi", a: "WiFi 6E", b: "WiFi 5", w: "A" }, { id: "res", n: "螢幕解析度", a: "1080p", b: "2K (1440p)", w: "B" } ];
 
     window.renderLBInner = () => {
@@ -1344,7 +1382,7 @@ function renderLaptopBattle(el) {
             <div class="p-6 max-w-5xl mx-auto">
                 <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500">${Icons.ArrowLeft} 返回大廳</button>
                 <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-black text-slate-800">關卡二：規格大比拚 (左右規格孰優孰劣?  請把"勝"拖曳到較優的規格前面 )</h1>
+                    <h1 class="text-3xl font-black text-slate-800">關卡二：規格大比拚 (左右規格孰優孰劣?  把"勝"拖曳到較優的規格 提示: 單位越大越優、數字越大越優 )</h1>
                     <div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="h2-time">${formatTime(timeSeconds)}</span></div>
                 </div>
                 <div class="flex justify-center mb-8">

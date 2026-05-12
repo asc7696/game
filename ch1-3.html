@@ -632,7 +632,7 @@ function renderArithmeticLogic(el) {
         // 正確答案：Q1=18, Q2=false, Q3=30
         let isQ1Correct = (a1 === "18");
         let isQ2Correct = (a2 === "false");
-        let isQ3Correct = (a3 === "30");
+        let isQ3Correct = (a3 === "30.0");
 
         // 更新回饋視覺 (不直接給解答，僅顯示對錯)
         document.getElementById('q13-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 再想一下運算順序';

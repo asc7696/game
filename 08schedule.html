@@ -2,115 +2,130 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <title>進程排程教學系統</title>
+    <title>工作排程法互動教學</title>
     <style>
-        body { font-family: "Microsoft JhengHei", sans-serif; background: #f0f2f5; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); }
-        .gantt-chart { display: flex; height: 60px; border: 2px solid #333; margin: 20px 0; background: #eee; border-radius: 5px; overflow: hidden; }
-        .process-block { display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1); border-right: 1px solid rgba(255,255,255,0.3); }
-        .controls { display: flex; gap: 10px; margin-bottom: 20px; }
-        button { flex: 1; padding: 12px; cursor: pointer; border: none; border-radius: 6px; font-weight: bold; background: #5c67f2; color: white; }
-        button:hover { background: #4a54e1; }
-        .desc { background: #fff9db; padding: 15px; border-left: 5px solid #fcc419; margin-bottom: 20px; min-height: 50px; }
-        .quiz-box { background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #dee2e6; }
-        input { padding: 10px; width: 150px; border: 1px solid #ccc; border-radius: 4px; margin-right: 10px; }
-        #quiz-feedback { margin-top: 15px; font-weight: bold; }
+        body { font-family: sans-serif; line-height: 1.6; color: #333; max-width: 900px; margin: 0 auto; padding: 20px; background: #f4f7f6; }
+        h1, h2 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+        .card { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .gantt-container { margin: 20px 0; background: #eee; padding: 10px; border-radius: 5px; min-height: 60px; display: flex; align-items: center; }
+        .process-block { height: 40px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; transition: width 0.5s ease; border-right: 1px solid #fff; }
+        .p1 { background: #e74c3c; } .p2 { background: #3498db; } .p3 { background: #f1c40f; color: #000; }
+        button { background: #3498db; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; }
+        button:hover { background: #2980b9; }
+        input[type="number"] { width: 60px; padding: 5px; margin: 5px; }
+        .quiz-section { background: #e8f4fd; border-left: 5px solid #3498db; }
+        .result { font-weight: bold; margin-top: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>作業系統排程教學</h1>
-    <p>數據：<strong>P1(6ms, 序3), P2(14ms, 序1), P3(8ms, 序2)</strong></p>
+<h1>工作排程法 (CPU Scheduling) 教學</h1>
+
+<div class="card">
+    <h2>1. 演算法說明</h2>
+    <ul>
+        <li><strong>先來先到 (FCFS):</strong> 最簡單的排程法，依照程序到達的先後順序執行。缺點是若大程序先到，會產生「護衛效應」(Convoy Effect)。</li>
+        <li><strong>最短工作優先 (SJF):</strong> 優先執行 CPU 區間 (Burst Time) 最短的工作。此法可獲得<strong>最小的平均等待時間</strong>。</li>
+        <li><strong>優先權排序 (Priority):</strong> 每個工作都有一個優先等級（通常數字越小優先權越高）。高優先權者先執行。</li>
+    </ul>
+</div>
+
+<div class="card">
+    <h2>2. 動態演示範例</h2>
+    <p>假設有三個程序同時到達 (0ms)：<br>
+        P1 (10ms), P2 (4ms), P3 (2ms)。優先權：P1(3), P2(1), P3(2)
+    </p>
+    <button onclick="runSimulation('FCFS')">演示 FCFS</button>
+    <button onclick="runSimulation('SJF')">演示 SJF</button>
+    <button onclick="runSimulation('Priority')">演示 Priority</button>
     
-    <div class="controls">
-        <button onclick="updateDisplay('FCFS')">1. FCFS 模擬</button>
-        <button onclick="updateDisplay('SJF')">2. SJF 模擬</button>
-        <button onclick="updateDisplay('Priority')">3. Priority 模擬</button>
-    </div>
+    <div id="gantt-title" style="margin-top: 20px; font-weight: bold;">甘特圖：</div>
+    <div class="gantt-container" id="gantt-chart">
+        </div>
+    <div id="wait-time-result"></div>
+</div>
 
-    <div id="algo-desc" class="desc">點擊上方按鈕觀看不同演算法的排程動畫。</div>
-
-    <div id="gantt" class="gantt-chart"></div>
-
-    <div class="quiz-box">
-        <h3>測驗評量</h3>
-        <p id="quiz-q">請先點擊模擬按鈕...</p>
-        <input type="number" step="0.01" id="quiz-ans" placeholder="平均等待時間">
-        <button style="flex:none; width: 100px;" onclick="checkAnswer()">提交</button>
-        <div id="quiz-feedback"></div>
-    </div>
+<div class="card quiz-section">
+    <h2>3. 測驗評量（填充題）</h2>
+    <p>假設有三個程序 A(5ms), B(2ms), C(8ms) 同時在 0ms 到達：</p>
+    
+    <ol>
+        <li>若使用 <strong>FCFS</strong> 排程（順序 A→B→C），平均等待時間為 <input type="number" id="q1"> ms。</li>
+        <li>若使用 <strong>SJF</strong> 排程，平均等待時間為 <input type="number" id="q2"> ms。</li>
+        <li>在所有非搶佔式排程法中，哪一種能保證獲得最短的平均等待時間？答：<input type="text" id="q3" placeholder="請填寫簡稱">。</li>
+    </ol>
+    <button onclick="checkQuiz()">提交答案</button>
+    <div id="quiz-feedback" class="result"></div>
 </div>
 
 <script>
-    const processes = [
-        { id: 'P1', burst: 6, priority: 3, color: '#ff6b6b' },
-        { id: 'P2', burst: 14, priority: 1, color: '#4ecdc4' },
-        { id: 'P3', burst: 8, priority: 2, color: '#45b7d1' }
+    const data = [
+        { name: 'P1', burst: 10, priority: 3, color: 'p1' },
+        { name: 'P2', burst: 4, priority: 1, color: 'p2' },
+        { name: 'P3', burst: 2, priority: 2, color: 'p3' }
     ];
 
-    let currentMode = '';
-    let correctAnswer = 0;
+    function runSimulation(type) {
+        let sorted = [...data];
+        if (type === 'SJF') sorted.sort((a, b) => a.burst - b.burst);
+        if (type === 'Priority') sorted.sort((a, b) => a.priority - b.priority);
 
-    function updateDisplay(type) {
-        currentMode = type;
-        let sorted = [...processes];
-        let info = "";
-
-        if (type === 'FCFS') {
-            // 順序: P1, P2, P3
-            info = "<strong>先來先到 (FCFS):</strong> 按照編號順序執行。P2 雖然很久但必須等 P1 完成。";
-            correctAnswer = (0 + 6 + (6+14)) / 3; 
-        } else if (type === 'SJF') {
-            // 順序: P1(6), P3(8), P2(14)
-            sorted.sort((a, b) => a.burst - b.burst);
-            info = "<strong>最短工作優先 (SJF):</strong> 比較長度 (6, 14, 8)，所以順序改為 P1 -> P3 -> P2。";
-            correctAnswer = (0 + 6 + (6+8)) / 3;
-        } else if (type === 'Priority') {
-            // 順序: P2(序1), P3(序2), P1(序3)
-            sorted.sort((a, b) => a.priority - b.priority);
-            info = "<strong>優先權排序:</strong> 數字越小越優先。順序為 P2(序1) -> P3(序2) -> P1(序3)。";
-            correctAnswer = (0 + 14 + (14+8)) / 3;
-        }
-
-        document.getElementById('algo-desc').innerHTML = info;
-        document.getElementById('quiz-q').innerHTML = `請問在 <b>${type}</b> 模式下，這三個進程的<b>平均等待時間</b>是多少？ (四捨五入至小數點後兩位)`;
-        document.getElementById('quiz-feedback').innerText = "";
-        renderGantt(sorted);
-    }
-
-    function renderGantt(data) {
-        const gantt = document.getElementById('gantt');
-        gantt.innerHTML = "";
-        const totalBurst = 28; // 6 + 14 + 8
-
-        data.forEach(p => {
-            const block = document.createElement('div');
-            block.className = 'process-block';
-            block.style.backgroundColor = p.color;
-            block.style.width = "0%"; 
-            block.innerText = `${p.id}(${p.burst})`;
-            gantt.appendChild(block);
-
-            setTimeout(() => {
-                block.style.width = (p.burst / totalBurst * 100) + "%";
-            }, 50);
-        });
-    }
-
-    function checkAnswer() {
-        if (!currentMode) return alert("請先選擇一個演算法進行模擬！");
+        const container = document.getElementById('gantt-chart');
+        container.innerHTML = '';
         
-        const userAns = parseFloat(document.getElementById('quiz-ans').value);
-        const feedback = document.getElementById('quiz-feedback');
-        const target = Math.round(correctAnswer * 100) / 100;
+        let totalWait = 0;
+        let currentWait = 0;
+        let waitDetails = [];
 
-        if (Math.abs(userAns - target) < 0.1) {
-            feedback.innerHTML = `✅ 正確！平均等待時間為 ${target} ms。`;
+        sorted.forEach((p, index) => {
+            // 計算等待時間
+            waitDetails.push(`${p.name}: ${currentWait}ms`);
+            totalWait += currentWait;
+            
+            // 建立動畫區塊
+            const div = document.createElement('div');
+            div.className = `process-block ${p.color}`;
+            div.style.width = '0%';
+            div.innerText = p.name;
+            container.appendChild(div);
+            
+            // 觸發寬度動畫
+            setTimeout(() => {
+                div.style.width = (p.burst * 5) + '%';
+            }, 100);
+
+            currentWait += p.burst;
+        });
+
+        const avgWait = (totalWait / data.length).toFixed(2);
+        document.getElementById('wait-time-result').innerHTML = `
+            <p>執行順序：${sorted.map(p => p.name).join(' -> ')}</p>
+            <p>各別等待時間：${waitDetails.join(', ')}</p>
+            <p><strong>平均等待時間：${avgWait} ms</strong></p>
+        `;
+    }
+
+    function checkQuiz() {
+        const q1 = document.getElementById('q1').value;
+        const q2 = document.getElementById('q2').value;
+        const q3 = document.getElementById('q3').value.toUpperCase();
+        
+        // Q1: (0 + 5 + 7)/3 = 4
+        // Q2: 順序 B, A, C -> (0 + 2 + 7)/3 = 3
+        // Q3: SJF
+        
+        let score = 0;
+        if(q1 == 4) score++;
+        if(q2 == 3) score++;
+        if(q3 === 'SJF') score++;
+        
+        const feedback = document.getElementById('quiz-feedback');
+        if(score === 3) {
             feedback.style.color = "green";
+            feedback.innerText = "太棒了！全部答對！";
         } else {
-            feedback.innerHTML = `❌ 不正確。提示：目前順序下各工作的等待時間加起來再除以 3。`;
             feedback.style.color = "red";
+            feedback.innerText = `得分為 ${score}/3。提示：平均等待時間 = (P1等待 + P2等待 + P3等待) / 3`;
         }
     }
 </script>

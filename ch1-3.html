@@ -46,7 +46,7 @@
         let studentScores = { "1號 示範學生": { ch4_l1: { time: 85, date: "2024/05/20 14:30:12" } } };
 
         const LEVEL_NAMES = {
-		    ch1_l1: "1-1 程式設計的概念", ch1_l2: "1-2 Python 程式語言簡介", ch1_l3: "數值運算",
+		    ch1_l1: "1-1 程式設計的概念", ch1_l2: "1-2 Python 程式語言簡介", ch1_l3: "1-3 數值運算",
         
             ch4_l1: "4-1 氣泡排序法", ch4_l2: "4-2 選擇排序法", ch4_l3: "4-3 循序搜尋法", ch4_l4: "4-4 二元搜尋法", ch4_l5: "4-5 排序與搜尋挑戰",
             ch5_l1: "5-1 分而治之演算法", ch5_l2: "5-2 函式定義與呼叫", ch5_l3: "5-3 遞迴函數概念", ch5_l4: "5-4 階乘推導", ch5_l5: "5-5 費氏級數推導", ch5_l6: "5-6 遞迴牛刀小試",
@@ -520,7 +520,7 @@ if (!window.ch1l3Inputs) window.ch1l3Inputs = { q1: "", q2: "", q3: "" };
 function renderArithmeticLogic(el) {
     // 1. 啟動計時器：500 秒
     startTimer('down', 1000, () => { 
-        const t = document.getElementById('h13-time'); 
+        const t = document.getElementById('app'); 
         if (t) t.innerText = formatTime(timeSeconds); 
     });
 

@@ -1,4 +1,4 @@
-
+	
 <!DOCTYPE html>
 <!-- saved from url=(0041)https://asc7696.github.io/game/ch4-7.html -->
 
@@ -1317,17 +1317,17 @@ async function submitScore(level, score, timeUsed, attempts) {
 
     try {
 
-        const response = await fetch(GAS_URL, {
+        await fetch(GAS_URL, {
 
             method: "POST",
+
+            mode: "no-cors",
 
             body: JSON.stringify(data)
 
         });
 
-        const result = await response.text();
-
-        console.log("成績已送出", result);
+        console.log("成績已送出");
 
     } catch (error) {
 
@@ -1335,7 +1335,6 @@ async function submitScore(level, score, timeUsed, attempts) {
 
     }
 }
-
 	
 	//--------------------?
 </script>

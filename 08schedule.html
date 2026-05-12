@@ -1,20 +1,11 @@
-const processes = [
-    { id: 'P1', burst: 6, priority: 3, color: '#ff6b6b' },
-    { id: 'P2', burst: 14, priority: 1, color: '#4ecdc4' }, // 數值小 = 優先權高
-    { id: 'P3', burst: 8, priority: 2, color: '#45b7d1' }
-];
-
-// 修正測驗題目常數 q 與解答邏輯
-function generateQuiz() {
-    const q = "題目：假設有三個工作 P1(5ms), P2(14ms), P3(8ms)，若按「先來先到 (FCFS)」且順序為 P1->P2->P3，請計算其『平均等待時間』。";
+function checkAnswer() {
+    const userAns = parseFloat(document.getElementById('quiz-ans').value);
+    const feedback = document.getElementById('quiz-feedback');
     
-    // FCFS 計算過程：
-    // P1 等待 0
-    // P2 等待 5 (P1結束)
-    // P3 等待 5 + 14 = 19 (P1+P2結束)
-    // 平均 = (0 + 5 + 19 / 3 = 8
-    currentAns = (0 + 5 + 19) / 3;
-    currentAns = Math.round(currentAns * 100) / 100; // 取小數點後兩位
-
-    document.getElementById('quiz-q').innerHTML = `<strong>${q}</strong>`;
+    // 使用 Math.abs 避免浮點數誤差
+    if (Math.abs(userAns - currentAns) < 0.1) {
+        feedback.innerHTML = `<span style="color:green">正確！計算方式：(0 + 6 + 20) / 3 = 8.67ms</span>`;
+    } else {
+        feedback.innerHTML = `<span style="color:red">不正確。提示：P1等待0, P2等待6, P3等待20，再平均一次！</span>`;
+    }
 }

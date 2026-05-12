@@ -1,5 +1,7 @@
+
 <!DOCTYPE html>
 <!-- saved from url=(0041)https://asc7696.github.io/game/ch4-7.html -->
+
 <html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1461,7 +1463,84 @@ if (!window.iDrops) window.iDrops = {};
         render();
 		
     </script>
+<script>
 
+//--------------------?
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxA3ApCJG_9Nyzii9tNTB2ntkPV6y7HoPbxmlkvWMnzQySNlSvR5qKzBZcvMBQNA8c9/exec";
+
+
+// =========================
+// 第一次登入
+// =========================
+
+function initStudentInfo() {
+
+  let className = localStorage.getItem("className");
+  let seatNumber = localStorage.getItem("seatNumber");
+  let studentName = localStorage.getItem("studentName");
+
+  if (!className) {
+
+    className = prompt("請輸入班級");
+    seatNumber = prompt("請輸入座號");
+    studentName = prompt("請輸入姓名");
+
+    localStorage.setItem("className", className);
+    localStorage.setItem("seatNumber", seatNumber);
+    localStorage.setItem("studentName", studentName);
+  }
+}
+
+initStudentInfo();
+
+
+// =========================
+// 送成績
+// =========================
+
+async function submitScore(level, score, timeUsed, attempts) {
+
+  const data = {
+
+    className:
+      localStorage.getItem("className"),
+
+    seatNumber:
+      localStorage.getItem("seatNumber"),
+
+    studentName:
+      localStorage.getItem("studentName"),
+
+    level: level,
+    score: score,
+    timeUsed: timeUsed,
+    attempts: attempts,
+
+    userAgent: navigator.userAgent
+  };
+
+  try {
+
+    const response = await fetch(GAS_URL, {
+
+      method: "POST",
+
+      body: JSON.stringify(data)
+
+    });
+
+    const result = await response.json();
+
+    console.log("成績已送出", result);
+
+  } catch (error) {
+
+    console.error("送出失敗", error);
+
+  }
+}
+//--------------------?
+</script>
 
 
 </body></html>

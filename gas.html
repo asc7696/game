@@ -101,7 +101,7 @@
             if (success && globalPlayerName !== 'Teacher') {
                 if (!studentScores[globalPlayerName]) studentScores[globalPlayerName] = {};
                 studentScores[globalPlayerName][currentView] = { time: actualUsedTime, date: getNowString() };
-				submitScore(currentView,actualUsedTime,actualUsedTime,1); ////////////////////////////////////////////////////////////////////////////////////////////////
+				submitScore(currentView,    success ? 100 : 0,    actualUsedTime,    1);////////////////////////////////////////////////////////////////////////////////////////////////
             }
 
             const modal = document.createElement('div');

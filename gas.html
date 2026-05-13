@@ -165,11 +165,11 @@
                     <div class="bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/20 max-w-md w-full text-center z-10 mb-8">
                         <h1 class="text-4xl font-black mb-2 tracking-tight">CS 學習大廳</h1>
                         <p class="mb-8 opacity-80">資訊科學演算法與電腦硬體</p>
-                        <div class="flex gap-4 mb-6">
-                            <input id="seat-input" type="text" placeholder="座號" class="w-1/3 p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
-                            <input id="name-input" type="text" placeholder="姓名" class="w-2/3 p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
-                        </div>
-                        <button onclick="saveName()" class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 rounded-2xl font-black text-xl transition-all active:scale-95 shadow-[0_0_20px_rgba(250,204,21,0.4)]">進入大廳</button>
+                       // <div class="flex gap-4 mb-6">
+                       //     <input id="seat-input" type="text" placeholder="座號" class="w-1/3 p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
+                       //     <input id="name-input" type="text" placeholder="姓名" class="w-2/3 p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
+                       // </div>
+                       // <button onclick="saveName()" class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 rounded-2xl font-black text-xl transition-all active:scale-95 shadow-[0_0_20px_rgba(250,204,21,0.4)]">進入大廳</button>
                     </div>
 
                     <div class="bg-slate-900/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-700 max-w-md w-full text-center z-10 flex flex-col items-center">
@@ -190,6 +190,7 @@
             }
         };
         window.saveName = () => {
+			
             const seat = document.getElementById('seat-input').value.trim();
             const name = document.getElementById('name-input').value.trim();
             if (seat && name) { globalPlayerName = `${seat}號 ${name}`; changeView('menu'); }
@@ -1293,7 +1294,7 @@ initStudentInfo();
 // 送成績
 // =========================
 async function submitScore(level, score, timeUsed, attempts) {
-
+//送出資料 {className: '201', seatNumber: '22', studentName: '可愛', level: 'ch4_l5', score: 100, …}
     const data = {
 
         className:

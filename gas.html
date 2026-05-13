@@ -1294,49 +1294,55 @@ initStudentInfo();
 // 送成績
 // =========================
 async function submitScore(level, score, timeUsed, attempts) {
-//送出資料 {className: '201', seatNumber: '22', studentName: '可愛', level: 'ch4_l5', score: 100, …}
-    const data = {
 
-        className:
-            localStorage.getItem("className"),
+  const seatMatch = globalPlayerName.match(/^(\d+)號\s(.+)$/);
 
-        seatNumber:
-            localStorage.getItem("seatNumber"),
+  const seatNumber = seatMatch ? seatMatch[1] : "";
+  const studentName = seatMatch ? seatMatch[2] : globalPlayerName;
 
-        studentName:
-            localStorage.getItem("studentName"),
+  const payload = {
+    className: "201",
+    seatNumber: seatNumber,
+    studentName: studentName,
+    level: level,
+    score: score,
+    timeUsed: timeUsed,
+    attempts: attempts,
+    userAgent: navigator.userAgent
+  };
 
-        level: level,
-        score: score,
-        timeUsed: timeUsed,
-        attempts: attempts,
+  console.log("送出資料", payload);
 
-        userAgent: navigator.userAgent
-    };
+  try {
 
-    console.log("送出資料", data);
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbxA3ApCJG_9Nyzii9tNTB2ntkPV6y7HoPbxmlkvWMnzQySNlSvR5qKzBZcvMBQNA8c9/exec",
+      {
+        method: "POST",
 
-    try {
+        headers: {
+          "Content-Type": "application/json"
+        },
 
-        await fetch(GAS_URL, {
+        body: JSON.stringify(payload)
+      }
+    );
 
-            method: "POST",
+    const result = await response.json();
 
-            mode: "no-cors",
+    console.log("GAS回傳", result);
 
-            body: JSON.stringify(data)
-
-        });
-
-        console.log("成績已送出");
-
-    } catch (error) {
-
-        console.error("送出失敗", error);
-
+    if(result.success){
+      console.log("成績已成功寫入 Google Sheet");
+    } else {
+      console.error("GAS錯誤", result.error);
     }
-}
-	
+
+  } catch(err) {
+
+    console.error("送出失敗", err);
+  }
+}	
 	//--------------------?
 </script>
 

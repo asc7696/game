@@ -99,47 +99,70 @@
             Lock: `<svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`
         };
 
-        function showResult(success, mbtiResult = '') {
-			// 💡 先從 localStorage 拿取班級
-    		const savedClass = localStorage.getItem("className") || "";
-            const app = document.getElementById('app');
-            const actualUsedTime = isCountingDown ? (initialDuration - timeSeconds) : timeSeconds;
-            const scoreStr = isCountingDown ? `剩餘時間: ${formatTime(timeSeconds)}` : `完成耗時: ${formatTime(timeSeconds)}`;
-            
-            if (success && globalPlayerName !== 'Teacher') {
-                if (!studentScores[globalPlayerName]) studentScores[globalPlayerName] = {};
-                studentScores[globalPlayerName][currentView] = { time: actualUsedTime, date: getNowString() };
-				submitScore(currentView,    success ? 100 : 0,    actualUsedTime,    1);////////////////////////////////////////////////////////////////////////////////////////////////
-            }
+// ==========================================
+// 遊戲挑戰結果結算與處理
+// ==========================================
+function showResult(success, mbtiResult = '') {
+    // 💡 先從 localStorage 拿取班級
+    const savedClass = localStorage.getItem("className") || globalClassName || "";
+    const app = document.getElementById('app');
+    
+    // 計算實際花費時間
+    const actualUsedTime = isCountingDown ? (initialDuration - timeSeconds) : timeSeconds;
+    const scoreStr = isCountingDown ? `剩餘時間: ${formatTime(timeSeconds)}` : `完成耗時: ${formatTime(timeSeconds)}`;
 
-            const modal = document.createElement('div');
-            modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-[100] px-4";
-            modal.innerHTML = `
-                <div class="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 animate-fade-in">
-        <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-slate-100 max-w-md w-full text-center">
-            <div class="text-6xl mb-4">${isSuccess ? '🎉' : '❌'}</div>
-            <h2 class="text-3xl font-black mb-2 text-slate-800">${isSuccess ? '挑戰成功！' : '挑戰失敗'}</h2>
-            <p class="text-slate-500 mb-6 font-medium">${currentLevelData.name}</p>
-            
-            <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 mb-6 font-bold text-slate-600">
-                <div>👤 玩家：${savedClass}班 ${globalPlayerName}</div>
-                <div>🎯 得分：<span class="text-2xl font-black ${currentScore >= 60 ? 'text-emerald-600' : 'text-rose-600'}">${currentScore}</span> / 100</div>
-                <div>⏱️ 剩餘時間：${formatTime(timeLeft)}</div>
-                <div>🔄 嘗試次數：${currentAttempts} 次</div>
-            </div>
-            
-            <div class="flex gap-4">
-                <button onclick="changeView('menu')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">返回大廳</button>
-                <button onclick="selectChapter(currentChapterId)" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md transition">再試一次</button>
+    if (success && globalPlayerName !== 'Teacher') {
+        if (!studentScores[globalPlayerName]) studentScores[globalPlayerName] = {};
+        studentScores[globalPlayerName][currentView] = { 
+            time: actualUsedTime, 
+            date: getNowString() 
+        };
+        
+        // 💡 修正原本殘缺的 ... 語法錯誤，補齊正確的參數傳遞
+        submitScore(currentView, success ? 100 : 0, actualUsedTime, 1);
+    }
+
+    // 儲存至本機
+    if (success) {
+        scores[currentView] = { 
+            score: 100, 
+            timeUsed: actualUsedTime, 
+            date: getNowString() 
+        };
+        localStorage.setItem('cs_lobby_scores', JSON.stringify(scores));
+    }
+
+    // 動態渲染過關/失敗的 UI 畫面
+    app.innerHTML = `
+        <div class="flex flex-col items-center justify-center min-h-screen bg-slate-900 text-white p-6 animate-fade-in">
+            <div class="bg-slate-800/80 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-slate-700 max-w-md w-full text-center">
+                <div class="text-6xl mb-6">${success ? '🎉' : '❌'}</div>
+                <h1 class="text-3xl font-black mb-2">${success ? '挑戰成功！' : '挑戰失敗'}</h1>
+                <p class="text-slate-400 mb-6">${LEVEL_NAMES[currentView] || '未知關卡'}</p>
+                
+                <div class="bg-slate-950/50 rounded-2xl p-4 mb-6 font-mono text-left space-y-2 border border-slate-800">
+                    <p class="text-slate-400">挑戰玩家：<span class="text-white font-bold">${savedClass ? savedClass + '班 ' : ''}${globalPlayerName}</span></p>
+                    <p class="text-slate-400">結算成績：<span class="${success ? 'text-emerald-400' : 'text-rose-400'} font-bold">${success ? '100 分' : '0 分'}</span></p>
+                    <p class="text-slate-400">時間記錄：<span class="text-yellow-400 font-bold">${scoreStr}</span></p>
+                    ${mbtiResult ? `<p class="text-slate-400">性格分析：<span class="text-purple-400 font-bold">${mbtiResult}</span></p>` : ''}
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="changeView('menu')" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl font-bold transition-all shadow-md">返回大廳地圖</button>
+                    ${!success ? `<button onclick="changeView('${currentView}')" class="w-full py-3.5 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition-all">重新挑戰</button>` : ''}
+                </div>
             </div>
         </div>
-    </div>            `;
-            app.appendChild(modal);
-        }
+    `;
+}
+ // 💡 拖曳與連連看關卡專用全域工具函式 (完整安全保留)
+window.drag = (ev, type, id) => { 
+    ev.dataTransfer.setData("type", type); 
+    ev.dataTransfer.setData("id", id); 
+};
+window.allowDrop = (ev) => ev.preventDefault();
 
-        window.drag = (ev, type, id) => { ev.dataTransfer.setData("type", type); ev.dataTransfer.setData("id", id); };
-        window.allowDrop = (ev) => ev.preventDefault();
-
+		
        // ================= 渲染引擎 =================
 function render() {
     const app = document.getElementById('app');

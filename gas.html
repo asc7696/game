@@ -1378,17 +1378,37 @@ const GAS_URL = "https://script.google.com/macros/s/AKfycbxA3ApCJG_9Nyzii9tNTB2n
 // =========================
 // 送成績
 // =========================
-async function submitScore(level, score, timeUsed, attempts) {
-  // 💡 修正關鍵：從瀏覽器儲存空間中抓取當前登入的班級，解決 className is not defined 報錯
-  const savedClass = localStorage.getItem("className") || "201";
+// 新增一個全域鎖定變數，放在函式外面
+let isSubmittingScore = false;
 
-  // 改善正則表達式，相容中英文或特殊符號的「號」
+async function submitScore(level, score, timeUsed, attempts) {
+  // 💡 1. 核心安全鎖：如果目前正在上傳中，直接攔截，不執行任何動作
+  if (isSubmittingScore) {
+    console.log("阻擋重複點擊：成績正在上傳中...");
+    return;
+  }
+
+  // 💡 2. 立刻上鎖
+  isSubmittingScore = true;
+
+  // 嘗試在畫面上找出送出按鈕或結果視窗的按鈕，讓它變灰、無法點擊
+  // 這樣能給學生極佳的視覺反饋
+  const activeButtons = document.querySelectorAll('#app button');
+  activeButtons.forEach(btn => {
+      if(btn.innerText.includes("再試一次") || btn.innerText.includes("返回選單")) {
+          btn.disabled = true;
+          btn.style.opacity = "0.5";
+          btn.style.cursor = "not-allowed";
+      }
+  });
+
+  const savedClass = localStorage.getItem("className") || "201";
   const seatMatch = globalPlayerName.match(/^(\d+)\s*[號号]\s*(.+)$/);
   const seatNumber = seatMatch ? seatMatch[1] : "";
   const studentName = seatMatch ? seatMatch[2] : globalPlayerName;
 
   const payload = {
-    className: savedClass, // 💡 成功帶入班級
+    className: savedClass,
     seatNumber: seatNumber,
     studentName: studentName,
     level: level,
@@ -1403,7 +1423,7 @@ async function submitScore(level, score, timeUsed, attempts) {
   try {
     const response = await fetch(
       "https://script.google.com/macros/s/AKfycbzjsNXVz5O0mY8x8CzayKhaU7vriOfocJy_Vozyr1jabmeu4wAiTqCYW3wBoUH3BE6y/exec",
-		{
+      {
         method: "POST",
         mode: "cors",
         headers: {
@@ -1412,7 +1432,7 @@ async function submitScore(level, score, timeUsed, attempts) {
         body: JSON.stringify(payload)
       }
     ).catch(err => {
-      console.warn("Fetch 被瀏覽器套件干擾，但仍嘗試繼續處理...", err);
+      console.warn("Fetch 被瀏覽器套件干擾...", err);
       return null;
     });
 
@@ -1437,9 +1457,16 @@ async function submitScore(level, score, timeUsed, attempts) {
   } catch (error) {
     console.error("送出失敗", error);
     alert("上傳失敗，請檢查網路連線或通知老師。");
+  } finally {
+    // 💡 3. 解鎖：不論成功或失敗，最後都把鎖解開，並讓按鈕恢復正常
+    isSubmittingScore = false;
+    activeButtons.forEach(btn => {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+    });
   }
-}
-  
+}  
 	//--------------------?
 </script>
 

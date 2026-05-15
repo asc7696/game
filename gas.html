@@ -299,44 +299,76 @@ function updateUIWithUserInfo(className, seatNumber, studentName) {
     `;
 }
         // --- 主選單 ---
-      function renderMenu(el) {
-    // 💡 1. 從瀏覽器儲存空間拿取當前登入的班級
+      // --- 主選單 ---
+function renderMenu(el) {
+    // 💡 完美融入：從瀏覽器儲存空間拿取當前登入的班級
     const savedClass = localStorage.getItem("className") || "";
 
-    // 💡 2. 配合你原本網頁的關卡與章節結構 (大四、五、六、七章)
-    // 這裡維持你原本網頁中渲染章節卡片的 HTML 寫法
-    el.innerHTML = `
-    <div class="p-6 max-w-6xl mx-auto">
-        <header class="mb-10 text-center relative flex flex-col items-center">
-            <h1 class="text-5xl font-black text-slate-800 mb-3 tracking-tight">CS 學習大廳</h1>
-            <p class="text-slate-600 font-bold">歡迎挑戰，${savedClass}班 ${globalPlayerName} 🚀 請選擇要學習的章節：</p>
-            <button onclick="changeView('reportCard')" class="mt-4 bg-white border-2 border-slate-200 text-slate-700 px-5 py-2 rounded-xl font-bold shadow-sm hover:border-slate-300 hover:bg-slate-50 transition flex items-center gap-2">
-                📊 學生成績單
-            </button>
-        </header>
+    const btnClass = (id) => unlockedLevels[id] ? "w-full text-left p-3 hover:bg-white/80 bg-white/50 rounded-xl transition-colors border border-slate-200 flex justify-between items-center group cursor-pointer shadow-sm text-sm" : "w-full text-left p-3 bg-slate-100 rounded-xl border border-slate-200 flex justify-between items-center opacity-50 cursor-not-allowed text-sm";
+    const btnAction = (id) => unlockedLevels[id] ? `onclick="changeView('${id}')"` : `onclick="alert('教師尚未開放此單元！')"` ;
+    const lockIcon = (id) => unlockedLevels[id] ? `<span class="opacity-0 group-hover:opacity-100 font-bold transition-opacity">開始 ➔</span>` : Icons.Lock;
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
-            <div class="bg-white p-8 rounded-3xl border-2 border-slate-100 shadow-lg hover:border-indigo-200 transition flex flex-col justify-between">
+    el.innerHTML = `
+        <div class="p-6 max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
                 <div>
-                    <span class="bg-indigo-50 text-indigo-600 text-xs px-3 py-1 rounded-full font-black">CHAPTER 4-5</span>
-                    <h3 class="text-2xl font-black text-slate-800 mt-3 mb-2">演算法、排序與二分搜尋</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">學習基礎演算法概念、流程圖，以及經典的泡沫排序法與高效率的二分搜尋法。</p>
+                    <h1 class="text-2xl font-black text-slate-800">歡迎挑戰，${savedClass ? savedClass + '班 ' : ''}${globalPlayerName}</h1>
+                    <p class="text-slate-500 font-medium">請選擇要學習的章節</p>
                 </div>
-                <button onclick="selectChapter('ch4_5')" class="w-full mt-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition">進入挑戰</button>
+                <div class="flex gap-4">
+                    <button onclick="changeView('report')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-6 py-3 rounded-xl font-bold shadow-sm transition-colors flex items-center">📊 成績單</button>
+                    ${globalPlayerName === 'Teacher' ? `<button onclick="changeView('teacher')" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-bold shadow-sm transition-colors">⚙️ 教師後臺</button>` : ''}
+                </div>
             </div>
 
-            <div class="bg-white p-8 rounded-3xl border-2 border-slate-100 shadow-lg hover:border-emerald-200 transition flex flex-col justify-between">
-                <div>
-                    <span class="bg-emerald-50 text-emerald-600 text-xs px-3 py-1 rounded-full font-black">CHAPTER 6-7</span>
-                    <h3 class="text-2xl font-black text-slate-800 mt-3 mb-2">電腦硬體、記憶體與資料表示</h3>
-                    <p class="text-slate-500 text-sm leading-relaxed">探索五大架構、CPU 運作原理、記憶體階層，以及二進位、十六進位與圖形編碼。</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gradient-to-b from-orange-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-orange-400">
+                    <h2 class="text-lg font-black mb-4 text-orange-900 flex items-center"><span class="bg-orange-200 text-orange-700 w-6 h-6 rounded flex items-center justify-center mr-2">4</span> 第四章：排序與搜尋</h2>
+                    <div class="space-y-2">
+                        <button ${btnAction('ch4_l1')} class="${btnClass('ch4_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l1']}</span>${lockIcon('ch4_l1')}</button>
+                        <button ${btnAction('ch4_l2')} class="${btnClass('ch4_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l2']}</span>${lockIcon('ch4_l2')}</button>
+                        <button ${btnAction('ch4_l3')} class="${btnClass('ch4_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l3']}</span>${lockIcon('ch4_l3')}</button>
+                        <button ${btnAction('ch4_l4')} class="${btnClass('ch4_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l4']}</span>${lockIcon('ch4_l4')}</button>
+                        <button ${btnAction('ch4_l5')} class="${btnClass('ch4_l5')} border-orange-300"><span class="font-black text-orange-800">${LEVEL_NAMES['ch4_l5']}</span>${lockIcon('ch4_l5')}</button>
+                    </div>
                 </div>
-                <button onclick="selectChapter('ch6_7')" class="w-full mt-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition">進入挑戰</button>
+
+                <div class="bg-gradient-to-b from-green-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-green-500">
+                    <h2 class="text-lg font-black mb-4 text-green-900 flex items-center"><span class="bg-green-200 text-green-700 w-6 h-6 rounded flex items-center justify-center mr-2">5</span> 第五章：分而治之與遞迴</h2>
+                    <div class="space-y-2">
+                        <button ${btnAction('ch5_l1')} class="${btnClass('ch5_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l1']}</span>${lockIcon('ch5_l1')}</button>
+                        <button ${btnAction('ch5_l2')} class="${btnClass('ch5_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l2']}</span>${lockIcon('ch5_l2')}</button>
+                        <button ${btnAction('ch5_l3')} class="${btnClass('ch5_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l3']}</span>${lockIcon('ch5_l3')}</button>
+                        <button ${btnAction('ch5_l4')} class="${btnClass('ch5_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l4']}</span>${lockIcon('ch5_l4')}</button>
+                        <button ${btnAction('ch5_l5')} class="${btnClass('ch5_l5')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l5']}</span>${lockIcon('ch5_l5')}</button>
+                        <button ${btnAction('ch5_l6')} class="${btnClass('ch5_l6')} border-green-300"><span class="font-black text-green-800">${LEVEL_NAMES['ch5_l6']}</span>${lockIcon('ch5_l6')}</button>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-b from-teal-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-teal-500">
+                    <h2 class="text-lg font-black mb-4 text-teal-900 flex items-center"><span class="bg-teal-200 text-teal-700 w-6 h-6 rounded flex items-center justify-center mr-2">6</span> 第六章：資料結構與走訪</h2>
+                    <div class="space-y-2">
+                        <button ${btnAction('ch6_l1')} class="${btnClass('ch6_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l1']}</span>${lockIcon('ch6_l1')}</button>
+                        <button ${btnAction('ch6_l2')} class="${btnClass('ch6_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l2']}</span>${lockIcon('ch6_l2')}</button>
+                        <button ${btnAction('ch6_l3')} class="${btnClass('ch6_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l3']}</span>${lockIcon('ch6_l3')}</button>
+                        <button ${btnAction('ch6_l4')} class="${btnClass('ch6_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l4']}</span>${lockIcon('ch6_l4')}</button>
+                        <button ${btnAction('ch6_l5')} class="${btnClass('ch6_l5')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l5']}</span>${lockIcon('ch6_l5')}</button>
+                        <button ${btnAction('ch6_l6')} class="${btnClass('ch6_l6')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l6']}</span>${lockIcon('ch6_l6')}</button>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-b from-purple-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-purple-500">
+                    <h2 class="text-lg font-black mb-4 text-purple-900 flex items-center"><span class="bg-purple-200 text-purple-700 w-6 h-6 rounded flex items-center justify-center mr-2">7</span> 第七章：系統平台(電腦軟硬體)</h2>
+                    <div class="space-y-2">
+                        <button ${btnAction('ch7_l1')} class="${btnClass('ch7_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch7_l1']}</span>${lockIcon('ch7_l1')}</button>
+                        <button ${btnAction('ch7_l2')} class="${btnClass('ch7_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch7_l2']}</span>${lockIcon('ch7_l2')}</button>
+                        <button ${btnAction('ch7_l3')} class="${btnClass('ch7_l3')} border-purple-300"><span class="font-black text-purple-800">${LEVEL_NAMES['ch7_l3']}</span>${lockIcon('ch7_l3')}</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>`;
+    `;
 }
-        // --- 學生：我的成績單 ---
         // --- 學生：我的成績單 ---
 function renderReportCard(el) {
     // 💡 從瀏覽器儲存空間拿取當前登入的班級

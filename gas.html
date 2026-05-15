@@ -189,11 +189,34 @@ function render() {
 // 全域變數
 let globalPlayerName = ""; 
 
+
+		
 // --- 主選單 ---
 function renderMenu(el) {
-    // 從瀏覽器快取拿取當前登入的班級
     const savedClass = localStorage.getItem("className") || "";
 
+    // 💡 1. 統計目前累計的金銀銅牌數
+    let goldCount = 0, silverCount = 0, bronzeCount = 0;
+    Object.keys(scores).forEach(lvl => {
+        if (scores[lvl] && scores[lvl].timeUsed) {
+            const medal = getMedalByTime(scores[lvl].timeUsed);
+            if (medal.includes("金牌")) goldCount++;
+            if (medal.includes("銀牌")) silverCount++;
+            if (medal.includes("銅牌")) bronzeCount++;
+        }
+    });
+
+    // 💡 2. 建立一個小工具：用來在關卡後方產生 (秒數 及 獎牌) 的標籤
+    const getLevelStatusTag = (id) => {
+        if (scores[id] && scores[id].timeUsed) {
+            const sec = scores[id].timeUsed;
+            const medal = getMedalByTime(sec);
+            return `<span class="text-xs bg-slate-200/80 text-slate-600 px-2 py-1 rounded-md ml-2 font-mono">⏱️${sec}秒 ${medal}</span>`;
+        }
+        return "";
+    };
+
+    // 原本的按鈕樣式與防呆
     const btnClass = (id) => unlockedLevels[id] ? "w-full text-left p-3 hover:bg-white/80 bg-white/50 rounded-xl transition-colors border border-slate-200 flex justify-between items-center group cursor-pointer shadow-sm text-sm" : "w-full text-left p-3 bg-slate-100 rounded-xl border border-slate-200 flex justify-between items-center opacity-50 cursor-not-allowed text-sm";
     const btnAction = (id) => unlockedLevels[id] ? `onclick="changeView('${id}')"` : `onclick="alert('教師尚未開放此單元！')"` ;
     const lockIcon = (id) => unlockedLevels[id] ? `<span class="opacity-0 group-hover:opacity-100 font-bold transition-opacity">開始 ➔</span>` : Icons.Lock;
@@ -202,7 +225,12 @@ function renderMenu(el) {
         <div class="p-6 max-w-6xl mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
                 <div>
-                    <h1 class="text-2xl font-black text-slate-800">歡迎挑戰，${savedClass ? savedClass + '班 ' : ''}${globalPlayerName}</h1>
+                    <h1 class="text-2xl font-black text-slate-800 flex items-center gap-2 flex-wrap">
+                        歡迎挑戰，${savedClass ? savedClass + '班 ' : ''}${globalPlayerName}
+                        <span class="flex gap-1 text-sm bg-slate-100 px-3 py-1 rounded-full border border-slate-200 font-normal text-slate-600">
+                            🏆 榮譽：🥇${goldCount} 🥈${silverCount} 🥉${bronzeCount}
+                        </span>
+                    </h1>
                     <p class="text-slate-500 font-medium">請選擇要學習的章節</p>
                 </div>
                 <div class="flex gap-3 flex-wrap">
@@ -216,51 +244,50 @@ function renderMenu(el) {
                 <div class="bg-gradient-to-b from-orange-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-orange-400">
                     <h2 class="text-lg font-black mb-4 text-orange-900 flex items-center"><span class="bg-orange-200 text-orange-700 w-6 h-6 rounded flex items-center justify-center mr-2">4</span> 第四章：排序與搜尋</h2>
                     <div class="space-y-2">
-                        <button ${btnAction('ch4_l1')} class="${btnClass('ch4_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l1']}</span>${lockIcon('ch4_l1')}</button>
-                        <button ${btnAction('ch4_l2')} class="${btnClass('ch4_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l2']}</span>${lockIcon('ch4_l2')}</button>
-                        <button ${btnAction('ch4_l3')} class="${btnClass('ch4_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l3']}</span>${lockIcon('ch4_l3')}</button>
-                        <button ${btnAction('ch4_l4')} class="${btnClass('ch4_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l4']}</span>${lockIcon('ch4_l4')}</button>
-                        <button ${btnAction('ch4_l5')} class="${btnClass('ch4_l5')} border-orange-300"><span class="font-black text-orange-800">${LEVEL_NAMES['ch4_l5']}</span>${lockIcon('ch4_l5')}</button>
+                        <button ${btnAction('ch4_l1')} class="${btnClass('ch4_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l1']}${getLevelStatusTag('ch4_l1')}</span>${lockIcon('ch4_l1')}</button>
+                        <button ${btnAction('ch4_l2')} class="${btnClass('ch4_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l2']}${getLevelStatusTag('ch4_l2')}</span>${lockIcon('ch4_l2')}</button>
+                        <button ${btnAction('ch4_l3')} class="${btnClass('ch4_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l3']}${getLevelStatusTag('ch4_l3')}</span>${lockIcon('ch4_l3')}</button>
+                        <button ${btnAction('ch4_l4')} class="${btnClass('ch4_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l4']}${getLevelStatusTag('ch4_l4')}</span>${lockIcon('ch4_l4')}</button>
+                        <button ${btnAction('ch4_l5')} class="${btnClass('ch4_l5')} border-orange-300"><span class="font-black text-orange-800">${LEVEL_NAMES['ch4_l5']}${getLevelStatusTag('ch4_l5')}</span>${lockIcon('ch4_l5')}</button>
                     </div>
                 </div>
 
                 <div class="bg-gradient-to-b from-green-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-green-500">
                     <h2 class="text-lg font-black mb-4 text-green-900 flex items-center"><span class="bg-green-200 text-green-700 w-6 h-6 rounded flex items-center justify-center mr-2">5</span> 第五章：分而治之與遞迴</h2>
                     <div class="space-y-2">
-                        <button ${btnAction('ch5_l1')} class="${btnClass('ch5_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l1']}</span>${lockIcon('ch5_l1')}</button>
-                        <button ${btnAction('ch5_l2')} class="${btnClass('ch5_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l2']}</span>${lockIcon('ch5_l2')}</button>
-                        <button ${btnAction('ch5_l3')} class="${btnClass('ch5_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l3']}</span>${lockIcon('ch5_l3')}</button>
-                        <button ${btnAction('ch5_l4')} class="${btnClass('ch5_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l4']}</span>${lockIcon('ch5_l4')}</button>
-                        <button ${btnAction('ch5_l5')} class="${btnClass('ch5_l5')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l5']}</span>${lockIcon('ch5_l5')}</button>
-                        <button ${btnAction('ch5_l6')} class="${btnClass('ch5_l6')} border-green-300"><span class="font-black text-green-800">${LEVEL_NAMES['ch5_l6']}</span>${lockIcon('ch5_l6')}</button>
+                        <button ${btnAction('ch5_l1')} class="${btnClass('ch5_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l1']}${getLevelStatusTag('ch5_l1')}</span>${lockIcon('ch5_l1')}</button>
+                        <button ${btnAction('ch5_l2')} class="${btnClass('ch5_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l2']}${getLevelStatusTag('ch5_l2')}</span>${lockIcon('ch5_l2')}</button>
+                        <button ${btnAction('ch5_l3')} class="${btnClass('ch5_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l3']}${getLevelStatusTag('ch5_l3')}</span>${lockIcon('ch5_l3')}</button>
+                        <button ${btnAction('ch5_l4')} class="${btnClass('ch5_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l4']}${getLevelStatusTag('ch5_l4')}</span>${lockIcon('ch5_l4')}</button>
+                        <button ${btnAction('ch5_l5')} class="${btnClass('ch5_l5')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l5']}${getLevelStatusTag('ch5_l5')}</span>${lockIcon('ch5_l5')}</button>
+                        <button ${btnAction('ch5_l6')} class="${btnClass('ch5_l6')} border-green-300"><span class="font-black text-green-800">${LEVEL_NAMES['ch5_l6']}${getLevelStatusTag('ch5_l6')}</span>${lockIcon('ch5_l6')}</button>
                     </div>
                 </div>
 
                 <div class="bg-gradient-to-b from-teal-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-teal-500">
                     <h2 class="text-lg font-black mb-4 text-teal-900 flex items-center"><span class="bg-teal-200 text-teal-700 w-6 h-6 rounded flex items-center justify-center mr-2">6</span> 第六章：資料結構與走訪</h2>
                     <div class="space-y-2">
-                        <button ${btnAction('ch6_l1')} class="${btnClass('ch6_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l1']}</span>${lockIcon('ch6_l1')}</button>
-                        <button ${btnAction('ch6_l2')} class="${btnClass('ch6_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l2']}</span>${lockIcon('ch6_l2')}</button>
-                        <button ${btnAction('ch6_l3')} class="${btnClass('ch6_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l3']}</span>${lockIcon('ch6_l3')}</button>
-                        <button ${btnAction('ch6_l4')} class="${btnClass('ch6_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l4']}</span>${lockIcon('ch6_l4')}</button>
-                        <button ${btnAction('ch6_l5')} class="${btnClass('ch6_l5')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l5']}</span>${lockIcon('ch6_l5')}</button>
-                        <button ${btnAction('ch6_l6')} class="${btnClass('ch6_l6')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l6']}</span>${lockIcon('ch6_l6')}</button>
+                        <button ${btnAction('ch6_l1')} class="${btnClass('ch6_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l1']}${getLevelStatusTag('ch6_l1')}</span>${lockIcon('ch6_l1')}</button>
+                        <button ${btnAction('ch6_l2')} class="${btnClass('ch6_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l2']}${getLevelStatusTag('ch6_l2')}</span>${lockIcon('ch6_l2')}</button>
+                        <button ${btnAction('ch6_l3')} class="${btnClass('ch6_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l3']}${getLevelStatusTag('ch6_l3')}</span>${lockIcon('ch6_l3')}</button>
+                        <button ${btnAction('ch6_l4')} class="${btnClass('ch6_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l4']}${getLevelStatusTag('ch6_l4')}</span>${lockIcon('ch6_l4')}</button>
+                        <button ${btnAction('ch6_l5')} class="${btnClass('ch6_l5')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l5']}${getLevelStatusTag('ch6_l5')}</span>${lockIcon('ch6_l5')}</button>
+                        <button ${btnAction('ch6_l6')} class="${btnClass('ch6_l6')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l6']}${getLevelStatusTag('ch6_l6')}</span>${lockIcon('ch6_l6')}</button>
                     </div>
                 </div>
 
                 <div class="bg-gradient-to-b from-purple-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-purple-500">
                     <h2 class="text-lg font-black mb-4 text-purple-900 flex items-center"><span class="bg-purple-200 text-purple-700 w-6 h-6 rounded flex items-center justify-center mr-2">7</span> 第七章：系統平台(電腦軟硬體)</h2>
                     <div class="space-y-2">
-                        <button ${btnAction('ch7_l1')} class="${btnClass('ch7_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch7_l1']}</span>${lockIcon('ch7_l1')}</button>
-                        <button ${btnAction('ch7_l2')} class="${btnClass('ch7_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch7_l2']}</span>${lockIcon('ch7_l2')}</button>
-                        <button ${btnAction('ch7_l3')} class="${btnClass('ch7_l3')} border-purple-300"><span class="font-black text-purple-800">${LEVEL_NAMES['ch7_l3']}</span>${lockIcon('ch7_l3')}</button>
+                        <button ${btnAction('ch7_l1')} class="${btnClass('ch7_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch7_l1']}${getLevelStatusTag('ch7_l1')}</span>${lockIcon('ch7_l1')}</button>
+                        <button ${btnAction('ch7_l2')} class="${btnClass('ch7_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch7_l2']}${getLevelStatusTag('ch7_l2')}</span>${lockIcon('ch7_l2')}</button>
+                        <button ${btnAction('ch7_l3')} class="${btnClass('ch7_l3')} border-purple-300"><span class="font-black text-purple-800">${LEVEL_NAMES['ch7_l3']}${getLevelStatusTag('ch7_l3')}</span>${lockIcon('ch7_l3')}</button>
                     </div>
                 </div>
             </div>
         </div>
     `;
 }
-
 // 💡 登出切換身分功能
 function logOutUser() {
     if (confirm("確定要切換身分（登出）嗎？這會清除目前的登入狀態。")) {
@@ -485,12 +512,14 @@ function renderLogin(el) {
 function renderReportCard(el) {
     // 💡 從瀏覽器儲存空間拿取當前登入的班級
     const savedClass = localStorage.getItem("className") || "";
-
+	const timeUsed = scores[id] ? scores[id].timeUsed + " 秒" : "-";
+	const medal = scores[id] ? getMedalByTime(scores[id].timeUsed) : "";
     const myScores = studentScores[globalPlayerName] || {};
     const rows = Object.keys(LEVEL_NAMES).map(key => {
         const sData = myScores[key];
         const status = sData ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold text-sm">已完成</span>` : `<span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold text-sm">未完成</span>`;
-        return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 font-bold text-slate-700">${LEVEL_NAMES[key]}</td><td class="p-4 text-center">${status}</td><td class="p-4 text-center font-mono font-bold text-blue-600">${sData ? formatTime(sData.time) + ' (' + sData.time + 's)' : '-'}</td><td class="p-4 text-center text-xs text-slate-500">${sData ? sData.date : '-'}</td></tr>`;
+        return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 font-bold text-slate-700">${LEVEL_NAMES[key]}</td><td class="p-4 text-center">${status}</td><td class="p-4 text-center font-mono font-bold text-blue-600">${sData ? formatTime(sData.time) + ' (' + sData.time + 's)' : '-'}</td><td class="p-4 text-center text-xs text-slate-500">${sData ? sData.date : '-'}</td><td class="px-6 py-4 text-slate-600 font-mono">${timeUsed}</td>
+<td class="px-6 py-4 font-bold text-slate-700">${medal || "-"}</td></tr>`;
     }).join('');
     
     // 💡 這裡將 ${savedClass}班 完美拼接到「查詢對象：」後面
@@ -1518,7 +1547,7 @@ async function submitScore(level, score, timeUsed, attempts) {
   const seatMatch = globalPlayerName.match(/^(\d+)\s*[號号]\s*(.+)$/);
   const seatNumber = seatMatch ? seatMatch[1] : "";
   const studentName = seatMatch ? seatMatch[2] : globalPlayerName;
-
+  const currentMedal = getMedalByTime(timeUsed);
   const payload = {
     className: savedClass,
     seatNumber: seatNumber,

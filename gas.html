@@ -1464,28 +1464,6 @@ async function submitScore(level, score, timeUsed, attempts) {
 	//--------------------?
 </script>
 
-	
-// =========================
-// 網頁初始化載入點
-// =========================
-function init() {
-    loadScores();
-    
-    // 💡 修正登入沒反應：載入時先檢查有沒有舊登入紀錄
-    const savedClass = localStorage.getItem("className");
-    const savedSeat = localStorage.getItem("seatNumber");
-    const savedName = localStorage.getItem("studentName");
-    
-    if (savedClass && savedSeat && savedName) {
-        // 有紀錄，直接進選單大廳
-        globalPlayerName = `${savedSeat}號 ${savedName}`;
-        changeView('menu');
-    } else {
-        // 沒紀錄，才顯示登入畫面
-        changeView('login');
-    }
-}
-init();
 
 	
 

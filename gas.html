@@ -300,31 +300,41 @@ function updateUIWithUserInfo(className, seatNumber, studentName) {
 }
         // --- 主選單 ---
       function renderMenu(el) {
+    // 💡 1. 從瀏覽器儲存空間拿取當前登入的班級
     const savedClass = localStorage.getItem("className") || "";
+
+    // 💡 2. 配合你原本網頁的關卡與章節結構 (大四、五、六、七章)
+    // 這裡維持你原本網頁中渲染章節卡片的 HTML 寫法
     el.innerHTML = `
-    <div class="max-w-6xl mx-auto p-6 animate-fade-in">
-        <header class="mb-10 text-center relative">
+    <div class="p-6 max-w-6xl mx-auto">
+        <header class="mb-10 text-center relative flex flex-col items-center">
             <h1 class="text-5xl font-black text-slate-800 mb-3 tracking-tight">CS 學習大廳</h1>
-            <p class="text-slate-600 mb-8 font-medium">歡迎挑戰，${savedClass}班 ${globalPlayerName} 🚀 請選擇要學習的章節：</p>
-            <button onclick="changeView('scoreboard')" class="absolute top-0 right-0 bg-white border-2 border-slate-200 text-slate-700 px-5 py-2.5 rounded-xl font-bold shadow-sm hover:border-slate-300 hover:bg-slate-50 transition flex items-center gap-2">
+            <p class="text-slate-600 font-bold">歡迎挑戰，${savedClass}班 ${globalPlayerName} 🚀 請選擇要學習的章節：</p>
+            <button onclick="changeView('reportCard')" class="mt-4 bg-white border-2 border-slate-200 text-slate-700 px-5 py-2 rounded-xl font-bold shadow-sm hover:border-slate-300 hover:bg-slate-50 transition flex items-center gap-2">
                 📊 學生成績單
             </button>
         </header>
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            ${Object.entries(chapters).map(([id, ch]) => `
-                <div class="bg-white rounded-3xl p-6 border-2 border-slate-100 shadow-sm hover:shadow-md hover:border-blue-200 transition group flex flex-col justify-between min-h-[220px]">
-                    <div>
-                        <div class="text-xs font-black text-blue-600 tracking-wider uppercase mb-2 bg-blue-50 px-2.5 py-1 rounded-md inline-block">${ch.title.split(' ')[0]}</div>
-                        <h3 class="text-xl font-black text-slate-800 mb-2 group-hover:text-blue-600 transition">${ch.title.split(' ').slice(1).join(' ')}</h3>
-                    </div>
-                    <button onclick="selectChapter('${id}')" class="w-full mt-4 py-3 bg-slate-50 group-hover:bg-blue-600 group-hover:text-white text-slate-700 rounded-xl font-bold transition flex items-center justify-center gap-1 text-sm border border-slate-100 group-hover:border-blue-600">
-                        開始挑戰
-                    </button>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+            <div class="bg-white p-8 rounded-3xl border-2 border-slate-100 shadow-lg hover:border-indigo-200 transition flex flex-col justify-between">
+                <div>
+                    <span class="bg-indigo-50 text-indigo-600 text-xs px-3 py-1 rounded-full font-black">CHAPTER 4-5</span>
+                    <h3 class="text-2xl font-black text-slate-800 mt-3 mb-2">演算法、排序與二分搜尋</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">學習基礎演算法概念、流程圖，以及經典的泡沫排序法與高效率的二分搜尋法。</p>
                 </div>
-            `).join('')}
+                <button onclick="selectChapter('ch4_5')" class="w-full mt-6 py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold transition">進入挑戰</button>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl border-2 border-slate-100 shadow-lg hover:border-emerald-200 transition flex flex-col justify-between">
+                <div>
+                    <span class="bg-emerald-50 text-emerald-600 text-xs px-3 py-1 rounded-full font-black">CHAPTER 6-7</span>
+                    <h3 class="text-2xl font-black text-slate-800 mt-3 mb-2">電腦硬體、記憶體與資料表示</h3>
+                    <p class="text-slate-500 text-sm leading-relaxed">探索五大架構、CPU 運作原理、記憶體階層，以及二進位、十六進位與圖形編碼。</p>
+                </div>
+                <button onclick="selectChapter('ch6_7')" class="w-full mt-6 py-3.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold transition">進入挑戰</button>
+            </div>
         </div>
-    </div>
-    `;
+    </div>`;
 }
         // --- 學生：我的成績單 ---
         // --- 學生：我的成績單 ---

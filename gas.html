@@ -189,7 +189,88 @@ function render() {
 // 全域變數
 let globalPlayerName = ""; 
 
+// --- 主選單 ---
+function renderMenu(el) {
+    // 從瀏覽器快取拿取當前登入的班級
+    const savedClass = localStorage.getItem("className") || "";
 
+    const btnClass = (id) => unlockedLevels[id] ? "w-full text-left p-3 hover:bg-white/80 bg-white/50 rounded-xl transition-colors border border-slate-200 flex justify-between items-center group cursor-pointer shadow-sm text-sm" : "w-full text-left p-3 bg-slate-100 rounded-xl border border-slate-200 flex justify-between items-center opacity-50 cursor-not-allowed text-sm";
+    const btnAction = (id) => unlockedLevels[id] ? `onclick="changeView('${id}')"` : `onclick="alert('教師尚未開放此單元！')"` ;
+    const lockIcon = (id) => unlockedLevels[id] ? `<span class="opacity-0 group-hover:opacity-100 font-bold transition-opacity">開始 ➔</span>` : Icons.Lock;
+
+    el.innerHTML = `
+        <div class="p-6 max-w-6xl mx-auto">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-8 bg-white p-6 rounded-3xl shadow-sm border border-slate-200 gap-4">
+                <div>
+                    <h1 class="text-2xl font-black text-slate-800">歡迎挑戰，${savedClass ? savedClass + '班 ' : ''}${globalPlayerName}</h1>
+                    <p class="text-slate-500 font-medium">請選擇要學習的章節</p>
+                </div>
+                <div class="flex gap-3 flex-wrap">
+                    <button onclick="logOutUser()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-3 rounded-xl font-bold shadow-sm transition-colors flex items-center gap-1">🔄 切換身分</button>
+                    <button onclick="changeView('report')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-6 py-3 rounded-xl font-bold shadow-sm transition-colors flex items-center">📊 成績單</button>
+                    ${globalPlayerName === 'Teacher' ? `<button onclick="changeView('teacher')" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-bold shadow-sm transition-colors">⚙️ 教師後臺</button>` : ''}
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gradient-to-b from-orange-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-orange-400">
+                    <h2 class="text-lg font-black mb-4 text-orange-900 flex items-center"><span class="bg-orange-200 text-orange-700 w-6 h-6 rounded flex items-center justify-center mr-2">4</span> 第四章：排序與搜尋</h2>
+                    <div class="space-y-2">
+                        <button ${btnAction('ch4_l1')} class="${btnClass('ch4_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l1']}</span>${lockIcon('ch4_l1')}</button>
+                        <button ${btnAction('ch4_l2')} class="${btnClass('ch4_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l2']}</span>${lockIcon('ch4_l2')}</button>
+                        <button ${btnAction('ch4_l3')} class="${btnClass('ch4_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l3']}</span>${lockIcon('ch4_l3')}</button>
+                        <button ${btnAction('ch4_l4')} class="${btnClass('ch4_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch4_l4']}</span>${lockIcon('ch4_l4')}</button>
+                        <button ${btnAction('ch4_l5')} class="${btnClass('ch4_l5')} border-orange-300"><span class="font-black text-orange-800">${LEVEL_NAMES['ch4_l5']}</span>${lockIcon('ch4_l5')}</button>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-b from-green-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-green-500">
+                    <h2 class="text-lg font-black mb-4 text-green-900 flex items-center"><span class="bg-green-200 text-green-700 w-6 h-6 rounded flex items-center justify-center mr-2">5</span> 第五章：分而治之與遞迴</h2>
+                    <div class="space-y-2">
+                        <button ${btnAction('ch5_l1')} class="${btnClass('ch5_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l1']}</span>${lockIcon('ch5_l1')}</button>
+                        <button ${btnAction('ch5_l2')} class="${btnClass('ch5_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l2']}</span>${lockIcon('ch5_l2')}</button>
+                        <button ${btnAction('ch5_l3')} class="${btnClass('ch5_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l3']}</span>${lockIcon('ch5_l3')}</button>
+                        <button ${btnAction('ch5_l4')} class="${btnClass('ch5_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l4']}</span>${lockIcon('ch5_l4')}</button>
+                        <button ${btnAction('ch5_l5')} class="${btnClass('ch5_l5')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch5_l5']}</span>${lockIcon('ch5_l5')}</button>
+                        <button ${btnAction('ch5_l6')} class="${btnClass('ch5_l6')} border-green-300"><span class="font-black text-green-800">${LEVEL_NAMES['ch5_l6']}</span>${lockIcon('ch5_l6')}</button>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-b from-teal-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-teal-500">
+                    <h2 class="text-lg font-black mb-4 text-teal-900 flex items-center"><span class="bg-teal-200 text-teal-700 w-6 h-6 rounded flex items-center justify-center mr-2">6</span> 第六章：資料結構與走訪</h2>
+                    <div class="space-y-2">
+                        <button ${btnAction('ch6_l1')} class="${btnClass('ch6_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l1']}</span>${lockIcon('ch6_l1')}</button>
+                        <button ${btnAction('ch6_l2')} class="${btnClass('ch6_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l2']}</span>${lockIcon('ch6_l2')}</button>
+                        <button ${btnAction('ch6_l3')} class="${btnClass('ch6_l3')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l3']}</span>${lockIcon('ch6_l3')}</button>
+                        <button ${btnAction('ch6_l4')} class="${btnClass('ch6_l4')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l4']}</span>${lockIcon('ch6_l4')}</button>
+                        <button ${btnAction('ch6_l5')} class="${btnClass('ch6_l5')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l5']}</span>${lockIcon('ch6_l5')}</button>
+                        <button ${btnAction('ch6_l6')} class="${btnClass('ch6_l6')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch6_l6']}</span>${lockIcon('ch6_l6')}</button>
+                    </div>
+                </div>
+
+                <div class="bg-gradient-to-b from-purple-50 to-white p-6 rounded-3xl shadow-md border-t-8 border-purple-500">
+                    <h2 class="text-lg font-black mb-4 text-purple-900 flex items-center"><span class="bg-purple-200 text-purple-700 w-6 h-6 rounded flex items-center justify-center mr-2">7</span> 第七章：系統平台(電腦軟硬體)</h2>
+                    <div class="space-y-2">
+                        <button ${btnAction('ch7_l1')} class="${btnClass('ch7_l1')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch7_l1']}</span>${lockIcon('ch7_l1')}</button>
+                        <button ${btnAction('ch7_l2')} class="${btnClass('ch7_l2')}"><span class="font-bold text-slate-700">${LEVEL_NAMES['ch7_l2']}</span>${lockIcon('ch7_l2')}</button>
+                        <button ${btnAction('ch7_l3')} class="${btnClass('ch7_l3')} border-purple-300"><span class="font-black text-purple-800">${LEVEL_NAMES['ch7_l3']}</span>${lockIcon('ch7_l3')}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 💡 登出切換身分功能
+function logOutUser() {
+    if (confirm("確定要切換身分（登出）嗎？這會清除目前的登入狀態。")) {
+        localStorage.removeItem("className");
+        localStorage.removeItem("seatNumber");
+        localStorage.removeItem("studentName");
+        globalPlayerName = "";
+        changeView('login');
+    }
+}
 		
 // 點擊網頁內「進入大廳」按鈕時觸發
 function login() {
@@ -290,6 +371,43 @@ function renderLogin(el) {
     `;
 }
 
+window.checkTeacher = () => {
+    const pwd = prompt("請輸入教師密碼：");
+    if (pwd === '393302') {
+        globalPlayerName = 'Teacher';
+        changeView('teacher');
+    } else if (pwd !== null) {
+        alert("密碼錯誤！");
+    }
+};
+
+window.saveName = () => {
+    const classEl = document.getElementById('class-input');
+    const seatEl = document.getElementById('seat-input');
+    const nameEl = document.getElementById('name-input');
+
+    if (!classEl || !seatEl || !nameEl) {
+        alert("系統找不到輸入欄位，請重新整理網頁！");
+        return;
+    }
+
+    const className = classEl.value.trim();
+    const seat = seatEl.value.trim();
+    const name = nameEl.value.trim();
+
+    if (className && seat && name) {
+        // 儲存至瀏覽器快取
+        localStorage.setItem("className", className);
+        localStorage.setItem("seatNumber", seat);
+        localStorage.setItem("studentName", name);
+
+        // 成功賦值並跳轉
+        globalPlayerName = `${seat}號 ${name}`;
+        changeView('menu');
+    } else {
+        alert("請完整選擇班級、並輸入座號與姓名！");
+    }
+};
 window.checkTeacher = () => {
     const pwd = prompt("請輸入教師密碼：");
     if (pwd === '393302') {

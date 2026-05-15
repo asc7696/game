@@ -168,10 +168,12 @@
 let globalPlayerName = ""; 
 
 // 網頁載入時自動執行
+
 window.addEventListener('DOMContentLoaded', () => {
     checkLoginStatus();
 });
 
+// 檢查登入狀態
 // 檢查登入狀態
 function checkLoginStatus() {
     const savedClass = localStorage.getItem("className");
@@ -179,99 +181,111 @@ function checkLoginStatus() {
     const savedName = localStorage.getItem("studentName");
 
     if (savedClass && savedSeat && savedName) {
+        // 如果有登入紀錄，直接設定全域變數並帶入 UI
         globalPlayerName = `${savedSeat}號 ${savedName}`;
-        updateUIWithUserInfo(savedClass, savedSeat, savedName);
         
-        // 💡 針對你原本的網頁結構修正：
-        // 你的原始碼是用 showTab('lobby') 來進大廳
-        showTab('lobby');
+        // 為了確保畫面上已有元素可帶入，延遲 100 毫秒同步 UI 
+        setTimeout(() => {
+            updateUIWithUserInfo(savedClass, savedSeat, savedName);
+        }, 100);
+        
+        // 配合你原本網頁進入大廳的方法（changeView）
+        if (typeof changeView === "function") {
+            changeView('menu');
+        } else if (typeof showTab === "function") {
+            showTab('lobby');
+        }
     } else {
-        renderLogin();
+        // 沒有登入紀錄，進行登入畫面渲染
+        const app = document.getElementById('app');
+        if (app && typeof renderLogin === "function") {
+            renderLogin(app); // 💡 注意：原本網頁的設計必須要把 app 傳進去
+        }
     }
 }
 
 // 點擊網頁內「進入大廳」按鈕時觸發
 function login() {
-    const className = document.getElementById("classInput").value.trim();
-    const seatNumber = document.getElementById("seatInput").value.trim();
-    const studentName = document.getElementById("nameInput").value.trim();
+    const classEl = document.getElementById("classInput");
+    const seatEl = document.getElementById("seatInput");
+    const nameEl = document.getElementById("nameInput");
+
+    // 防呆：如果找不到輸入框元素，代表畫面可能還沒渲染出來
+    if (!classEl || !seatEl || !nameEl) {
+        alert("找不到輸入欄位，請嘗試重新整理網頁！");
+        return;
+    }
+
+    const className = classEl.value.trim();
+    const seatNumber = seatEl.value.trim();
+    const studentName = nameEl.value.trim();
 
     if (!className || !seatNumber || !studentName) {
         alert("請填寫完整的班級、座號與姓名！");
         return;
     }
 
+    // 儲存到瀏覽器
     localStorage.setItem("className", className);
     localStorage.setItem("seatNumber", seatNumber);
     localStorage.setItem("studentName", studentName);
 
     globalPlayerName = `${seatNumber}號 ${studentName}`;
 
-    updateUIWithUserInfo(className, seatNumber, studentName);
-
+    // 登入成功，切換畫面
     alert("登入成功！");
     
-    // 💡 登入成功後，切換到大廳畫面
-    showTab('lobby');
+    if (typeof changeView === "function") {
+        changeView('menu');
+    } else if (typeof showTab === "function") {
+        showTab('lobby');
+    }
+
+    // 切換完畫面後同步左上角資訊
+    updateUIWithUserInfo(className, seatNumber, studentName);
 }
 
 // 負責把資料同步到左上角和成績單的欄位
 function updateUIWithUserInfo(className, seatNumber, studentName) {
+    // 1. 更新主網頁左上角
     const displayBox = document.getElementById("user-display-info");
     if (displayBox) {
         if(document.getElementById("display-class")) document.getElementById("display-class").innerText = className;
         if(document.getElementById("display-seat")) document.getElementById("display-seat").innerText = seatNumber;
         if(document.getElementById("display-name")) document.getElementById("display-name").innerText = studentName;
-        displayBox.classList.remove("hidden");
+        displayBox.classList.remove("hidden"); // 顯示左上角
     }
-
-    // 💡 根據你原本 HTML 的成績單 Input 欄位 ID（原本是 classInput、seatInput、nameInput）
-    // 如果你打開右上角成績單時發現資料沒帶入，代表你在同一個頁面有重複的 ID，可再跟我說，我幫你調成績單的 HTML
-    if (document.getElementById("classInput")) document.getElementById("classInput").value = className;
-    if (document.getElementById("seatInput")) document.getElementById("seatInput").value = seatNumber;
-    if (document.getElementById("nameInput")) document.getElementById("nameInput").value = studentName;
 }
         // --- 登入 ---
-        function renderLogin(el) {
-            el.innerHTML = `
-                <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-800 to-indigo-900 text-white relative overflow-hidden p-6">
-                    <div class="bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/20 max-w-md w-full text-center z-10 mb-8">
-                        <h1 class="text-4xl font-black mb-2 tracking-tight">CS 學習大廳</h1>
-                        <p class="mb-8 opacity-80">資訊科學演算法與電腦硬體</p>
-                        <div class="flex gap-4 mb-6">
-                            <input id="class-input" type="text" placeholder="班級" class="w-1/3 p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
-							<input id="seat-input" type="text" placeholder="座號" class="w-1/3 p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
-                            <input id="name-input" type="text" placeholder="姓名" class="w-2/3 p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
-                        </div>
-						
-                        <button onclick="login()" class="w-full bg-blue-600 text-white p-2 rounded-md hover:bg-blue-700 transition">進入大廳  </button>  
-						
-
-                    <div class="bg-slate-900/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-700 max-w-md w-full text-center z-10 flex flex-col items-center">
-                        <h2 class="text-xl font-bold text-blue-300 mb-2 flex items-center">⚙️ 教師管理專區</h2>
-                        <p class="text-sm text-slate-300 mb-4">設定各關卡開放狀態，並查閱或下載班級成績單。</p>
-                        <button onclick="checkTeacher()" class="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition-colors shadow flex items-center gap-2">進入教師後臺</button>
-                    </div>
+       function renderLogin(el) {
+    el.innerHTML = `
+    <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-800 to-indigo-900 text-white relative overflow-hidden p-6">
+        <div class="bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/20 max-w-md w-full text-center z-10 mb-8">
+            <h1 class="text-4xl font-black mb-2 tracking-tight">CS 學習大廳</h1>
+            <p class="mb-8 opacity-80">資訊科學演算法與電腦硬體</p>
+            
+            <div class="space-y-4 text-left mb-6">
+                <div>
+                    <label class="block text-sm font-bold text-slate-300 mb-1">班級</label>
+                    <input type="text" id="classInput" placeholder="例如: 201" class="w-full p-3 bg-white/5 border-2 border-white/20 rounded-xl text-white outline-none focus:border-blue-400 placeholder-white/30 font-medium">
                 </div>
-            `;
-        }
-        window.checkTeacher = () => {
-            const pwd = prompt("請輸入教師密碼：");
-            if (pwd === '393302') {
-                globalPlayerName = 'Teacher';
-                changeView('teacher');
-            } else if (pwd !== null) {
-                alert("密碼錯誤！");
-            }
-        };
-        window.saveName = () => {
-			
-            const seat = document.getElementById('seat-input').value.trim();
-            const name = document.getElementById('name-input').value.trim();
-            if (seat && name) { globalPlayerName = `${seat}號 ${name}`; changeView('menu'); }
-            else { alert("請完整輸入座號與姓名！"); }
-        };
+                <div>
+                    <label class="block text-sm font-bold text-slate-300 mb-1">座號</label>
+                    <input type="number" id="seatInput" placeholder="例如: 1" class="w-full p-3 bg-white/5 border-2 border-white/20 rounded-xl text-white outline-none focus:border-blue-400 placeholder-white/30 font-medium">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-slate-300 mb-1">姓名</label>
+                    <input type="text" id="nameInput" placeholder="請輸入姓名" class="w-full p-3 bg-white/5 border-2 border-white/20 rounded-xl text-white outline-none focus:border-blue-400 placeholder-white/30 font-medium">
+                </div>
+            </div>
 
+            <button onclick="login()" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xl shadow-lg transition-colors">
+                進入大廳
+            </button>
+        </div>
+    </div>
+    `;
+}
         // --- 主選單 ---
         function renderMenu(el) {
             const btnClass = (id) => unlockedLevels[id] ? "w-full text-left p-3 hover:bg-white/80 bg-white/50 rounded-xl transition-colors border border-slate-200 flex justify-between items-center group cursor-pointer shadow-sm text-sm" : "w-full text-left p-3 bg-slate-100 rounded-xl border border-slate-200 flex justify-between items-center opacity-50 cursor-not-allowed text-sm";

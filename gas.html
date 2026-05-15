@@ -243,8 +243,6 @@ function updateUIWithUserInfo(className, seatNumber, studentName) {
         displayBox.classList.remove("hidden"); // 顯示左上角
     }
 }
- // --- 登入 ---
-// --- 登入 ---
 // --- 登入 ---
 function renderLogin(el) {
     el.innerHTML = `
@@ -256,12 +254,22 @@ function renderLogin(el) {
                 <div class="space-y-4 text-left mb-6">
                     <div>
                         <label class="block text-sm font-bold text-slate-300 mb-1">班級</label>
-                        <input id="class-input" type="text" placeholder="例如: 201" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl font-bold shadow-inner">
+                        <select id="class-input" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl font-bold shadow-inner cursor-pointer">
+                            <option value="">請選擇班級</option>
+                            <option value="202">202 班</option>
+                            <option value="204">204 班</option>
+                            <option value="206">206 班</option>
+                            <option value="208">208 班</option>
+                            <option value="210">210 班</option>
+                            <option value="212">212 班</option>
+                            <option value="214">214 班</option>
+                            <option value="216">216 班</option>
+                        </select>
                     </div>
                     <div class="flex gap-4">
                         <div class="w-1/3">
                             <label class="block text-sm font-bold text-slate-300 mb-1">座號</label>
-                            <input id="seat-input" type="number" placeholder="座號" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
+                            <input id="seat-input" type="number" placeholder="座號" min="1" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
                         </div>
                         <div class="w-2/3">
                             <label class="block text-sm font-bold text-slate-300 mb-1">姓名</label>
@@ -274,7 +282,7 @@ function renderLogin(el) {
             </div>
 
             <div class="bg-slate-900/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-700 max-w-md w-full text-center z-10 flex flex-col items-center">
-                <h2 class="text-xl font-bold text-blue-300 mb-2 flex items-center">⚙️ 教師管理專專區</h2>
+                <h2 class="text-xl font-bold text-blue-300 mb-2 flex items-center">⚙️ 教師管理專區</h2>
                 <p class="text-sm text-slate-300 mb-4">設定各關卡開放狀態，並查閱或下載班級成績單。</p>
                 <button onclick="checkTeacher()" class="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition-colors shadow flex items-center gap-2">進入教師後臺</button>
             </div>
@@ -293,12 +301,21 @@ window.checkTeacher = () => {
 };
 
 window.saveName = () => {
-    const className = document.getElementById('class-input').value.trim();
-    const seat = document.getElementById('seat-input').value.trim();
-    const name = document.getElementById('name-input').value.trim();
+    const classEl = document.getElementById('class-input');
+    const seatEl = document.getElementById('seat-input');
+    const nameEl = document.getElementById('name-input');
+
+    if (!classEl || !seatEl || !nameEl) {
+        alert("找不到輸入欄位，請重新整理網頁！");
+        return;
+    }
+
+    const className = classEl.value.trim();
+    const seat = seatEl.value.trim();
+    const name = nameEl.value.trim();
 
     if (className && seat && name) {
-        // 儲存資訊
+        // 儲存資訊到本機
         localStorage.setItem("className", className);
         localStorage.setItem("seatNumber", seat);
         localStorage.setItem("studentName", name);
@@ -306,10 +323,9 @@ window.saveName = () => {
         globalPlayerName = `${seat}號 ${name}`;
         changeView('menu');
     } else {
-        alert("請完整輸入班級、座號與姓名！");
+        alert("請完整選擇班級、並輸入座號與姓名！");
     }
-};
-		
+};		
 // --- 主選單 ---
 // --- 登入 ---
 function renderLogin(el) {
@@ -1448,5 +1464,29 @@ async function submitScore(level, score, timeUsed, attempts) {
 	//--------------------?
 </script>
 
+	
+// =========================
+// 網頁初始化載入點
+// =========================
+function init() {
+    loadScores();
+    
+    // 💡 修正登入沒反應：載入時先檢查有沒有舊登入紀錄
+    const savedClass = localStorage.getItem("className");
+    const savedSeat = localStorage.getItem("seatNumber");
+    const savedName = localStorage.getItem("studentName");
+    
+    if (savedClass && savedSeat && savedName) {
+        // 有紀錄，直接進選單大廳
+        globalPlayerName = `${savedSeat}號 ${savedName}`;
+        changeView('menu');
+    } else {
+        // 沒紀錄，才顯示登入畫面
+        changeView('login');
+    }
+}
+init();
+
+	
 
 </body></html>

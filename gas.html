@@ -299,9 +299,8 @@ function updateUIWithUserInfo(className, seatNumber, studentName) {
     `;
 }
         // --- 主選單 ---
-      // --- 主選單 ---
+// --- 主選單 ---
 function renderMenu(el) {
-    // 💡 完美融入：從瀏覽器儲存空間拿取當前登入的班級
     const savedClass = localStorage.getItem("className") || "";
 
     const btnClass = (id) => unlockedLevels[id] ? "w-full text-left p-3 hover:bg-white/80 bg-white/50 rounded-xl transition-colors border border-slate-200 flex justify-between items-center group cursor-pointer shadow-sm text-sm" : "w-full text-left p-3 bg-slate-100 rounded-xl border border-slate-200 flex justify-between items-center opacity-50 cursor-not-allowed text-sm";
@@ -315,7 +314,9 @@ function renderMenu(el) {
                     <h1 class="text-2xl font-black text-slate-800">歡迎挑戰，${savedClass ? savedClass + '班 ' : ''}${globalPlayerName}</h1>
                     <p class="text-slate-500 font-medium">請選擇要學習的章節</p>
                 </div>
-                <div class="flex gap-4">
+                <div class="flex gap-3 flex-wrap">
+                    <button onclick="logOutUser()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 px-4 py-3 rounded-xl font-bold shadow-sm transition-colors flex items-center gap-1">🔄 切換身分</button>
+                    
                     <button onclick="changeView('report')" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 px-6 py-3 rounded-xl font-bold shadow-sm transition-colors flex items-center">📊 成績單</button>
                     ${globalPlayerName === 'Teacher' ? `<button onclick="changeView('teacher')" class="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-xl font-bold shadow-sm transition-colors">⚙️ 教師後臺</button>` : ''}
                 </div>
@@ -369,7 +370,8 @@ function renderMenu(el) {
         </div>
     `;
 }
-        // --- 學生：我的成績單 ---
+		
+// --- 學生：我的成績單 ---
 function renderReportCard(el) {
     // 💡 從瀏覽器儲存空間拿取當前登入的班級
     const savedClass = localStorage.getItem("className") || "";

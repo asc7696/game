@@ -140,71 +140,55 @@
         window.drag = (ev, type, id) => { ev.dataTransfer.setData("type", type); ev.dataTransfer.setData("id", id); };
         window.allowDrop = (ev) => ev.preventDefault();
 
-        // ================= 渲染引擎 =================
-        function render() {
-            const app = document.getElementById('app');
-            if (currentView === 'login') renderLogin(app);
-            else if (currentView === 'menu') renderMenu(app);
-            else if (currentView === 'report') renderReportCard(app);
-            else if (currentView === 'teacher') renderTeacherDashboard(app);
-            
-            else if (currentView === 'ch1_l1') renderConceptModule(app);
-            else if (currentView === 'ch1_l2') renderPythonModule(app);
-            
-			else if (currentView === 'ch4_l1') renderBubbleSort(app);
-            else if (currentView === 'ch4_l2') renderSelectionSort(app);
-            else if (currentView === 'ch4_l3') renderSequentialSearch(app);
-            else if (currentView === 'ch4_l4') renderBinarySearch(app);
-            else if (currentView === 'ch4_l5') renderChallenge(app);
-
-            else if (currentView === 'ch5_l1') renderDivConq(app);
-            else if (currentView === 'ch5_l2') renderFuncDef(app);
-            else if (currentView === 'ch5_l3') renderRecIntro(app);
-            else if (currentView === 'ch5_l4') renderFactorial(app);
-            else if (currentView === 'ch5_l5') renderFibonacci(app);
-            else if (currentView === 'ch5_l6') renderCowTest(app);
-
-            else if (currentView === 'ch6_l1') renderMBTI(app);
-            else if (currentView === 'ch6_l2') renderTreeTraverse(app);
-            else if (currentView === 'ch6_l3') renderMST(app);
-            else if (currentView === 'ch6_l4') renderShortestPath(app);
-			else if (currentView === 'ch6_l5') renderTrieModule(app);
-			else if (currentView === 'ch6_l6') renderBSTModule(app);
-
-            else if (currentView === 'ch7_l1') renderHardwareMatch(app);
-            else if (currentView === 'ch7_l2') renderLaptopBattle(app);
-            else if (currentView === 'ch7_l3') renderIndustry(app);
+       // ================= 渲染引擎 =================
+function render() {
+    const app = document.getElementById('app');
+    
+    // 💡 自動分流：如果還沒指定目前的畫面，就根據瀏覽器記憶來決定
+    if (!currentView) {
+        const savedClass = localStorage.getItem("className");
+        const savedSeat = localStorage.getItem("seatNumber");
+        const savedName = localStorage.getItem("studentName");
+        
+        if (savedClass && savedSeat && savedName) {
+            globalPlayerName = `${savedSeat}號 ${savedName}`;
+            currentView = 'menu';
+        } else {
+            currentView = 'login';
         }
+    }
 
-		// 全域變數
+    if (currentView === 'login') renderLogin(app);
+    else if (currentView === 'menu') renderMenu(app);
+    else if (currentView === 'report') renderReportCard(app);
+    else if (currentView === 'teacher') renderTeacherDashboard(app);
+    
+    else if (currentView === 'ch1_l1') renderConceptModule(app);
+    else if (currentView === 'ch1_l2') renderPythonModule(app);
+    else if (currentView === 'ch4_l1') renderBubbleSort(app);
+    else if (currentView === 'ch4_l2') renderSelectionSort(app);
+    else if (currentView === 'ch4_l3') renderSequentialSearch(app);
+    else if (currentView === 'ch4_l4') renderBinarySearch(app);
+    else if (currentView === 'ch4_l5') renderChallenge(app);
+    else if (currentView === 'ch5_l1') renderDivConq(app);
+    else if (currentView === 'ch5_l2') renderFuncDef(app);
+    else if (currentView === 'ch5_l3') renderRecIntro(app);
+    else if (currentView === 'ch5_l4') renderFactorial(app);
+    else if (currentView === 'ch5_l5') renderFibonacci(app);
+    else if (currentView === 'ch5_l6') renderCowTest(app);
+    else if (currentView === 'ch6_l1') renderMBTI(app);
+    else if (currentView === 'ch6_l2') renderTreeTraverse(app);
+    else if (currentView === 'ch6_l3') renderMST(app);
+    else if (currentView === 'ch6_l4') renderShortestPath(app);
+    else if (currentView === 'ch6_l5') renderTrieModule(app);
+    else if (currentView === 'ch6_l6') renderBSTModule(app);
+    else if (currentView === 'ch7_l1') renderHardwareMatch(app);
+    else if (currentView === 'ch7_l2') renderLaptopBattle(app);
+    else if (currentView === 'ch7_l3') renderIndustry(app);
+}
+// 全域變數
 let globalPlayerName = ""; 
 
-// 網頁載入時自動執行
-
-window.addEventListener('DOMContentLoaded', () => {
-    checkLoginStatus();
-});
-
-// 檢查登入狀態
-function checkLoginStatus() {
-    const savedClass = localStorage.getItem("className");
-    const savedSeat = localStorage.getItem("seatNumber");
-    const savedName = localStorage.getItem("studentName");
-
-    if (savedClass && savedSeat && savedName) {
-        // 有登入紀錄，直接設定變數進大廳
-        globalPlayerName = `${savedSeat}號 ${savedName}`;
-        changeView('menu');
-    } else {
-        // 沒有紀錄，確保停在登入畫面
-        changeView('login');
-    }
-}
-
-// 網頁載入時啟動檢查
-window.addEventListener('DOMContentLoaded', () => {
-    checkLoginStatus();
-});
 
 		
 // 點擊網頁內「進入大廳」按鈕時觸發
@@ -259,57 +243,72 @@ function updateUIWithUserInfo(className, seatNumber, studentName) {
         displayBox.classList.remove("hidden"); // 顯示左上角
     }
 }
-        // --- 登入 ---
-       function renderLogin(el) {
+ // --- 登入 ---
+// --- 登入 ---
+// --- 登入 ---
+function renderLogin(el) {
     el.innerHTML = `
-    <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-800 to-indigo-900 text-white relative overflow-hidden p-6">
-        <div class="bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/20 max-w-md w-full text-center z-10 mb-8">
-            <h1 class="text-4xl font-black mb-2 tracking-tight">CS 學習大廳</h1>
-            <p class="mb-8 opacity-80">資訊科學演算法與電腦硬體</p>
-            
-            <div class="space-y-4 text-left mb-6">
-                <div>
-                    <label class="block text-sm font-bold text-slate-300 mb-1">班級</label>
-                    <input type="text" id="classInput" placeholder="例如: 201" class="w-full p-3 bg-white/5 border-2 border-white/20 rounded-xl text-white outline-none focus:border-blue-400 placeholder-white/30 font-medium">
+        <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-800 to-indigo-900 text-white relative overflow-hidden p-6">
+            <div class="bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/20 max-w-md w-full text-center z-10 mb-8">
+                <h1 class="text-4xl font-black mb-2 tracking-tight">CS 學習大廳</h1>
+                <p class="mb-8 opacity-80">資訊科學演算法與電腦硬體</p>
+                
+                <div class="space-y-4 text-left mb-6">
+                    <div>
+                        <label class="block text-sm font-bold text-slate-300 mb-1">班級</label>
+                        <input id="class-input" type="text" placeholder="例如: 201" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl font-bold shadow-inner">
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-1/3">
+                            <label class="block text-sm font-bold text-slate-300 mb-1">座號</label>
+                            <input id="seat-input" type="number" placeholder="座號" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
+                        </div>
+                        <div class="w-2/3">
+                            <label class="block text-sm font-bold text-slate-300 mb-1">姓名</label>
+                            <input id="name-input" type="text" placeholder="請輸入姓名" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-300 mb-1">座號</label>
-                    <input type="number" id="seatInput" placeholder="例如: 1" class="w-full p-3 bg-white/5 border-2 border-white/20 rounded-xl text-white outline-none focus:border-blue-400 placeholder-white/30 font-medium">
-                </div>
-                <div>
-                    <label class="block text-sm font-bold text-slate-300 mb-1">姓名</label>
-                    <input type="text" id="nameInput" placeholder="請輸入姓名" class="w-full p-3 bg-white/5 border-2 border-white/20 rounded-xl text-white outline-none focus:border-blue-400 placeholder-white/30 font-medium">
-                </div>
+
+                <button onclick="saveName()" class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 rounded-2xl font-black text-xl transition-all active:scale-95 shadow-[0_0_20px_rgba(250,204,21,0.4)]">進入大廳</button>
             </div>
 
-            <button onclick="login()" class="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black text-xl shadow-lg transition-colors">
-                進入大廳
-            </button>
+            <div class="bg-slate-900/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-700 max-w-md w-full text-center z-10 flex flex-col items-center">
+                <h2 class="text-xl font-bold text-blue-300 mb-2 flex items-center">⚙️ 教師管理專專區</h2>
+                <p class="text-sm text-slate-300 mb-4">設定各關卡開放狀態，並查閱或下載班級成績單。</p>
+                <button onclick="checkTeacher()" class="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition-colors shadow flex items-center gap-2">進入教師後臺</button>
+            </div>
         </div>
-    </div>
     `;
 }
-////////?
+
+window.checkTeacher = () => {
+    const pwd = prompt("請輸入教師密碼：");
+    if (pwd === '393302') {
+        globalPlayerName = 'Teacher';
+        changeView('teacher');
+    } else if (pwd !== null) {
+        alert("密碼錯誤！");
+    }
+};
+
 window.saveName = () => {
     const className = document.getElementById('class-input').value.trim();
     const seat = document.getElementById('seat-input').value.trim();
     const name = document.getElementById('name-input').value.trim();
 
     if (className && seat && name) {
-        // 1. 儲存至瀏覽器
+        // 儲存資訊
         localStorage.setItem("className", className);
         localStorage.setItem("seatNumber", seat);
         localStorage.setItem("studentName", name);
 
-        // 2. 設定全域變數
         globalPlayerName = `${seat}號 ${name}`;
-        
-        // 3. 切換到大廳
         changeView('menu');
     } else {
         alert("請完整輸入班級、座號與姓名！");
     }
-};		
+};
 		
 // --- 主選單 ---
 // --- 登入 ---

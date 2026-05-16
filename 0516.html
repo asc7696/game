@@ -167,7 +167,7 @@ function render() {
 	else if (currentView === 'ch1_l3') renderArithmeticLogic(app);
 	else if (currentView === 'ch1_l4') renderStringOperations(app);
     else if (currentView === 'ch1_l5') renderInputOutputModule(app);
-    //else if (currentView === 'ch2_l1') renderBubbleSort(app);
+    else if (currentView === 'ch2_l1') renderCh2L1Module(app);
     //else if (currentView === 'ch2_l2') renderSelectionSort(app);
     //else if (currentView === 'ch2_l3') renderSequentialSearch(app);
     //else if (currentView === 'ch2_l4') renderBinarySearch(app);
@@ -1812,7 +1812,7 @@ h = float(input("請輸入身高(cm)："))
 w = float(input("請輸入體重(kg)："))
 bmi = w / ________________________  # 填空處：身高公分轉公尺後的「平方」算式
 print(bmi)</pre>
-                            <input type="text" id="q15-6" value="${window.ch1l5Inputs.q6_bmi}" oninput="window.ch1l5Inputs.q6_bmi=this.value" placeholder="例如: ((h/100)**2)" class="w-80 p-3 border-2 border-sky-300 rounded-xl focus:border-sky-500 outline-none font-mono font-bold">
+                            <input type="text" id="q15-6" value="${window.ch1l5Inputs.q6_bmi}" oninput="window.ch1l5Inputs.q6_bmi=this.value" placeholder="??" class="w-80 p-3 border-2 border-sky-300 rounded-xl focus:border-sky-500 outline-none font-mono font-bold">
                             <span id="q15-6-feedback" class="text-base"></span>
                         </div>
                     </div>
@@ -1889,6 +1889,165 @@ print(bmi)</pre>
     window.renderCh1L5Inner();
 }
 
+// --- 2-1 if 條件結構關卡 ---
+if (!window.ch2l1Inputs) window.ch2l1Inputs = { q1: "", q2: "", q3: "" };
+if (!window.ch2l1ReadStatus) window.ch2l1ReadStatus = { sec1: false, sec2: false };
+
+window.idle21State = {
+    currentExample: 1, // 1: 血量警告, 2: 獲得金幣
+    hp: "25",
+    gold: "100",
+    isRunning: false,
+    hasRun: false
+};
+
+function renderCh2L1Module(el) {
+    if (typeof startTimer === 'function') startTimer('up');
+
+    const checkAllRead = () => {
+        const s = window.ch2l1ReadStatus;
+        const btn = document.getElementById('ch2l1-submit-btn');
+        const msg = document.getElementById('ch2l1-lock-msg');
+        if (s.sec1 && s.sec2) {
+            if (btn) { btn.disabled = false; btn.className = "w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-3xl rounded-2xl shadow-lg transition-all active:scale-95"; }
+            if (msg) msg.classList.add('hidden');
+        }
+    };
+
+    window.toggleSec21Read = (secId, btnEl) => {
+        window.ch2l1ReadStatus[secId] = true;
+        btnEl.innerHTML = '✅ 我已讀懂此區塊（已確認）';
+        btnEl.className = "w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow-md border-2 border-emerald-700 text-center";
+        btnEl.onclick = null;
+        checkAllRead();
+    };
+
+    window.switchIdle21 = (exNum) => {
+        window.idle21State.currentExample = exNum;
+        window.idle21State.hasRun = false;
+        window.renderCh2L1Inner();
+    };
+
+    window.runIdle21 = () => {
+        window.idle21State.isRunning = true;
+        window.renderCh2L1Inner();
+        setTimeout(() => {
+            window.idle21State.isRunning = false;
+            window.idle21State.hasRun = true;
+            window.renderCh2L1Inner();
+        }, 500);
+    };
+
+    window.renderCh2L1Inner = () => {
+        const app = document.getElementById('app') || el;
+        
+        let codeHtml = "";
+        let inputHtml = "";
+        let outputHtml = "";
+
+        if (window.idle21State.currentExample === 1) {
+            codeHtml = `hp = <span class="text-amber-400">int</span>(<span class="text-indigo-400">input</span>(<span class="text-emerald-400">'請輸入目前血量：'</span>))\n<span class="text-pink-400 font-bold">if hp &lt; 30:</span>\n    <span class="text-amber-400">print</span>(<span class="text-rose-400">'🚨 警告：血量過低，畫面閃爍紅燈！'</span>)\n<span class="text-amber-400">print</span>(<span class="text-slate-400">'檢查完畢'</span>)`;
+            inputHtml = `<span class="text-sm font-bold text-slate-400">⌨️ 模擬輸入目前 HP：</span><input type="text" value="${window.idle21State.hp}" oninput="window.idle21State.hp=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-3 py-1 rounded font-mono text-lg w-24 text-center">`;
+            if (window.idle21State.hasRun) {
+                const val = parseInt(window.idle21State.hp);
+                if (isNaN(val)) outputHtml = `<span class="text-red-500 font-mono">ValueError</span>`;
+                else if (val < 30) outputHtml = `<div class="text-slate-400">請輸入目前血量：${val}</div>\n<div class="text-rose-400 font-bold">🚨 警告：血量過低，畫面閃爍紅燈！</div>\n<div class="text-slate-200">檢查完畢</div>`;
+                else outputHtml = `<div class="text-slate-400">請輸入目前血量：${val}</div>\n<div class="text-slate-200">檢查完畢</div>`;
+            }
+        } else {
+            codeHtml = `gold = <span class="text-amber-400">int</span>(<span class="text-indigo-400">input</span>(<span class="text-emerald-400">'請輸入金幣：'</span>))\n<span class="text-pink-400 font-bold">if gold == 100:</span>\n    <span class="text-amber-400">print</span>(<span class="text-yellow-400">'🏆 恭喜解鎖：百金富翁稱號！'</span>)`;
+            inputHtml = `<span class="text-sm font-bold text-slate-400">⌨️ 模擬輸入金幣數：</span><input type="text" value="${window.idle21State.gold}" oninput="window.idle21State.gold=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-3 py-1 rounded font-mono text-lg w-24 text-center">`;
+            if (window.idle21State.hasRun) {
+                const val = parseInt(window.idle21State.gold);
+                if (isNaN(val)) outputHtml = `<span class="text-red-500 font-mono">ValueError</span>`;
+                else if (val === 100) outputHtml = `<div class="text-slate-400">請輸入金幣：100</div>\n<div class="text-yellow-400 font-bold">🏆 恭喜解鎖：百金富翁稱號！</div>`;
+                else outputHtml = `<div class="text-slate-400">請輸入金幣：${val}</div>\n<span class="text-slate-500 italic">(條件不成立，什麼都沒印出)</span>`;
+            }
+        }
+
+        app.innerHTML = `
+            <div class="p-6 max-w-5xl mx-auto space-y-8 text-slate-800">
+                <button onclick="changeView('menu')" class="flex items-center text-xl text-slate-500 font-bold">< 返回選單</button>
+                <h1 class="text-4xl font-black text-slate-800 border-b-4 border-amber-500 pb-2">關卡 2-1：單向 if 條件結構</h1>
+                
+                <div class="bg-amber-50 p-6 rounded-3xl border-2 border-amber-200 space-y-3">
+                    <h2 class="font-black text-2xl text-amber-800">💡 1. 什麼是 if 條件判斷？</h2>
+                    <p class="text-xl leading-relaxed">當程式執行到 if 時，會先檢查後方的<b>「條件式」</b>是否為 <code class="font-mono bg-white px-1 text-emerald-600">True</code>。若是 True 就會執行內部縮排的程式碼；若是 <code class="font-mono bg-white px-1 text-rose-600">False</code> 則直接跳過。</p>
+                    <div class="bg-white p-4 rounded-xl border border-amber-100 font-bold text-red-600 text-lg">
+                        ⚠️ 語法兩大鐵律：<br>
+                        1. 條件寫完後面一定要加<b>冒號 <code class="font-mono text-xl text-black font-black">:</code></b>！<br>
+                        2. 屬於 if 內部的指令，前方一定要<b>縮排（按 Tab 鍵或 4 個空白鍵）</b>！
+                    </div>
+                    ${window.ch2l1ReadStatus.sec1 ? `<button class="w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl">✅ 已確認讀懂</button>` : `<button onclick="window.toggleSec21Read('sec1', this)" class="w-full mt-4 py-3 bg-amber-500 text-white font-bold text-xl rounded-xl animate-pulse">📖 我已讀懂此概念，點擊確認</button>`}
+                </div>
+
+                <div class="bg-slate-900 p-6 rounded-3xl border-4 border-slate-700 space-y-4">
+                    <div class="flex justify-between items-center flex-wrap gap-4">
+                        <h2 class="text-xl font-mono font-black text-slate-200">💻 Python IDLE 互動模擬環境</h2>
+                        <div class="flex gap-2 bg-slate-800 p-1 rounded-xl text-xs font-bold">
+                            <button onclick="window.switchIdle21(1)" class="px-3 py-1.5 rounded-lg ${window.idle21State.currentExample===1?'bg-indigo-600 text-white':'text-slate-400'}">範例 1 (HP警告)</button>
+                            <button onclick="window.switchIdle21(2)" class="px-3 py-1.5 rounded-lg ${window.idle21State.currentExample===2?'bg-indigo-600 text-white':'text-slate-400'}">範例 2 (稱號解鎖)</button>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between min-h-[200px]">
+                            <pre class="font-mono text-base text-slate-300 leading-relaxed">${codeHtml}</pre>
+                            <div class="pt-4 border-t border-slate-800 mt-4 space-y-2">
+                                ${inputHtml}
+                                <button onclick="window.runIdle21()" class="w-full bg-indigo-600 py-2 text-white font-black rounded-xl">▶ 點擊執行 (Run Module)</button>
+                            </div>
+                        </div>
+                        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 min-h-[200px] flex flex-col justify-between font-mono">
+                            <div>
+                                <span class="text-xs text-slate-500 block mb-2">// 執行結果：</span>
+                                <pre class="text-base text-slate-200 whitespace-pre-line">${window.idle21State.hasRun ? outputHtml : '<span class="text-slate-600 italic">等待執行...</span>'}</pre>
+                            </div>
+                        </div>
+                    </div>
+                    ${window.ch2l1ReadStatus.sec2 ? `<button class="w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl">✅ 已確認操作</button>` : `<button onclick="window.toggleSec21Read('sec2', this)" class="w-full mt-4 py-3 bg-indigo-500 text-white font-bold text-xl rounded-xl">🕹️ 已親自切換並操作模擬器，點擊確認</button>`}
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-indigo-200 space-y-6">
+                    <h2 class="font-black text-3xl text-indigo-700">📝 鷹架檢核任務</h2>
+                    <div class="space-y-4 text-xl">
+                        <div>
+                            <label class="font-bold">1. 請問下方程式碼執行後，螢幕上會印出幾次 "Hello"？</label>
+                            <pre class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-sm w-fit mt-2">if 5 > 3:\n    print("Hello")\nprint("Hello")</pre>
+                            <input type="text" id="q21-1" value="${window.ch2l1Inputs.q1}" oninput="window.ch2l1Inputs.q1=this.value.trim()" placeholder="填入數字" class="mt-2 p-2 border-b-2 border-indigo-500 w-32 text-center">
+                            <span id="q21-1-err" class="text-sm block mt-1"></span>
+                        </div>
+                        <div>
+                            <label class="font-bold">2. 請問下方程式碼中，哪一行犯了「漏掉縮排」的錯誤？</label>
+                            <pre class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-sm w-fit mt-2">行1: hp = 10\n行2: if hp < 20:\n行3: print("危險")</pre>
+                            <input type="text" id="q21-2" value="${window.ch2l1Inputs.q2}" oninput="window.ch2l1Inputs.q2=this.value.trim()" placeholder="例如: 行3" class="mt-2 p-2 border-b-2 border-indigo-500 w-44 text-center">
+                            <span id="q21-2-err" class="text-sm block mt-1"></span>
+                        </div>
+                    </div>
+                    <div class="pt-4">
+                        <p id="ch2l1-lock-msg" class="text-sm font-bold text-amber-600 text-center bg-amber-50 py-2 rounded-xl mb-3">⚠️ 請先完成上方概念與互動模擬的確認按鈕，方可解鎖提交。</p>
+                        <button id="ch2l1-submit-btn" disabled onclick="window.submitCh2L1()" class="w-full py-5 bg-slate-400 text-white font-black text-3xl rounded-2xl cursor-not-allowed opacity-50">提交所有答案</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    window.submitCh2L1 = () => {
+        const c1 = window.ch2l1Inputs.q1;
+        const c2 = window.ch2l1Inputs.q2.replace(/\s/g, "");
+        const isC1 = (c1 === "2");
+        const isC2 = (c2 === "行3" || c2 === "3");
+
+        document.getElementById('q21-1-err').innerHTML = isC1 ? '✅ 正確' : '❌ 不對喔！5 > 3 成立(True)，所以縮排的會印，沒縮排的也會印！';
+        document.getElementById('q21-1-err').className = isC1 ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+        document.getElementById('q21-2-err').innerHTML = isC2 ? '✅ 正確' : '❌ if 條件下方需要執行的指令必須縮排，所以是「行3」出錯！';
+        document.getElementById('q21-2-err').className = isC2 ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+
+        if (isC1 && isC2) { if (typeof stopTimer === 'function') stopTimer(); showResult(true); }
+    };
+
+    window.renderCh2L1Inner();
+}
 		
 	//--------------------?
   // 預設啟動

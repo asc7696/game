@@ -629,105 +629,278 @@ function renderConceptModule(el) {
 
     window.renderCPInner();
 }
-//1-2
+
+// --- 1-2 Python 變數與資料型態關卡 ---
 function renderPythonModule(el) {
     if (typeof startTimer === 'function') startTimer('up');
     
-    window.pyStep = 0;
-    window.pyAns = {};
+    // 初始化全域狀態
+    if (!window.pyAns) window.pyAns = { q_eq: "", q_side: "", fill_a: "", fill_b: "", t1: "", t2: "", t3: "", t4: "" };
     window.pyStatus = 'normal';
-    
+    window.swapStep = 0; // 控制第三部分變數交換的步驟
+
+    // 變數交換的數據與代碼
     const swapSteps = [
-        { label: "初始狀態", desc: "x = 20, y = 16", x: 20, y: 16, t: 0, code: "# 目前數值\nx = 20\ny = 16" },
-        { label: "步驟 1：temp = x", desc: "把 x 的值暫存到 temp 變數", x: 20, y: 16, t: 20, code: "temp = x  # temp 變成 20" },
-        { label: "步驟 2：x = y", desc: "把 y 的值覆蓋到 x", x: 16, y: 16, t: 20, code: "x = y     # x 變成 16" },
-        { label: "步驟 3：y = temp", desc: "最後把 temp 的值還原給 y", x: 16, y: 20, t: 20, code: "y = temp  # y 變成 20" }
+        { label: "初始狀態", desc: "遊戲背包有金劍（a = '金劍'）與木盾（b = '木盾'），我們想把兩者對調。", a: "金劍", b: "木盾", t: "無", code: "a = '金劍'\nb = '木盾'\ntemp = None" },
+        { label: "步驟 1：temp = a", desc: "把 a 的『金劍』複製一份，暫存到臨時箱子 temp 中。", a: "金劍", b: "木盾", t: "金劍", code: "temp = a  # temp 變箱子裝金劍" },
+        { label: "步驟 2：a = b", desc: "把 b 的『木盾』拿去覆蓋掉原本 a 的位置。", a: "木盾", b: "木盾", t: "金劍", code: "a = b     # a 的金劍被木盾覆蓋" },
+        { label: "步驟 3：b = temp", desc: "最後把臨時箱子 temp 裡的『金劍』放進 b 裡面。完成交換！", a: "木盾", b: "金劍", t: "金劍", code: "b = temp  # b 成功變成金劍" }
     ];
 
     window.renderPYInner = () => {
-        const app = document.getElementById('app'); 
-        if(typeof currentView !== 'undefined' && currentView !== 'ch1_l2') return;
+        const app = document.getElementById('app') || el; 
+        if (typeof currentView !== 'undefined' && currentView !== 'ch1_l2') return;
 
         app.innerHTML = `
-            <div class="p-6 max-w-4xl mx-auto">
-                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500">${Icons.ArrowLeft} 返回選單</button>
-                <h1 class="text-3xl font-black mb-6 text-amber-600">1-2 Python 程式語言簡介</h1>
+            <div class="p-6 max-w-5xl mx-auto space-y-8 text-slate-800">
+                <button onclick="changeView('menu')" class="flex items-center text-xl text-slate-500 hover:text-slate-800 font-bold transition-colors">${Icons.ArrowLeft} 返回選單</button>
+                
+                <h1 class="text-4xl font-black text-amber-600 pb-2 border-b-4 border-amber-500">關卡 1-2：Python 變數與資料型態</h1>
 
-                <div class="bg-white p-6 rounded-3xl shadow-lg mb-8 border-t-8 border-amber-500">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold text-amber-700">一、變數交換原理 (Swap)</h3>
-                        <div class="flex gap-2">
-                            <button onclick="window.movePY(-1)" class="px-4 py-1 bg-slate-100 rounded-lg">上一步</button>
-                            <button onclick="window.movePY(1)" class="px-4 py-1 bg-amber-500 text-white rounded-lg">下一步</button>
+                <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-slate-100">
+                    <h2 class="text-2xl font-black text-amber-700 mb-4 flex items-center gap-2">📦 一、什麼是變數？(Variable)</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-lg">
+                        <div class="p-4 bg-amber-50 rounded-2xl border border-amber-200">
+                            <span class="font-bold text-xl text-amber-800">1. 變數的意義 💡</span>
+                            <p class="mt-2 text-slate-700">變數就像一個<b>有標籤的置物盒</b>（記憶體空間），用來存放遊戲或程式執行時需要隨時記錄、改變的資料。</p>
                         </div>
-                    </div>
-                    
-                    <div class="grid grid-cols-2 gap-6 mb-4">
-                        <div class="flex justify-around items-end h-40 bg-slate-50 p-4 rounded-2xl border border-slate-100">
-                            <div class="flex flex-col items-center">
-                                <div class="w-10 bg-blue-400 rounded-t-lg transition-all" style="height: ${swapSteps[window.pyStep].x*3}px"></div>
-                                <div class="font-black mt-2">x: ${swapSteps[window.pyStep].x}</div>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <div class="w-10 bg-rose-400 rounded-t-lg transition-all" style="height: ${swapSteps[window.pyStep].y*3}px"></div>
-                                <div class="font-black mt-2">y: ${swapSteps[window.pyStep].y}</div>
-                            </div>
-                            <div class="flex flex-col items-center">
-                                <div class="w-10 ${swapSteps[window.pyStep].t?'bg-slate-400':'border-2 border-dashed border-slate-300'} rounded-t-lg transition-all" style="height: ${swapSteps[window.pyStep].t*3}px"></div>
-                                <div class="font-black mt-2 text-slate-400">temp: ${swapSteps[window.pyStep].t || '0'}</div>
-                            </div>
+                        <div class="p-4 bg-blue-50 rounded-2xl border border-blue-200">
+                            <span class="font-bold text-xl text-blue-800">2. 語法：指定運算子 📝</span>
+                            <p class="mt-2 text-slate-700">在程式中，單一個等號 <code class="bg-white px-1.5 py-0.5 rounded font-mono font-bold text-red-600">=</code> 代表<b>「把右邊的東西塞給左邊的盒子」</b>，這叫做指定運算。</p>
                         </div>
-                        <div class="bg-slate-900 rounded-2xl p-4 font-mono text-sm text-emerald-400 flex items-center">
-                            <code>${swapSteps[window.pyStep].code.replace('\n', '<br>')}</code>
+                        <div class="p-4 bg-emerald-50 rounded-2xl border border-emerald-200">
+                            <span class="font-bold text-xl text-emerald-800">3. 命名三大原則 🛑</span>
+                            <p class="mt-2 text-slate-700 text-sm leading-relaxed">
+                                • 只能由<b>英文、數字、底線(_)</b>組成。<br>
+                                • <b>開頭絕對不能是數字</b>（例如：<code class="text-red-500 font-mono">3lv</code> 是錯的）。<br>
+                                • 大小寫有別，且不能用 Python 內建關鍵字。
+                            </p>
                         </div>
-                    </div>
-                    <div class="bg-amber-50 p-4 rounded-xl border border-amber-100 font-bold text-amber-900">
-                        ${swapSteps[window.pyStep].label}：${swapSteps[window.pyStep].desc}
                     </div>
                 </div>
 
-                <div class="bg-white p-6 rounded-3xl shadow-lg">
-                    <h3 class="text-xl font-bold mb-4 text-emerald-600">二、資料型態挑戰</h3>
-					<h5 class="text-xl font-bold mb-4 text-emerald-600">1.整數（int）:不含小數點的數值</h5>
-					<h5 class="text-xl font-bold mb-4 text-emerald-600">2.浮點數（float） 包含小數點的數值</h5>
-					<h5 class="text-xl font-bold mb-4 text-emerald-600">3.字串（str）:由單（雙）引號、或連續3個單（雙）引號括起來的一串文字資料</h5>
-					<h5 class="text-xl font-bold mb-4 text-emerald-600">4.布林（bool）:只有True（真）和False（假）兩種</h5>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        ${[
-                            {id:'t1', val:'911', ans:'int'},
-                            {id:'t2', val:'"Python"', ans:'str'},
-                            {id:'t3', val:'3.14', ans:'float'},
-                            {id:'t4', val:'True', ans:'bool'}
-                        ].map(it => `
-                            <div class="p-4 border-2 rounded-2xl flex justify-between items-center ${window.pyStatus==='error' && (window.pyAns[it.id]||'').toLowerCase()!==it.ans ? 'border-rose-300 bg-rose-50' : 'border-slate-50'}">
-                                <code class="bg-slate-800 text-white px-3 py-1 rounded-md text-sm">${it.val}</code>
-                                <input type="text" placeholder="型態" oninput="window.pyAns['${it.id}']=this.value; window.pyStatus='normal';" 
-                                    class="w-24 border-b-2 border-emerald-500 text-center outline-none bg-transparent font-bold">
+                <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-slate-100 space-y-6">
+                    <h2 class="text-2xl font-black text-emerald-700">🎮 二、資料型態：以遊戲角色屬性為例</h2>
+                    <p class="text-lg font-bold text-slate-600">快來看看程式在記憶體中是如何幫我們管理「惡靈古堡」玩家資料與狀態變化的：</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="border-2 border-blue-200 rounded-3xl p-4 bg-slate-50 shadow-inner">
+                            <span class="bg-blue-600 text-white font-black text-sm px-3 py-1 rounded-full">狀態 🟢 遊戲剛開始</span>
+                            
+                            <div class="my-4 p-4 bg-slate-900 rounded-2xl font-mono text-white space-y-1 text-sm border-4 border-slate-700 shadow-md">
+                                <div class="text-emerald-400 font-bold border-b border-slate-700 pb-1">🌟 RE: VILLAGE STATUS</div>
+                                <div>PLAYER : <span class="text-yellow-400">"May"</span></div>
+                                <div>LEVEL  : <span class="text-sky-400">3</span></div>
+                                <div>HP     : <span class="text-rose-400">67.4 / 100</span></div>
+                                <div>CLEAR  : <span class="text-red-400">False</span></div>
+                                <div class="text-slate-400 mt-2 italic">💬 "歡迎來到惡靈古堡!"</div>
                             </div>
-                        `).join('')}
+
+                            <div class="space-y-2 text-sm">
+                                <span class="font-bold text-slate-500">🧠 電腦內部記憶體分配 (Memory Allocation)</span>
+                                <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                                    <div class="p-2 bg-white rounded-lg border shadow-sm">📥 <b class="text-blue-600">玩家名稱</b> = "May"<br><span class="text-slate-400">(字串 str)</span></div>
+                                    <div class="p-2 bg-white rounded-lg border shadow-sm">📥 <b class="text-blue-600">LV</b> = 3<br><span class="text-slate-400">(整數 int)</span></div>
+                                    <div class="p-2 bg-white rounded-lg border shadow-sm">📥 <b class="text-blue-600">HP</b> = 67.4<br><span class="text-slate-400">(浮點數 float)</span></div>
+                                    <div class="p-2 bg-white rounded-lg border shadow-sm">📥 <b class="text-blue-600">過關?</b> = False<br><span class="text-slate-400">(布林值 bool)</span></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="border-2 border-emerald-200 rounded-3xl p-4 bg-slate-50 shadow-inner">
+                            <span class="bg-emerald-600 text-white font-black text-sm px-3 py-1 rounded-full">狀態 🏆 觸發過關條件</span>
+                            
+                            <div class="my-4 p-4 bg-slate-900 rounded-2xl font-mono text-white space-y-1 text-sm border-4 border-yellow-500 shadow-xl">
+                                <div class="text-yellow-400 font-black border-b border-slate-700 pb-1 animate-pulse">🎉 MISSION COMPLETE!</div>
+                                <div>PLAYER : <span class="text-yellow-400">"May"</span></div>
+                                <div>LEVEL  : <span class="text-emerald-400">4 (升級!)</span></div>
+                                <div>HP     : <span class="text-emerald-400">100.0 (補滿!)</span></div>
+                                <div>CLEAR  : <span class="text-emerald-400">True (過關!)</span></div>
+                                <div class="text-yellow-300 mt-2 font-bold animate-bounce">💬 "過關!!!"</div>
+                            </div>
+
+                            <div class="space-y-2 text-sm">
+                                <span class="font-bold text-slate-500">🧠 記憶體資料被新數值「覆蓋」</span>
+                                <div class="grid grid-cols-2 gap-2 text-xs font-mono">
+                                    <div class="p-2 bg-yellow-50 rounded-lg border-2 border-yellow-300 shadow-sm">📥 <b>玩家名稱</b> = "May"<br><span class="text-slate-400">(不變)</span></div>
+                                    <div class="p-2 bg-emerald-50 rounded-lg border-2 border-emerald-300 shadow-sm">🔄 <b>LV</b> = <del class="text-slate-400">3</del> ➔ <b class="text-emerald-700">4</b><br><span class="text-slate-500">(數值覆蓋)</span></div>
+                                    <div class="p-2 bg-emerald-50 rounded-lg border-2 border-emerald-300 shadow-sm">🔄 <b>HP</b> = <del class="text-slate-400">67.4</del> ➔ <b class="text-emerald-700">100.0</b><br><span class="text-slate-500">(數值覆蓋)</span></div>
+                                    <div class="p-2 bg-emerald-50 rounded-lg border-2 border-emerald-300 shadow-sm">🔄 <b>過關?</b> = <del class="text-slate-400">False</del> ➔ <b class="text-emerald-700">True</b><br><span class="text-slate-500">(型態仍為 bool)</span></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <button onclick="window.submitPY()" class="mt-8 w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xl rounded-2xl shadow-lg transform transition active:scale-95">提交挑戰驗證</button>
+                </div>
+
+                <div class="bg-amber-50 p-6 rounded-3xl border-2 border-amber-200 shadow-sm space-y-4">
+                    <div class="flex justify-between items-center flex-wrap gap-2">
+                        <h2 class="text-2xl font-black text-amber-800 flex items-center gap-1">🔄 三、變數交換 (Swap) 運作原理</h2>
+                        <div class="flex gap-2 bg-white p-1.5 rounded-xl border border-amber-300 shadow-sm">
+                            <button onclick="window.moveSwapStep(-1)" class="px-4 py-1.5 bg-slate-100 hover:bg-slate-200 rounded-lg font-bold text-sm transition-all">◀ 上一步</button>
+                            <button onclick="window.moveSwapStep(1)" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-bold text-sm transition-all">下一步 ▶</button>
+                        </div>
+                    </div>
+
+                    <p class="text-lg text-amber-900 font-bold bg-white px-4 py-2.5 rounded-xl border border-amber-100">
+                        💡 <span class="text-red-600">請按上方「上一步/下一步」按鈕</span>，觀察記憶體格子內「金劍與木盾」的移動變化：
+                    </p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+                        <div class="bg-white p-4 rounded-2xl border border-amber-200 space-y-4 shadow-sm">
+                            <span class="block text-sm font-black text-slate-500">🧠 記憶體置物箱現況：</span>
+                            <div class="grid grid-cols-3 gap-2 text-center font-bold">
+                                <div class="p-4 bg-blue-50 border-2 border-blue-400 rounded-xl shadow-sm">
+                                    <div class="text-xs text-blue-600">盒子 a</div>
+                                    <div class="text-xl text-slate-800 font-mono mt-1">${swapSteps[window.swapStep].a}</div>
+                                </div>
+                                <div class="p-4 bg-rose-50 border-2 border-rose-400 rounded-xl shadow-sm">
+                                    <div class="text-xs text-rose-600">盒子 b</div>
+                                    <div class="text-xl text-slate-800 font-mono mt-1">${swapSteps[window.swapStep].b}</div>
+                                </div>
+                                <div class="p-4 bg-slate-50 border-2 border-dashed border-slate-400 rounded-xl shadow-sm">
+                                    <div class="text-xs text-slate-500">臨時箱 temp</div>
+                                    <div class="text-xl text-slate-700 font-mono mt-1">${swapSteps[window.swapStep].t}</div>
+                                </div>
+                            </div>
+                            <div class="p-3 bg-amber-100 text-amber-900 rounded-xl font-medium text-sm">
+                                <b>目前步驟：</b>${swapSteps[window.swapStep].label} <br> ➔ ${swapSteps[window.swapStep].desc}
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-900 rounded-2xl p-4 font-mono text-sm text-emerald-400 shadow-md h-full flex flex-col justify-center">
+                            <span class="text-slate-500 text-xs mb-2">// 執行對應的 Python 程式：</span>
+                            <code class="leading-relaxed block whitespace-pre-line text-base">${swapSteps[window.swapStep].code}</code>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-xl border border-amber-200 text-base text-slate-700 space-y-1">
+                        <span class="font-black text-amber-800 text-lg">💡 何時會用到變數交換？</span>
+                        <p>1. <b>排序演算法</b>：當我們想把一整排學生的身高「由矮到高」重新排列時，發現前面的人比後面高，就要在記憶體中進行兩兩位置調換。</p>
+                        <p>2. <b>遊戲機制</b>：例如玩家在道具欄中，將第 1 格的武器跟第 2 格的防具「拖曳調換位置」時，後台就是用這種交換邏輯。</p>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-emerald-500 space-y-8">
+                    <div>
+                        <h2 class="font-black text-3xl text-emerald-700 flex items-center gap-2">📝 挑戰練習：變數與型態綜合驗證</h2>
+                        <p class="text-slate-500 text-base mt-1">請仔細思考後填入正確答案，答錯的題目背景將會變紅提示喔！</p>
+                    </div>
+
+                    <div class="space-y-6 text-xl">
+                        <div class="p-4 border-2 border-slate-100 rounded-2xl space-y-2 ${window.pyStatus==='error' && window.pyAns.q_eq !== '2' ? 'border-rose-300 bg-rose-50' : ''}">
+                            <label class="font-bold text-slate-800">1. 觀念辨析：在 Python 中，關於 <code class="font-mono bg-white px-1 text-red-600">=</code> 與 <code class="font-mono bg-white px-1 text-red-600">==</code> 的敘述何者正確？</label>
+                            <div class="text-base text-slate-600 pl-2 space-y-1 font-medium">
+                                <div>(1) <code class="font-mono">=</code> 是用來檢查兩邊是否相等，<code class="font-mono">==</code> 是指定盒子資料。</div>
+                                <div>(2) <code class="font-mono">=</code> 是指定運算子（把右邊放進左邊），<code class="font-mono">==</code> 是關係運算子（檢查兩邊是否相等）。</div>
+                                <div>(3) 兩者完全一模一樣，可以互相通用。</div>
+                            </div>
+                            <input type="text" placeholder="填入選項數字 (1~3)" value="${window.pyAns.q_eq}"
+                                oninput="window.pyAns.q_eq=this.value.trim(); window.pyStatus='normal';"
+                                class="mt-2 w-52 p-2 border-b-2 border-emerald-500 font-bold outline-none text-center bg-transparent">
+                        </div>
+
+                        <div class="p-4 border-2 border-slate-100 rounded-2xl space-y-2 ${window.pyStatus==='error' && window.pyAns.q_side !== '2' ? 'border-rose-300 bg-rose-50' : ''}">
+                            <label class="font-bold text-slate-800">2. 語法方向：請問 <code class="font-mono bg-white px-1 text-blue-600">10 = HP</code> 與 <code class="font-mono bg-white px-1 text-blue-600">HP = 10</code> 哪一個寫法才是正確的？</label>
+                            <div class="text-base text-slate-600 pl-2 space-y-1 font-medium">
+                                <div>(1) <code class="font-mono">10 = HP</code> 正確，因為要把 HP 置物櫃裝進 10 裡面。</div>
+                                <div>(2) <code class="font-mono">HP = 10</code> 正確，左邊必須是「變數箱子名稱」，右邊是「要放入的數值」。</div>
+                                <div>(3) 兩種寫法皆合法，都沒有語法錯誤。</div>
+                            </div>
+                            <input type="text" placeholder="填入選項數字 (1~3)" value="${window.pyAns.q_side}"
+                                oninput="window.pyAns.q_side=this.value.trim(); window.pyStatus='normal';"
+                                class="mt-2 w-52 p-2 border-b-2 border-emerald-500 font-bold outline-none text-center bg-transparent">
+                        </div>
+
+                        <div class="p-4 border-2 border-slate-100 rounded-2xl space-y-3 ${window.pyStatus==='error' && (window.pyAns.fill_a !== '5' || window.pyAns.fill_b !== '12') ? 'border-rose-300 bg-rose-50' : ''}">
+                            <label class="font-bold text-slate-800">3. 程式軌跡追蹤：閱讀以下程式碼，求最終變數 <code class="font-mono text-indigo-600">a</code> 與 <code class="font-mono text-indigo-600">b</code> 留在記憶體的值分別是多少？</label>
+                            <pre class="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-sm leading-relaxed">
+a = 12
+b = 5
+temp = a
+a = b
+b = temp
+                            </pre>
+                            <div class="flex flex-wrap items-center gap-4 text-base font-bold">
+                                <div>變數 a 最終為：
+                                    <input type="text" placeholder="填值" value="${window.pyAns.fill_a}"
+                                        oninput="window.pyAns.fill_a=this.value.trim(); window.pyStatus='normal';"
+                                        class="w-20 border-b-2 border-emerald-500 text-center outline-none bg-transparent">
+                                </div>
+                                <div>變數 b 最終為：
+                                    <input type="text" placeholder="填值" value="${window.pyAns.fill_b}"
+                                        oninput="window.pyAns.fill_b=this.value.trim(); window.pyStatus='normal';"
+                                        class="w-20 border-b-2 border-emerald-500 text-center outline-none bg-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="p-4 border-2 border-slate-100 rounded-2xl space-y-3">
+                            <label class="font-bold text-slate-800">4. 資料型態挑戰：請填入各數值對應的型態名稱 (<code class="text-sm font-mono bg-slate-100 px-1">int</code> / <code class="text-sm font-mono bg-slate-100 px-1">float</code> / <code class="text-sm font-mono bg-slate-100 px-1">str</code> / <code class="text-sm font-mono bg-slate-100 px-1">bool</code>)</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-base">
+                                ${[
+                                    { id: 't1', val: '911', ans: 'int' },
+                                    { id: 't2', val: '"Python"', ans: 'str' },
+                                    { id: 't3', val: '3.14', ans: 'float' },
+                                    { id: 't4', val: 'True', ans: 'bool' }
+                                ].map(it => {
+                                    const isItemErr = window.pyStatus === 'error' && (window.pyAns[it.id] || '').toLowerCase().trim() !== it.ans;
+                                    return `
+                                    <div class="p-3 border rounded-xl flex justify-between items-center bg-slate-50 ${isItemErr ? 'border-rose-400 bg-rose-50 animate-shake' : 'border-slate-200'}">
+                                        <code class="bg-slate-800 text-white px-3 py-1 rounded-md font-mono text-sm">${it.val}</code>
+                                        <input type="text" placeholder="型態" value="${window.pyAns[it.id] || ''}"
+                                            oninput="window.pyAns['${it.id}']=this.value.trim(); window.pyStatus='normal';" 
+                                            class="w-24 border-b-2 border-emerald-500 text-center outline-none bg-transparent font-bold">
+                                    </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="window.submitPY()" class="mt-4 w-full py-5 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-2xl rounded-2xl shadow-lg transform transition active:scale-95">
+                        🚀 提交所有挑戰驗證
+                    </button>
                 </div>
             </div>
         `;
     };
 
-    window.movePY = (d) => { window.pyStep = Math.max(0, Math.min(swapSteps.length - 1, window.pyStep + d)); window.renderPYInner(); };
+    // 控制變數交換步驟的動態更新
+    window.moveSwapStep = (d) => {
+        window.swapStep = Math.max(0, Math.min(swapSteps.length - 1, window.swapStep + d));
+        window.renderPYInner();
+    };
+
+    // 提交挑戰總判定驗證
     window.submitPY = () => {
-        const answers = { t1: 'int', t2: 'str', t3: 'float', t4: 'bool' };
-        let allCorrect = Object.keys(answers).every(k => (window.pyAns[k]||'').toLowerCase().trim() === answers[k]);
-        if(allCorrect) {
-            if(typeof stopTimer === 'function') stopTimer();
-            showResult(true);
+        const typeAnswers = { t1: 'int', t2: 'str', t3: 'float', t4: 'bool' };
+        
+        // 1. 檢查觀念題與填充題
+        let isQ1Correct = window.pyAns.q_eq === '2';
+        let isQ2Correct = window.pyAns.q_side === '2';
+        let isQ3Correct = window.pyAns.fill_a === '5' && window.pyAns.fill_b === '12';
+        
+        // 2. 檢查資料型態填充題
+        let isTypesCorrect = Object.keys(typeAnswers).every(k => 
+            (window.pyAns[k] || '').toLowerCase().trim() === typeAnswers[k]
+        );
+
+        if (isQ1Correct && isQ2Correct && isQ3Correct && isTypesCorrect) {
+            if (typeof stopTimer === 'function') stopTimer();
+            showResult(true); // 觸發過關成功畫面
         } else {
             window.pyStatus = 'error';
-            window.renderPYInner();
-            alert("型態判斷有誤！提示：int 是整數，float 是小數，str 需要引號，bool 只有 True/False。");
+            window.renderPYInner(); // 重新渲染觸發變紅或震動效果
+            alert("❌ 部分挑戰答案有誤喔！請重新檢查有變紅底色提示的區塊。");
         }
     };
 
     window.renderPYInner();
-}// --- 1-3 數值運算關卡 (大字 + 閱讀解鎖版) ---
+}
+		
+		
+		
+// --- 1-3 數值運算關卡 (大字 + 閱讀解鎖版) ---
 if (!window.ch1l3Inputs) window.ch1l3Inputs = { q1: "", q2: "", q3: "", q4: "" };
 // 紀錄各區塊閱讀狀態
 if (!window.ch1l3ReadStatus) window.ch1l3ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };

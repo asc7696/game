@@ -165,8 +165,7 @@ function render() {
     else if (currentView === 'ch1_l1') renderConceptModule(app);
     else if (currentView === 'ch1_l2') renderPythonModule(app);
 	else if (currentView === 'ch1_l3') renderArithmeticLogic(app);
-	
-	//else if (currentView === 'ch1_l4') renderBinarySearch(app);
+	else if (currentView === 'ch1_l4') renderStringOperations(app);
     //else if (currentView === 'ch1_l5') renderChallenge(app);
     //else if (currentView === 'ch2_l1') renderBubbleSort(app);
     //else if (currentView === 'ch2_l2') renderSelectionSort(app);
@@ -851,6 +850,139 @@ function renderArithmeticLogic(el) {
                     <div class="bg-white p-4 rounded-2xl border-2 border-purple-200 overflow-x-auto">
                         <span class="block text-xl font-black text-slate-800 mb-3">📊 邏輯運算真值表（重要！）</span>
                         <table class="w-full text-
+
+// --- 1-4 字串運算關卡 (大字 + 閱讀解鎖版) ---
+if (!window.ch1l4Inputs) window.ch1l4Inputs = { q1: "", q2: "", q3: "", q4: "" };
+// 紀錄各區塊閱讀狀態
+if (!window.ch1l4ReadStatus) window.ch1l4ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
+
+function renderStringOperations(el) {
+    // 啟動計時器：只更新時間標籤 `#h14-time`
+    startTimer('down', 1000, () => { 
+        const timeEl = document.getElementById('app'); 
+        if (timeEl) timeEl.innerText = formatTime(timeSeconds); 
+    });
+
+    // 檢查是否所有區塊都讀完了
+    const checkAllRead = () => {
+        const s = window.ch1l4ReadStatus;
+        const submitBtn = document.getElementById('ch1l4-submit-btn');
+        const lockMsg = document.getElementById('ch1l4-lock-msg');
+        
+        if (s.sec1 && s.sec2 && s.sec3 && s.sec4) {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
+            }
+            if (lockMsg) lockMsg.classList.add('hidden');
+        }
+    };
+
+    // 點擊檢核鈕的觸發函式
+    window.toggleSection14Read = (sectionId, btnEl) => {
+        window.ch1l4ReadStatus[sectionId] = true;
+        btnEl.innerHTML = '✅ 我已讀懂此區塊（已確認）';
+        btnEl.className = "w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow-md border-2 border-emerald-700 transition-all text-center";
+        btnEl.onclick = null; 
+        checkAllRead();
+    };
+
+    window.renderCh1L4Inner = () => {
+        if (typeof currentView !== 'undefined' && currentView !== 'ch1_l4') return; 
+
+        const getBtnHtml = (secId) => {
+            if (window.ch1l4ReadStatus[secId]) {
+                return `<button class="w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow-md border-2 border-emerald-700 text-center">✅ 我已讀懂此區塊（已確認）</button>`;
+            } else {
+                return `<button onclick="window.toggleSection14Read('${secId}', this)" class="w-full mt-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xl rounded-xl shadow-md border-2 border-amber-600 transition-all active:scale-95 text-center animate-pulse">📖 我已讀懂此區塊，點擊確認</button>`;
+            }
+        };
+
+        el.innerHTML = `
+            <div class="p-6 max-w-6xl mx-auto space-y-8">
+                <button onclick="changeView('menu')" class="mb-2 flex items-center text-xl text-slate-500 hover:text-slate-800 transition-colors font-bold">${Icons.ArrowLeft} 返回大廳</button>
+                
+                <div class="flex justify-between items-center pb-4 border-b-2 border-slate-200">
+                    <h1 class="text-4xl font-black text-slate-800">關卡 1-4：字串基本運算與常用方法</h1>
+                    <div class="text-2xl font-mono bg-slate-800 text-white px-8 py-3 rounded-full shadow-md">限時：<span id="h14-time">${formatTime(timeSeconds)}</span></div>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-3xl border-2 border-blue-200 shadow-sm">
+                    <h2 class="font-black text-2xl text-blue-700 mb-4 flex items-center gap-2">🔤 1. 字串基本運算</h2>
+                    <p class="text-xl text-slate-800 font-bold mb-4 bg-white p-3 rounded-xl border border-blue-100">
+                        字串可以用引號（單引號 <code class="font-mono text-blue-600">' '</code> 或雙引號 <code class="font-mono text-blue-600">" "</code>）包起來。在 Python 中，字串也可以進行簡單的數學運算！
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xl text-slate-800 mb-4 font-medium">
+                        <ul class="space-y-2">
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">+</code> <strong>字串串接：</strong>將兩個字串接在一起。</li>
+                            <li class="pl-6 text-slate-600 font-mono">例如：<code class="bg-white px-1">"Py" + "thon"</code> 結果為 <code class="bg-slate-100 px-1 text-orange-600">"Python"</code></li>
+                        </ul>
+                        <ul class="space-y-2">
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">*</code> <strong>字串複製：</strong>將字串重複指定次數（必須搭配整數）。</li>
+                            <li class="pl-6 text-slate-600 font-mono">例如：<code class="bg-white px-1">"A" * 3</code> 結果為 <code class="bg-slate-100 px-1 text-orange-600">"AAA"</code></li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-blue-200 text-lg text-red-600 font-bold leading-relaxed">
+                        ⚠️ 注意：字串「不能」與數字直接進行加法運算（例如 <code class="bg-slate-100 px-1">"Age:" + 18</code> 會產生錯誤 TypeErrror），必須先將數字轉為字串。
+                    </div>
+                    ${getBtnHtml('sec1')}
+                </div>
+
+                <div class="bg-green-50 p-6 rounded-3xl border-2 border-green-200 shadow-sm">
+                    <h2 class="font-black text-2xl text-green-700 mb-3">📍 2. 字串索引 (Indexing)</h2>
+                    <p class="text-xl text-slate-800 font-bold mb-4 bg-white p-3 rounded-xl border border-green-100">
+                        字串裡的每個字元都有一個編號，稱為「索引值（Index）」。<strong>第一個字元的索引值是從 0 開始計算！</strong>
+                    </p>
+                    <div class="bg-white p-4 rounded-2xl border border-green-200 overflow-x-auto mb-4">
+                        <span class="block text-xl font-black text-slate-800 mb-3">📊 字串索引值對照表（以 "Python" 為例）：</span>
+                        <table class="w-full text-center border-collapse text-xl font-mono">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-800 font-bold">
+                                    <th class="p-3 border-2">字元</th>
+                                    <th class="p-3 border-2 text-blue-600">P</th>
+                                    <th class="p-3 border-2 text-blue-600">y</th>
+                                    <th class="p-3 border-2 text-blue-600">t</th>
+                                    <th class="p-3 border-2 text-blue-600">h</th>
+                                    <th class="p-3 border-2 text-blue-600">o</th>
+                                    <th class="p-3 border-2 text-blue-600">n</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-slate-700 font-bold">
+                                <tr>
+                                    <td class="p-3 border-2 bg-slate-50 font-sans text-sm">正向索引 (從0開始)</td>
+                                    <td class="p-3 border-2 text-emerald-600">0</td>
+                                    <td class="p-3 border-2 text-emerald-600">1</td>
+                                    <td class="p-3 border-2 text-emerald-600">2</td>
+                                    <td class="p-3 border-2 text-emerald-600">3</td>
+                                    <td class="p-3 border-2 text-emerald-600">4</td>
+                                    <td class="p-3 border-2 text-emerald-600">5</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3 border-2 bg-slate-50 font-sans text-sm">反向索引 (從後往前)</td>
+                                    <td class="p-3 border-2 text-rose-500">-6</td>
+                                    <td class="p-3 border-2 text-rose-500">-5</td>
+                                    <td class="p-3 border-2 text-rose-500">-4</td>
+                                    <td class="p-3 border-2 text-rose-500">-3</td>
+                                    <td class="p-3 border-2 text-rose-500">-2</td>
+                                    <td class="p-3 border-2 text-rose-500">-1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="text-xl text-slate-700 font-medium leading-relaxed pl-2">
+                        • 寫法：使用中括號 <code class="bg-white px-1 font-mono font-bold">[索引值]</code><br>
+                        • 範例：若 <code class="bg-white px-1 font-mono">s = "Python"</code>，則 <code class="bg-white px-1 font-mono">s[0]</code> 為 <code class="text-emerald-600 font-bold">"P"</code>，而 <code class="bg-white px-1 font-mono">s[-1]</code> 為最後一個字 <code class="text-rose-500 font-bold">"n"</code>。
+                    </p>
+                    ${getBtnHtml('sec2')}
+                </div>
+
+                <div class="bg-purple-50 p-6 rounded-3xl border-2 border-purple-200 shadow-sm">
+                    <h2 class="font-black text-2xl text-purple-700 mb-3">✂️ 3. 字串切片 (Slicing)與常用方法</h2>
+                    <p class="text-xl text-slate-800 font-bold mb-4 bg-white p-3 rounded-xl border border-purple-100 leading-relaxed">
+                        <strong>(1) 切片寫法：</strong> <code class="bg-slate-100 px-1 font-mono font-bold">
+
+
 //-------------------------------------------------
 
         // 預設啟動

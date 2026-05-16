@@ -872,7 +872,7 @@ function renderStringOperations(el) {
         if (s.sec1 && s.sec2 && s.sec3 && s.sec4) {
             if (submitBtn) {
                 submitBtn.disabled = false;
-                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'bg-slate-400');
                 submitBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
             }
             if (lockMsg) lockMsg.classList.add('hidden');
@@ -924,7 +924,7 @@ function renderStringOperations(el) {
                         </ul>
                     </div>
                     <div class="bg-white p-4 rounded-xl border border-blue-200 text-lg text-red-600 font-bold leading-relaxed">
-                        ⚠️ 注意：字串「不能」與數字直接進行加法運算（例如 <code class="bg-slate-100 px-1">"Age:" + 18</code> 會產生錯誤 TypeErrror），必須先將數字轉為字串。
+                        ⚠️ 注意：字串「不能」與數字直接進行加法運算（例如 <code class="bg-slate-100 px-1">"Age:" + 18</code> 會產生錯誤 TypeError），必須先將數字轉為字串。
                     </div>
                     ${getBtnHtml('sec1')}
                 </div>
@@ -991,10 +991,10 @@ function renderStringOperations(el) {
                             <span class="font-black text-purple-700 text-xl">len(字串)</span><br>計算字串的<span class="text-orange-600 font-bold">總長度</span>（字數）。<br><span class="text-sm text-slate-500">如: len("Hi") 為 2</span>
                         </div>
                         <div class="bg-white p-4 rounded-xl border border-purple-200 font-medium">
-                            <span class="font-black text-purple-700 text-xl">字串.upper()</span><br>將字串英文英文全部轉換為<span class="text-orange-600 font-bold">大寫</span>。<br><span class="text-sm text-slate-500">如: "py".upper() 為 "PY"</span>
+                            <span class="font-black text-purple-700 text-xl">字串.upper()</span><br>將英文字串全部轉換為<span class="text-orange-600 font-bold">大寫</span>。<br><span class="text-sm text-slate-500">如: "py".upper() 為 "PY"</span>
                         </div>
                         <div class="bg-white p-4 rounded-xl border border-purple-200 font-medium">
-                            <span class="font-black text-purple-700 text-xl">字串.lower()</span><br>將字串英文英文全部轉換為<span class="text-orange-600 font-bold">小寫</span>。<br><span class="text-sm text-slate-500">如: "Py".lower() 為 "py"</span>
+                            <span class="font-black text-purple-700 text-xl">字串.lower()</span><br>將英文字串全部轉換為<span class="text-orange-600 font-bold">小寫</span>。<br><span class="text-sm text-slate-500">如: "Py".lower() 為 "py"</span>
                         </div>
                     </div>
                     ${getBtnHtml('sec3')}
@@ -1120,17 +1120,13 @@ function renderStringOperations(el) {
         const a4 = window.ch1l4Inputs.q4.trim().toLowerCase(); 
 
         // 正確答案判定
-        // Q1: "GoGoGo!]"
-        // Q2: Strawberry 的索引 2,3,4 是 "raw" (包含r,不包含b)
-        // Q3: len是5(True) and lower是"dog"(True) -> True
-        // Q4: Banana[0]="B" == "b"為False -> not False為True -> True or 任何事皆為 true
-        let isQ1Correct = (a1 === "GoGoGo!]");
+        let isQ1Correct = (a1 === "GoGoGo!] ");
         let isQ2Correct = (a2 === "raw");
         let isQ3Correct = (a3 === "true");
         let isQ4Correct = (a4 === "true"); 
 
         // 更新回饋視覺
-        document.getElementById('q14-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 檢查複製次數與串接符號';
+        document.getElementById('q14-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 檢查複製次數與串接符號（注意末尾空格）';
         document.getElementById('q14-1-feedback').className = isQ1Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
         
         document.getElementById('q14-2-feedback').innerHTML = isQ2Correct ? '✅ 正確' : '❌ 記得口訣：包含開頭，不包含結束！';
@@ -1139,7 +1135,7 @@ function renderStringOperations(el) {
         document.getElementById('q14-3-feedback').innerHTML = isQ3Correct ? '✅ 正確' : '❌ 檢查長度與大小寫方法轉換';
         document.getElementById('q14-3-feedback').className = isQ3Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
 
-        document.getElementById('q14-4-feedback').innerHTML = isQ4Correct ? '✅ 正確' : '❌ 注意大小寫不同！"B" == "b" 是 False 唷';
+        document.getElementById('q14-4-feedback').innerHTML = isQ4Correct ? '✅ 正確' : '❌ 注意！"Banana"[0] 是大寫 "B"，與 "b" 相比為 False，經 not 轉換後為 True';
         document.getElementById('q14-4-feedback').className = isQ4Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
 
         if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
@@ -1157,8 +1153,7 @@ function renderStringOperations(el) {
     };
 
     window.renderCh1L4Inner();
-}
-	
+}	
 	
 	//--------------------?
 </script>

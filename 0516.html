@@ -859,7 +859,7 @@ if (!window.ch1l4ReadStatus) window.ch1l4ReadStatus = { sec1: false, sec2: false
 function renderStringOperations(el) {
     // 啟動計時器：只更新時間標籤 `#h14-time`
     startTimer('down', 1000, () => { 
-        const timeEl = document.getElementById('app'); 
+        const timeEl = document.getElementById('h14-time'); 
         if (timeEl) timeEl.innerText = formatTime(timeSeconds); 
     });
 
@@ -980,113 +980,186 @@ function renderStringOperations(el) {
                 <div class="bg-purple-50 p-6 rounded-3xl border-2 border-purple-200 shadow-sm">
                     <h2 class="font-black text-2xl text-purple-700 mb-3">✂️ 3. 字串切片 (Slicing)與常用方法</h2>
                     <p class="text-xl text-slate-800 font-bold mb-4 bg-white p-3 rounded-xl border border-purple-100 leading-relaxed">
-                        <strong>(1) 切片寫法：</strong> <code class="bg-slate-100 px-1 font-mono font-bold">
+                        <strong>(1) 切片寫法：</strong> <code class="bg-slate-100 px-1 font-mono font-bold">[開頭索引 : 結束索引]</code><br>
+                        <span class="text-purple-700 font-black">🌟 重要口訣：包含開頭，不包含結束（左閉右開）！</span><br>
+                        • 範例：若 <code class="bg-slate-100 px-1 font-mono">s = "Python"</code>，則 <code class="bg-slate-100 px-1 font-mono">s[1:4]</code> 會取出索引 1, 2, 3 的字，結果為 <code class="text-purple-600 font-bold">"yth"</code>。
+                    </p>
+                    
+                    <p class="text-xl text-slate-800 font-bold mb-2">(2) 常用字串內建方法：</p>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xl mb-2">
+                        <div class="bg-white p-4 rounded-xl border border-purple-200 font-medium">
+                            <span class="font-black text-purple-700 text-xl">len(字串)</span><br>計算字串的<span class="text-orange-600 font-bold">總長度</span>（字數）。<br><span class="text-sm text-slate-500">如: len("Hi") 為 2</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-purple-200 font-medium">
+                            <span class="font-black text-purple-700 text-xl">字串.upper()</span><br>將字串英文英文全部轉換為<span class="text-orange-600 font-bold">大寫</span>。<br><span class="text-sm text-slate-500">如: "py".upper() 為 "PY"</span>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-purple-200 font-medium">
+                            <span class="font-black text-purple-700 text-xl">字串.lower()</span><br>將字串英文英文全部轉換為<span class="text-orange-600 font-bold">小寫</span>。<br><span class="text-sm text-slate-500">如: "Py".lower() 為 "py"</span>
+                        </div>
+                    </div>
+                    ${getBtnHtml('sec3')}
+                </div>
 
+                <div class="bg-white p-6 rounded-3xl shadow-lg border-2 border-slate-200">
+                    <h2 class="font-black text-2xl text-slate-800 mb-2 flex items-center gap-2">
+                        <span class="bg-yellow-400 w-2 h-6 rounded-full"></span> 💡 4. 綜合運算優先順序逐步看
+                    </h2>
+                    <p class="text-xl font-black text-orange-700 mb-4 bg-orange-50 px-4 py-3 rounded-xl border border-orange-200">
+                        👑 核心大原則：括號與字串切片/方法 ＞ 數值或字串算術 ＞ 關係比較 ＞ 邏輯運算
+                    </p>
+                    
+                    <div class="space-y-6 text-xl">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-mono font-bold text-blue-600 text-2xl">範例一： "Apple" * 2 + "Bee"</p>
+                            <p class="text-sm font-bold text-slate-500 mt-1">解析：字串運算中，複製（*）優先於串接（+）</p>
+                            <p class="mt-2 text-slate-800 leading-relaxed font-medium">1. 先處理複製：<code class="bg-white px-1">"Apple" * 2</code> 得到 <code class="bg-white px-1 font-mono">"AppleApple"</code><br> 2. 再處理串接：加上 "Bee" 得到 <span class="font-black text-orange-600">"AppleAppleBee"</span></p>
+                        </div>
+                        
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-mono font-bold text-blue-600 text-2xl">範例二： "code"[1:3] == "od"</p>
+                            <p class="text-sm font-bold text-slate-500 mt-1">解析：先處理字串切片，再進行關係相等比較</p>
+                            <p class="mt-2 text-slate-800 leading-relaxed font-medium">1. 切片 <code class="bg-white px-1">"code"[1:3]</code>：取索引 1 和 2，得到 <code class="bg-white px-1 font-mono">"od"</code><br> 2. 關係判斷：<code class="bg-white px-1 font-mono">"od" == "od"</code> 成立，結果為 <span class="font-black text-green-600">True</span></p>
+                        </div>
 
-//-------------------------------------------------
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-mono font-bold text-blue-600 text-2xl">範例三： len("Python") &gt; 5 and "cat".upper() == "CAT"</p>
+                            <p class="text-sm font-bold text-slate-500 mt-1">解析：綜合練習（字串方法 ＞ 關係比較 ＞ 邏輯運算）</p>
+                            <p class="mt-2 text-slate-800 leading-relaxed font-medium">
+                                1. 先做字串方法：<code class="bg-white px-1">len("Python")</code> 得到 6；<code class="bg-white px-1">"cat".upper()</code> 得到 "CAT"<br>
+                                2. 再做關係比較：6 &gt; 5 為 True；"CAT" == "CAT" 也是 True<br>
+                                3. 最後做邏輯運算：True and True 結果為 <span class="font-black text-green-600">True</span>
+                            </p>
+                        </div>
 
-        // 預設啟動
-        render();
-		
-    </script>
-<script>
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-mono font-bold text-blue-600 text-2xl">範例四： not "Apple"[-1] == "e" or len("ABC") == 4</p>
+                            <p class="text-sm font-bold text-slate-500 mt-1">解析：綜合練習（索引與長度 ＞ 關係比較 ＞ not ＞ or）</p>
+                            <p class="mt-2 text-slate-800 leading-relaxed font-medium">
+                                1. 先處理字串：<code class="bg-white px-1">"Apple"[-1]</code> 得到最後一個字 "e"；<code class="bg-white px-1">len("ABC")</code> 得到 3<br>
+                                2. 再做比較：<code class="bg-white px-1">"e" == "e"</code> 為 True；<code class="bg-white px-1">3 == 4</code> 為 False。式子簡化為 <code class="bg-white px-1">not True or False</code><br>
+                                3. 先做 not：not True 變成 False<br>
+                                4. 最後做 or：False or False 結果為 <span class="font-black text-red-500">False</span>
+                            </p>
+                        </div>
+                    </div>
+                    ${getBtnHtml('sec4')}
+                </div>
 
-//--------------------?
-const GAS_URL = "https://script.google.com/macros/s/AKfycbxA3ApCJG_9Nyzii9tNTB2ntkPV6y7HoPbxmlkvWMnzQySNlSvR5qKzBZcvMBQNA8c9/exec";
+                <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-indigo-200">
+                    <h2 class="font-black text-3xl text-indigo-700 mb-6 pb-2 border-b-2 border-indigo-100">📝 挑戰練習：請計算出結果</h2>
+                    
+                    <div class="space-y-8 text-2xl">
+                        <div class="flex flex-col gap-3">
+                            <label class="font-bold text-slate-800">1. 計算 <code class="text-rose-600 font-bold bg-rose-50 px-2 rounded font-mono">"Go" * 3 + "!] "</code> 的字串結果（請包含引號內的空白）：</label>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <input type="text" id="q14-1" value="${window.ch1l4Inputs.q1}" 
+                                    oninput="window.ch1l4Inputs.q1=this.value" 
+                                    placeholder="填寫字串結果"
+                                    class="w-80 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-mono font-bold text-2xl shadow-sm">
+                                <span id="q14-1-feedback" class="text-2xl"></span>
+                            </div>
+                        </div>
 
+                        <div class="flex flex-col gap-3">
+                            <label class="font-bold text-slate-800">2. 若 <code class="font-mono text-indigo-600 bg-slate-100 px-1 rounded">text = "Strawberry"</code>，求 <code class="text-rose-600 font-bold bg-rose-50 px-2 rounded font-mono">text[2:5]</code> 的切片結果：</label>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <input type="text" id="q14-2" value="${window.ch1l4Inputs.q2}" 
+                                    oninput="window.ch1l4Inputs.q2=this.value" 
+                                    placeholder="填寫切片結果"
+                                    class="w-80 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-mono font-bold text-2xl shadow-sm">
+                                <span id="q14-2-feedback" class="text-2xl"></span>
+                            </div>
+                        </div>
 
-// =========================
-// 送成績
-// =========================
-// 新增一個全域鎖定變數，放在函式外面
-let isSubmittingScore = false;
+                        <div class="flex flex-col gap-3">
+                            <label class="font-bold text-slate-800">3. 判斷 <code class="text-rose-600 font-bold bg-rose-50 px-2 rounded font-mono">len("Lucky") == 5 and "Dog".lower() == "dog"</code> 的結果 (填 True/False)：</label>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <input type="text" id="q14-3" value="${window.ch1l4Inputs.q3}" 
+                                    oninput="window.ch1l4Inputs.q3=this.value" 
+                                    placeholder="填 True 或 False"
+                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
+                                <span id="q14-3-feedback" class="text-2xl"></span>
+                            </div>
+                        </div>
 
-async function submitScore(level, score, timeUsed, attempts) {
-  // 💡 1. 核心安全鎖：如果目前正在上傳中，直接攔截，不執行任何動作
-  if (isSubmittingScore) {
-    console.log("阻擋重複點擊：成績正在上傳中...");
-    return;
-  }
+                        <div class="flex flex-col gap-3">
+                            <label class="font-bold text-slate-800">4. 綜合練習：判斷 <code class="text-rose-600 font-bold bg-rose-50 px-2 rounded font-mono">not "Banana"[0] == "b" or "cat" * 2 == "catcat"</code> 的結果 (填 True/False)：</label>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <input type="text" id="q14-4" value="${window.ch1l4Inputs.q4}" 
+                                    oninput="window.ch1l4Inputs.q4=this.value" 
+                                    placeholder="填 True 或 False"
+                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
+                                <span id="q14-4-feedback" class="text-2xl"></span>
+                            </div>
+                        </div>
+                    </div>
 
-  // 💡 2. 立刻上鎖
-  isSubmittingScore = true;
+                    <div class="mt-10">
+                        <p id="ch1l4-lock-msg" class="text-xl font-bold text-amber-600 text-center bg-amber-50 py-2 rounded-xl border border-amber-200 mb-3">
+                            ⚠️ 請先將上方 1 至 4 個說明區塊點擊「確認讀懂」按鈕，方可解鎖提交答案。
+                        </p>
+                        <button id="ch1l4-submit-btn" onclick="window.submitCh1L4()" disabled 
+                            class="w-full py-5 text-white rounded-2xl font-black text-3xl shadow-lg transition-all active:scale-95 opacity-50 cursor-not-allowed bg-slate-400">
+                            提交答案
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        
+        checkAllRead();
+    };
 
-  // 嘗試在畫面上找出送出按鈕或結果視窗的按鈕，讓它變灰、無法點擊
-  // 這樣能給學生極佳的視覺反饋
-  const activeButtons = document.querySelectorAll('#app button');
-  activeButtons.forEach(btn => {
-      if(btn.innerText.includes("再試一次") || btn.innerText.includes("返回選單")) {
-          btn.disabled = true;
-          btn.style.opacity = "0.5";
-          btn.style.cursor = "not-allowed";
-      }
-  });
+    // 提交檢核邏輯
+    window.submitCh1L4 = () => {
+        // 清理使用者輸入的引號與前後空格，增加容錯性
+        const cleanStr = (val) => val.trim().replace(/['"“”]/g, "");
+        
+        const a1 = cleanStr(window.ch1l4Inputs.q1);
+        const a2 = cleanStr(window.ch1l4Inputs.q2); 
+        const a3 = window.ch1l4Inputs.q3.trim().toLowerCase();
+        const a4 = window.ch1l4Inputs.q4.trim().toLowerCase(); 
 
-  const savedClass = localStorage.getItem("className") || "201";
-  const seatMatch = globalPlayerName.match(/^(\d+)\s*[號号]\s*(.+)$/);
-  const seatNumber = seatMatch ? seatMatch[1] : "";
-  const studentName = seatMatch ? seatMatch[2] : globalPlayerName;
+        // 正確答案判定
+        // Q1: "GoGoGo!]"
+        // Q2: Strawberry 的索引 2,3,4 是 "raw" (包含r,不包含b)
+        // Q3: len是5(True) and lower是"dog"(True) -> True
+        // Q4: Banana[0]="B" == "b"為False -> not False為True -> True or 任何事皆為 true
+        let isQ1Correct = (a1 === "GoGoGo!]");
+        let isQ2Correct = (a2 === "raw");
+        let isQ3Correct = (a3 === "true");
+        let isQ4Correct = (a4 === "true"); 
 
-  const payload = {
-    className: savedClass,
-    seatNumber: seatNumber,
-    studentName: studentName,
-    level: level,
-    score: score,
-    timeUsed: timeUsed,
-    attempts: attempts,
-    userAgent: navigator.userAgent
-  };
+        // 更新回饋視覺
+        document.getElementById('q14-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 檢查複製次數與串接符號';
+        document.getElementById('q14-1-feedback').className = isQ1Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+        
+        document.getElementById('q14-2-feedback').innerHTML = isQ2Correct ? '✅ 正確' : '❌ 記得口訣：包含開頭，不包含結束！';
+        document.getElementById('q14-2-feedback').className = isQ2Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
 
-  console.log("送出資料", payload);
+        document.getElementById('q14-3-feedback').innerHTML = isQ3Correct ? '✅ 正確' : '❌ 檢查長度與大小寫方法轉換';
+        document.getElementById('q14-3-feedback').className = isQ3Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
 
-  try {
-    const response = await fetch(
-      "https://script.google.com/macros/s/AKfycbzjsNXVz5O0mY8x8CzayKhaU7vriOfocJy_Vozyr1jabmeu4wAiTqCYW3wBoUH3BE6y/exec",
-      {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "text/plain"
-        },
-        body: JSON.stringify(payload)
-      }
-    ).catch(err => {
-      console.warn("Fetch 被瀏覽器套件干擾...", err);
-      return null;
-    });
+        document.getElementById('q14-4-feedback').innerHTML = isQ4Correct ? '✅ 正確' : '❌ 注意大小寫不同！"B" == "b" 是 False 唷';
+        document.getElementById('q14-4-feedback').className = isQ4Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
 
-    if (!response) {
-      alert("連線失敗，請檢查網路或確認 GAS 網址是否正確。");
-      return;
-    }
+        if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
+            stopTimer();
+            setTimeout(() => {
+                showResult(true); 
+            }, 500);
+        } else {
+            const btn = document.getElementById('ch1l4-submit-btn');
+            if (btn) {
+                btn.classList.add('animate-shake');
+                setTimeout(() => btn.classList.remove('animate-shake'), 400);
+            }
+        }
+    };
 
-    if (!response.ok) {
-      throw new Error(`HTTP 錯誤！狀態碼: ${response.status}`);
-    }
-
-    const result = await response.json();
-    console.log("伺服器回傳結果:", result);
-    
-    if (result.status === "success") {
-      alert("成績上傳成功！");
-    } else {
-      alert("資料庫儲存失敗：" + result.message);
-    }
-
-  } catch (error) {
-    console.error("送出失敗", error);
-    alert("上傳失敗，請檢查網路連線或通知老師。");
-  } finally {
-    // 💡 3. 解鎖：不論成功或失敗，最後都把鎖解開，並讓按鈕恢復正常
-    isSubmittingScore = false;
-    activeButtons.forEach(btn => {
-        btn.disabled = false;
-        btn.style.opacity = "1";
-        btn.style.cursor = "pointer";
-    });
-  }
-}  
+    window.renderCh1L4Inner();
+}
+	
+	
 	//--------------------?
 </script>
 

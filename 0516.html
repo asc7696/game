@@ -2449,18 +2449,12 @@ function renderCh2L2Module(el) {
         const slots = window.drag22State.slots;
 
         // 題目一正確判定
-        // 條件式必須是用餘數運算子 % 且用雙等號判定等於 0 ➔ x % 3 == 0
-        // else行定義必須包含冒號 ➔ else:
         const isQ1Correct = (
             slots.t1_1 === "x % 3 == 0" &&
             slots.t1_2 === "else:"
         );
 
         // 題目二正確判定
-        // 填空1: if temp >= 28: (超過或等於)
-        // 填空2:     print("開冷氣") (需四格縮排)
-        // 填空3: else: (要有冒號且沒條件)
-        // 填空4:     print("關冷氣") (需四格縮排)
         const isQ2Correct = (
             slots.t2_1 === "if temp >= 28:" &&
             slots.t2_2 === "    print(\"開冷氣\")" &&
@@ -2483,7 +2477,7 @@ function renderCh2L2Module(el) {
             f2.innerHTML = "✅ 第二題完全正確！『大於或等於』條件、縮排、以及 else: 語法全部過關！";
             f2.className = "text-green-600 font-bold mt-2 text-base animate-pulse";
         } else {
-            f2.innerHTML = "❌ 第二題組裝出錯。提示：1.「超過或等於」要使用 <code class='font-mono text-rose-600 font-bold'>&gt;=</code>。 2. if 和 else 的下一行指令都<b>必須選前方帶有 4 個空白縮排</b>的元件！ 3. 檢查 else 後面是否正確選了帶有冒號的標籤。";
+            f2.innerHTML = "❌ 第二題組裝出錯.提示：1.「超過或等於」要使用 <code class='font-mono text-rose-600 font-bold'>&gt;=</code>。 2. if 和 else 的下一行指令都<b>必須選前方帶有 4 個空白縮排</b>的元件！ 3. 檢查 else 後面是否正確選了帶有冒號的標籤。";
             f2.className = "text-red-500 font-bold mt-2 text-base";
         }
 
@@ -2503,7 +2497,7 @@ function renderCh2L2Module(el) {
     };
 
     window.renderCh2L2Inner();
-}
+} // <-- 🌟 就是補上了這一個大括號！完全拯救了你的 JavaScript 檔案層級結構！
 
 // --- 2-3 if-elif-else 條件結構關卡 (最新升級：多向公式、地雷辨析、自適應多向挑戰) ---
 if (!window.ch2l3ReadStatus) window.ch2l3ReadStatus = { sec1: false, sec2: false };

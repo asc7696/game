@@ -3,14 +3,14 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS 互動學習大廳 - 全模組整合版</title>
+    <title>CS 互動學習大廳</title>
     
     <script>
         (function() {
             const originalWarn = console.warn;
             console.warn = function (...args) {
                 if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
-                    return; 
+                    return;
                 }
                 originalWarn.apply(console, args);
             };
@@ -51,69 +51,16 @@
         let initialDuration = 0;
         let currentAnimation = null;
 
-        // 題目與遊戲狀態變數 (由原關卡教材使用)
-        let currentLevelKey = '';
-        let currentAttempts = 0;
-        let ch4l1Array = [];
-        let ch4l1Steps = [];
-        let ch4l1CurrentStep = 0;
-        let ch4l2Array = [];
-        let ch4l2Steps = [];
-        let ch4l2CurrentStep = 0;
-        let ch4l3Target = 0;
-        let ch4l3Array = [];
-        let ch4l3Index = 0;
-        let ch4l4Target = 0;
-        let ch4l4Array = [];
-        let ch4l4Low = 0;
-        let ch4l4High = 0;
-        let ch4l4Mid = 0;
-        let ch4l4History = [];
-        window.ch4l5Inputs = {};
-        window.ch5l1Inputs = {};
-        window.ch5l2Inputs = {};
-        window.ch5l3Inputs = {};
-        window.ch5l4Inputs = {};
-        window.ch5l5Inputs = {};
-        window.ch5l6Inputs = {};
-        window.ch6l1Inputs = {};
-        window.ch6l2Inputs = {};
-        window.ch6l5Inputs = {};
-        window.ch6l6Inputs = {};
-        window.ch7l1Inputs = {};
-        window.ch7l2Inputs = {};
-        window.ch7l3Inputs = {};
-
-        // 最小生成樹 (6-3) 狀態
-        let ch6l3Edges = [
-            { u: 'A', v: 'B', w: 4, selected: false, id: 0 },
-            { u: 'A', v: 'C', w: 2, selected: false, id: 1 },
-            { u: 'B', v: 'C', w: 1, selected: false, id: 2 },
-            { u: 'B', v: 'D', w: 5, selected: false, id: 3 },
-            { u: 'C', v: 'D', w: 8, selected: false, id: 4 },
-            { u: 'C', v: 'E', w: 10, selected: false, id: 5 },
-            { u: 'D', v: 'E', w: 2, selected: false, id: 6 },
-            { u: 'D', v: 'F', w: 6, selected: false, id: 7 },
-            { u: 'E', v: 'F', w: 3, selected: false, id: 8 }
-        ];
-
-        // 最短路徑 (6-4) 狀態
-        let ch6l4Nodes = {
-            'A': { dist: 0, visited: false },
-            'B': { dist: Infinity, visited: false },
-            'C': { dist: Infinity, visited: false },
-            'D': { dist: Infinity, visited: false },
-            'E': { dist: Infinity, visited: false },
-            'F': { dist: Infinity, visited: false }
-        };
-
-        // ================= 玩家與成績快取資料 =================
+        // ================= 玩家資料 =================
         let globalPlayerName = '';
         let globalClassName = '';
+        let globalSeatNumber = '';
+
+        // ================= 本地成績 =================
         let scores = JSON.parse(localStorage.getItem('cs_lobby_scores')) || {};
 
-        // 所有章節 20 個關卡預設全部解鎖 (true)
         let unlockedLevels = {
+            ch1_l1: true, ch1_l2: true,
             ch4_l1: true, ch4_l2: true, ch4_l3: true, ch4_l4: true, ch4_l5: true,
             ch5_l1: true, ch5_l2: true, ch5_l3: true, ch5_l4: true, ch5_l5: true, ch5_l6: true,
             ch6_l1: true, ch6_l2: true, ch6_l3: true, ch6_l4: true, ch6_l5: true, ch6_l6: true,
@@ -123,11 +70,11 @@
         const LEVEL_NAMES = {
             ch4_l1: "4-1 氣泡排序法", ch4_l2: "4-2 選擇排序法", ch4_l3: "4-3 循序搜尋法", ch4_l4: "4-4 二元搜尋法", ch4_l5: "4-5 排序與搜尋挑戰",
             ch5_l1: "5-1 分而治之演算法", ch5_l2: "5-2 函式定義與呼叫", ch5_l3: "5-3 遞迴函數概念", ch5_l4: "5-4 階乘推導", ch5_l5: "5-5 費氏級數推導", ch5_l6: "5-6 遞迴牛刀小試",
-            ch6_l1: "6-1 MBTI 決策樹", ch6_l2: "6-2 二元樹走訪", ch6_l3: "6-3 最小生成樹", ch6_l4: "6-4 最短路徑挑戰", ch6_l5: "6-5 字典樹 Trie", ch6_l6: "6-6 二元搜尋樹 BST",
+            ch6_l1: "6-1 MBTI 決策樹", ch6_l2: "6-2 二元樹走訪", ch6_l3: "6-3 最小生成樹", re_6_4: "6-4 最短路徑", ch6_l5: "6-5 字典樹", ch6_l6: "6-6 二元搜尋樹",
             ch7_l1: "7-1 元件與功能配對", ch7_l2: "7-2 規格大比拚", ch7_l3: "7-3 認識電子產業"
         };
 
-        // 依據花費秒數精確判定獎牌
+        // 輔助函式：根據秒數判定獎牌
         function getMedalByTime(s) {
             if (s <= 60) return "🥇 金牌";
             if (s <= 150) return "🥈 銀牌";
@@ -152,7 +99,7 @@
             timerInterval = setInterval(() => {
                 if (isCountingDown) {
                     timeSeconds--;
-                    if (timeSeconds <= 0) { clearInterval(timerInterval); showResult(false); }
+                    if (timeSeconds <= 0) { clearInterval(timerInterval); alert('時間到！'); changeView('menu'); }
                 } else { timeSeconds++; }
                 if (callback) callback();
             }, 1000);
@@ -171,84 +118,53 @@
         const Icons = {
             ArrowLeft: `<svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>`,
             Check: `<svg class="w-12 h-12 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`,
-            X: `<svg class="w-12 h-12 text-red-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`
+            X: `<svg class="w-12 h-12 text-red-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`,
+            Lock: `<svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`
         };
 
         // ==========================================
-        // 核心功能：登入處置
+        // 核心功能：處理學生登入邏輯
         // ==========================================
         function handleLogin() {
-            const cls = document.getElementById('input-class').value.trim();
-            const seat = document.getElementById('input-seat').value.trim();
-            const name = document.getElementById('input-name').value.trim();
+            const classInput = document.getElementById('input-class').value.trim();
+            const seatInput = document.getElementById('input-seat').value.trim();
+            const nameInput = document.getElementById('input-name').value.trim();
 
-            if (!cls || !seat || !name) {
+            if (!classInput || !seatInput || !nameInput) {
                 alert('請完整填寫班級、座號與真實姓名！');
                 return;
             }
 
-            globalClassName = cls;
-            globalPlayerName = `${seat}號 ${name}`;
+            globalClassName = classInput;
+            globalSeatNumber = seatInput;
+            // 格式化為雲端撈取所需格式（如 "1號 示範學生"）
+            globalPlayerName = `${seatInput}號 ${nameInput}`;
 
-            // 更新頂部資訊列
-            document.getElementById('display-class').innerText = globalClassName;
-            document.getElementById('display-seat').innerText = seat + ' 號';
-            document.getElementById('display-name').innerText = name;
+            // 將玩家資訊暫存於本地快取，方便重新整理時免重複輸入
+            localStorage.setItem('cs_lobby_class', globalClassName);
+            localStorage.setItem('cs_lobby_seat', globalSeatNumber);
+            localStorage.setItem('cs_lobby_name', nameInput);
 
             changeView('menu');
         }
 
-        // ==========================================
-        // 核心功能：送出成績至 GAS (與雲端同步)
-        // ==========================================
-        async function submitScore(level, score, timeUsed, attempts) {
-            const seatMatch = globalPlayerName.match(/^(\d+)號\s(.+)$/);
-            const seatNumber = seatMatch ? seatMatch[1] : "";
-            const studentName = seatMatch ? seatMatch[2] : globalPlayerName;
-
-            const currentMedal = score >= 100 ? getMedalByTime(timeUsed) : "無獎牌";
-
-            // 先保存在地快取
-            scores[level] = { score, timeUsed, attempts, medal: currentMedal, timestamp: getNowString() };
-            localStorage.setItem('cs_lobby_scores', JSON.stringify(scores));
-
-            const payload = {
-                className: globalClassName,
-                seatNumber: seatNumber,
-                studentName: studentName,
-                level: level,
-                score: score,
-                timeUsed: timeUsed,
-                attempts: attempts,
-                medal: currentMedal,
-                userAgent: navigator.userAgent
-            };
-
-            console.log("送出資料至雲端 GAS", payload);
-
-            try {
-                const gasUrl = "https://script.google.com/macros/s/AKfycbzjsNXVz5O0mY8x8CzayKhaU7vriOfocJy_Vozyr1jabmeu4wAiTqCYW3wBoUH3BE6y/exec";
-                const response = await fetch(gasUrl, {
-                    method: "POST",
-                    mode: "cors",
-                    headers: { "Content-Type": "text/plain" },
-                    body: JSON.stringify(payload)
-                }).catch(err => {
-                    console.warn("Fetch 被套件干擾，嘗試忽略...", err);
-                    return null;
-                });
-
-                if (response && response.ok) {
-                    const result = await response.json();
-                    console.log("伺服器同步成功:", result);
-                }
-            } catch (error) {
-                console.error("雲端上傳失敗，已優先保存於本地:", error);
+        // 自動從本地快取嘗試登入
+        function initStudentInfo() {
+            const savedClass = localStorage.getItem('cs_lobby_class');
+            const savedSeat = localStorage.getItem('cs_lobby_seat');
+            const savedName = localStorage.getItem('cs_lobby_name');
+            if (savedClass && savedSeat && savedName) {
+                globalClassName = savedClass;
+                globalSeatNumber = savedSeat;
+                globalPlayerName = `${savedSeat}號 ${savedName}`;
+                changeView('menu');
+            } else {
+                render();
             }
         }
 
         // ==========================================
-        // 核心功能：非同步同步並載入雲端學習歷史紀錄清單 (GET)
+        // 核心功能：非同步載入歷史成績 (GET)
         // ==========================================
         async function loadScores() {
             const scoreContainer = document.getElementById("history-scores-list");
@@ -256,700 +172,13 @@
 
             scoreContainer.innerHTML = `<p class="text-slate-400 text-center py-4 text-sm animate-pulse">🔄 正在同步雲端學習進度...</p>`;
 
-            const seatMatch = globalPlayerName.match(/^(\d+)號\s(.+)$/);
+            const seatMatch = globalPlayerName.match(/^(\d+)\s*[號号]\s*(.+)$/);
             const studentName = seatMatch ? seatMatch[2] : globalPlayerName;
 
             if (!studentName || studentName === 'Teacher') {
-                scoreContainer.innerHTML = `<p class="text-slate-400 text-center py-4 text-sm">維護模式下，不載入成績清單。</p>`;
+                scoreContainer.innerHTML = `<p class="text-slate-400 text-center py-4 text-sm">歡迎維護模式，目前不載入成績。</p>`;
                 return;
             }
 
             try {
-                const gasUrl = "https://script.google.com/macros/s/AKfycbzjsNXVz5O0mY8x8CzayKhaU7vriOfocJy_Vozyr1jabmeu4wAiTqCYW3wBoUH3BE6y/exec";
-                const response = await fetch(`${gasUrl}?action=getScores&studentName=${encodeURIComponent(studentName)}`, {
-                    method: "GET",
-                    mode: "cors"
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    if (result.status === "success" && result.data) {
-                        const scoreData = result.data;
-                        if (scoreData.length === 0) {
-                            scoreContainer.innerHTML = `<p class="text-slate-400 text-center py-4 text-sm">雲端無歷史紀錄。開始你的挑戰吧！</p>`;
-                            return;
-                        }
-
-                        scoreContainer.innerHTML = scoreData.map(item => `
-                            <div class="flex justify-between items-center p-3.5 bg-slate-50 rounded-xl border border-slate-200/60 text-sm hover:bg-slate-100/50 transition-colors">
-                                <div class="space-y-0.5">
-                                    <span class="font-bold text-slate-800">${LEVEL_NAMES[item.level] || item.level}</span>
-                                    <span class="text-[11px] text-slate-400 block">${item.timestamp}</span>
-                                </div>
-                                <div class="text-right flex items-center gap-3">
-                                    <span class="text-xs px-2 py-0.5 bg-white border border-slate-200 rounded-md font-medium text-slate-600">${item.medal || '無獎牌'}</span>
-                                    <span class="font-mono font-black text-indigo-600 text-base">${item.score} 分</span>
-                                </div>
-                            </div>
-                        `).join('');
-                    } else {
-                        scoreContainer.innerHTML = `<p class="text-rose-500 text-center py-4 text-sm">❌ 讀取失敗：${result.message}</p>`;
-                    }
-                }
-            } catch (error) {
-                console.error("雲端讀取異常:", error);
-                scoreContainer.innerHTML = `<p class="text-rose-500 text-center py-4 text-sm">📡 網路逾時，目前呈現本機操作模式</p>`;
-            }
-        }
-
-        // ==========================================
-        // 核心功能：顯示關卡挑戰結果並觸發雲端上傳
-        // ==========================================
-        function showResult(isSuccess, score = 100) {
-            stopTimer();
-            const view = document.getElementById('app');
-            const usedTime = timeSeconds;
-
-            if (isSuccess) {
-                const medal = getMedalByTime(usedTime);
-                submitScore(currentLevelKey, score, usedTime, currentAttempts);
-
-                view.innerHTML = `
-                    <div class="flex items-center justify-center min-h-screen bg-slate-100 p-6">
-                        <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center border border-slate-200">
-                            <div class="flex justify-center">${Icons.Check}</div>
-                            <h2 class="text-2xl font-black text-slate-800 mb-2">挑戰成功！</h2>
-                            <p class="text-slate-500 mb-6">太棒了！你已順利通關！</p>
-                            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200/60 mb-6 space-y-2">
-                                <div class="flex justify-between text-sm"><span class="text-slate-400">通關關卡</span><span class="font-bold text-slate-700">${LEVEL_NAMES[currentLevelKey]}</span></div>
-                                <div class="flex justify-between text-sm"><span class="text-slate-400">測驗得分</span><span class="font-black text-emerald-600">${score} 分</span></div>
-                                <div class="flex justify-between text-sm"><span class="text-slate-400">花費時間</span><span class="font-mono font-bold text-slate-700">${formatTime(usedTime)}</span></div>
-                                <div class="flex justify-between text-sm"><span class="text-slate-400">榮獲獎牌</span><span class="font-bold text-amber-500">${medal}</span></div>
-                                <div class="flex justify-between text-sm"><span class="text-slate-400">嘗試次數</span><span class="font-bold text-slate-700">${currentAttempts} 次</span></div>
-                            </div>
-                            <button onclick="changeView('menu')" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md">返回主大廳</button>
-                        </div>
-                    </div>
-                `;
-            } else {
-                submitScore(currentLevelKey, 0, usedTime, currentAttempts);
-                view.innerHTML = `
-                    <div class="flex items-center justify-center min-h-screen bg-slate-100 p-6">
-                        <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full text-center border border-slate-200">
-                            <div class="flex justify-center">${Icons.X}</div>
-                            <h2 class="text-2xl font-black text-slate-800 mb-2">挑戰失敗</h2>
-                            <p class="text-slate-500 mb-6">時間到了或回答錯誤，再接再厲！</p>
-                            <button onclick="enterLevel('${currentLevelKey}')" class="w-full py-3 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-xl transition-all shadow-md mb-2">重新挑戰</button>
-                            <button onclick="changeView('menu')" class="w-full py-3 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-xl transition-all">返回學習大廳</button>
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        // ==========================================
-        // 進入指定關卡 (20個核心模組點位初始化)
-        // ==========================================
-        function enterLevel(levelKey) {
-            currentLevelKey = levelKey;
-            currentAttempts = 1;
-            changeView(levelKey);
-        }
-
-        // ========================================================
-        // 模組初始化特定控制邏輯 (4-1, 4-2, 4-3, 4-4)
-        // ========================================================
-        function initCh4L1() {
-            ch4l1Array = [35, 12, 89, 43, 7];
-            ch4l1Steps = [
-                { arr: [12, 35, 89, 43, 7], desc: "比較 35 與 12，因為 35 > 12，兩者交換。" },
-                { arr: [12, 35, 89, 43, 7], desc: "比較 35 與 89，不交換。" },
-                { arr: [12, 35, 43, 89, 7], desc: "比較 89 與 43，因為 89 > 43，兩者交換。" },
-                { arr: [12, 35, 43, 7, 89], desc: "比較 89 與 7，因為 89 > 7，兩者交換（第一回合結束，最大值 89 已沉底）。" }
-            ];
-            ch4l1CurrentStep = 0;
-            startTimer('up', 0, () => {
-                const el = document.getElementById('ch4l1-timer');
-                if (el) el.innerText = formatTime(timeSeconds);
-            });
-        }
-
-        function nextCh4L1() {
-            if (ch4l1CurrentStep < ch4l1Steps.length) {
-                const step = ch4l1Steps[ch4l1CurrentStep];
-                ch4l1Array = [...step.arr];
-                document.getElementById('ch4l1-desc').innerText = step.desc;
-                
-                const container = document.getElementById('ch4l1-bars');
-                container.innerHTML = ch4l1Array.map(val => `
-                    <div class="flex flex-col items-center">
-                        <div class="bg-indigo-500 w-12 text-white font-mono rounded-t-md flex items-end justify-center font-bold sort-item" style="height: ${val * 2}px; padding-bottom: 5px;">${val}</div>
-                    </div>
-                `).join('');
-
-                ch4l1CurrentStep++;
-                if (ch4l1CurrentStep === ch4l1Steps.length) {
-                    document.getElementById('ch4l1-next-btn').innerText = "完成觀察，進入挑戰";
-                }
-            } else {
-                showResult(true, 100);
-            }
-        }
-
-        function initCh4L2() {
-            ch4l2Array = [24, 8, 55, 19, 3];
-            ch4l2Steps = [
-                { arr: [3, 8, 55, 19, 24], desc: "第一回合：在全陣列中找到最小值 3，與第 0 個元素 24 交換位置。" },
-                { arr: [3, 8, 55, 19, 24], desc: "第二回合：在未排序部分 [8, 55, 19, 24] 找最小值，8 已在正確位置不變。" },
-                { arr: [3, 8, 19, 55, 24], desc: "第三回合：在未排序部分 [55, 19, 24] 找到最小值 19，與 55 交換。" },
-                { arr: [3, 8, 19, 24, 55], desc: "第四回合：在未排序部分 [55, 24] 找到較小值 24，與 55 交換。排序完成！" }
-            ];
-            ch4l2CurrentStep = 0;
-            startTimer('up', 0, () => {
-                const el = document.getElementById('ch4l2-timer');
-                if (el) el.innerText = formatTime(timeSeconds);
-            });
-        }
-
-        function nextCh4L2() {
-            if (ch4l2CurrentStep < ch4l2Steps.length) {
-                const step = ch4l2Steps[ch4l2CurrentStep];
-                ch4l2Array = [...step.arr];
-                document.getElementById('ch4l2-desc').innerText = step.desc;
-                
-                const container = document.getElementById('ch4l2-bars');
-                container.innerHTML = ch4l2Array.map(val => `
-                    <div class="flex flex-col items-center">
-                        <div class="bg-amber-500 w-12 text-white font-mono rounded-t-md flex items-end justify-center font-bold sort-item" style="height: ${val * 3}px; padding-bottom: 5px;">${val}</div>
-                    </div>
-                `).join('');
-
-                ch4l2CurrentStep++;
-                if (ch4l2CurrentStep === ch4l2Steps.length) {
-                    document.getElementById('ch4l2-next-btn').innerText = "完成觀察，進入挑戰";
-                }
-            } else {
-                showResult(true, 100);
-            }
-        }
-
-        function initCh4L3() {
-            ch4l3Array = [15, 42, 8, 73, 29, 61, 50, 11];
-            ch4l3Target = 61;
-            ch4l3Index = 0;
-            startTimer('up', 0, () => {
-                const el = document.getElementById('ch4l3-timer');
-                if (el) el.innerText = formatTime(timeSeconds);
-            });
-            renderCh4L3();
-        }
-
-        function renderCh4L3() {
-            const container = document.getElementById('ch4l3-search-box');
-            container.innerHTML = ch4l3Array.map((val, idx) => {
-                let borderCls = "border-slate-300 bg-white";
-                if (idx < ch4l3Index) borderCls = "border-slate-400 bg-slate-100 text-slate-400 line-through";
-                if (idx === ch4l3Index) borderCls = "border-indigo-600 bg-indigo-50 text-indigo-700 ring-2 ring-indigo-500/20";
-                return `<div class="w-14 h-14 border-2 rounded-xl flex items-center justify-center font-mono font-black text-lg transition-all shadow-sm ${borderCls}">${val}</div>`;
-            }).join('');
-        }
-
-        function stepCh4L3() {
-            if (ch4l3Index >= ch4l3Array.length) {
-                alert("未尋找到目標元素！");
-                return;
-            }
-            if (ch4l3Array[ch4l3Index] === ch4l3Target) {
-                document.getElementById('ch4l3-desc').innerText = `🎉 找到了！在索引第 ${ch4l3Index} 格發現目標 61！總計比對了 ${ch4l3Index + 1} 次。`;
-                document.getElementById('ch4l3-btn').innerText = "通關關卡";
-                document.getElementById('ch4l3-btn').onclick = () => showResult(true, 100);
-            } else {
-                document.getElementById('ch4l3-desc').innerText = `目前比對第 ${ch4l3Index} 格的數值 ${ch4l3Array[ch4l3Index]}，與目標不符，繼續前進...`;
-                ch4l3Index++;
-                currentAttempts++;
-                renderCh4L3();
-            }
-        }
-
-        function initCh4L4() {
-            ch4l4Array = [5, 12, 19, 25, 38, 47, 56, 68, 72, 83, 91];
-            ch4l4Target = 72;
-            ch4l4Low = 0;
-            ch4l4High = ch4l4Array.length - 1;
-            ch4l4History = [];
-            startTimer('up', 0, () => {
-                const el = document.getElementById('ch4l4-timer');
-                if (el) el.innerText = formatTime(timeSeconds);
-            });
-            stepCh4L4();
-        }
-
-        function stepCh4L4() {
-            if (ch4l4Low > ch4l4High) {
-                alert("搜尋失敗，無此目標元素。");
-                return;
-            }
-            ch4l4Mid = Math.floor((ch4l4Low + ch4l4High) / 2);
-            let midVal = ch4l4Array[ch4l4Mid];
-            ch4l4History.push({ low: ch4l4Low, high: ch4l4High, mid: ch4l4Mid, val: midVal });
-
-            const arrayBox = document.getElementById('ch4l4-array-box');
-            arrayBox.innerHTML = ch4l4Array.map((val, idx) => {
-                let bg = "bg-white border-slate-200 text-slate-700";
-                if (idx < ch4l4Low || idx > ch4l4High) bg = "bg-slate-50 border-slate-100 text-slate-300 line-through";
-                if (idx === ch4l4Mid) bg = "bg-amber-500 border-amber-500 text-white font-black scale-105 shadow-md";
-                return `<div class="flex flex-col items-center">
-                    <span class="text-[10px] font-mono text-slate-400 mb-0.5">${idx}</span>
-                    <div class="w-12 h-12 border rounded-xl flex items-center justify-center font-mono text-sm font-bold transition-all ${bg}">${val}</div>
-                </div>`;
-            }).join('');
-
-            const histBox = document.getElementById('ch4l4-history-box');
-            histBox.innerHTML = ch4l4History.map((h, i) => `
-                <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-1">
-                    <div class="font-bold text-slate-700">第 ${i+1} 次切分比對：</div>
-                    <div class="font-mono text-slate-500">搜尋範圍索引: [${h.low} ~ ${h.high}] ➔ 中間索引 Mid = ${h.mid} (數值: ${h.val})</div>
-                </div>
-            `).join('');
-
-            if (midVal === ch4l4Target) {
-                document.getElementById('ch4l4-desc').innerText = `🎯 找到了！中間值 ${midVal} 正好等於目標 72！搜尋圓滿結束。`;
-                const btn = document.getElementById('ch4l4-btn');
-                btn.innerText = "完成通關";
-                btn.onclick = () => showResult(true, 100);
-            } else if (midVal < ch4l4Target) {
-                document.getElementById('ch4l4-desc').innerText = `中間值 ${midVal} < 目標 72，因此將左邊界右移 ➔ Low = Mid + 1 = ${ch4l4Mid + 1}`;
-                ch4l4Low = ch4l4Mid + 1;
-                currentAttempts++;
-            } else {
-                document.getElementById('ch4l4-desc').innerText = `中間值 ${midVal} > 目標 72，因此將右邊界左移 ➔ High = Mid - 1 = ${ch4l4Mid - 1}`;
-                ch4l4High = ch4l4Mid - 1;
-                currentAttempts++;
-            }
-        }
-
-        // ==========================================
-        // 核心頁面控制器：主渲染調度器
-        // ==========================================
-        function render() {
-            const app = document.getElementById('app');
-            const infoBar = document.getElementById('user-display-info');
-
-            if (currentView === 'login') {
-                infoBar.classList.add('hidden');
-                app.innerHTML = `
-                    <div class="flex flex-col items-center justify-center min-h-screen bg-slate-100 p-6">
-                        <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-slate-200">
-                            <h2 class="text-2xl font-black text-center text-slate-800 mb-2">CS 資訊科學學習大廳</h2>
-                            <p class="text-slate-400 text-sm text-center mb-6">請輸入資訊以進入教學與評測系統</p>
-                            <div class="space-y-4 mb-6">
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1">班級 (如：201)</label>
-                                    <input type="text" id="input-class" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-bold" placeholder="例如：201">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1">座號</label>
-                                    <input type="number" id="input-seat" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono" placeholder="填寫數字">
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-bold text-slate-700 mb-1">真實姓名</label>
-                                    <input type="text" id="input-name" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500" placeholder="姓名">
-                                </div>
-                            </div>
-                            <button onclick="handleLogin()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md">進入大廳</button>
-                        </div>
-                    </div>
-                `;
-                return;
-            } 
-
-            if (currentView === 'menu') {
-                infoBar.classList.remove('hidden');
-                
-                // 產生 4 大章節 20 個模組的列表面板
-                let menuHtml = `
-                    <div class="max-w-6xl mx-auto p-6 pt-20 space-y-8">
-                        <div class="bg-white rounded-3xl p-6 shadow-md border border-slate-200/80 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                            <div>
-                                <h1 class="text-2xl font-black text-slate-800 tracking-tight">資訊科學互動學習控制台</h1>
-                                <p class="text-slate-400 text-sm mt-1">自主點選對應章節關卡即可啟動學習教材與自我評測。</p>
-                            </div>
-                            <div class="flex items-center gap-3">
-                                <span class="text-xs font-bold text-slate-400">目前身分：</span>
-                                <span class="px-4 py-2 bg-indigo-50 text-indigo-700 font-bold rounded-xl border border-indigo-100 text-sm">學生專區</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-                            <div class="lg:col-span-2 space-y-6">
-                                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                                    <div class="p-4 bg-gradient-to-r from-indigo-500 to-blue-600 text-white font-black flex justify-between items-center">
-                                        <span>CH4 排序與搜尋演算法</span>
-                                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-normal">5 模組</span>
-                                    </div>
-                                    <div class="p-4 divide-y divide-slate-100">
-                                        ${['ch4_l1','ch4_l2','ch4_l3','ch4_l4','ch4_l5'].map(k => `
-                                            <div class="flex justify-between items-center py-3">
-                                                <span class="text-sm font-bold text-slate-700">${LEVEL_NAMES[k]}</span>
-                                                <button onclick="enterLevel('${k}')" class="px-4 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm">進入教材</button>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-
-                                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                                    <div class="p-4 bg-gradient-to-r from-emerald-500 to-teal-600 text-white font-black flex justify-between items-center">
-                                        <span>CH5 學習思維與遞迴演算法</span>
-                                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-normal">6 模組</span>
-                                    </div>
-                                    <div class="p-4 divide-y divide-slate-100">
-                                        ${['ch5_l1','ch5_l2','ch5_l3','ch5_l4','ch5_l5','ch5_l6'].map(k => `
-                                            <div class="flex justify-between items-center py-3">
-                                                <span class="text-sm font-bold text-slate-700">${LEVEL_NAMES[k]}</span>
-                                                <button onclick="enterLevel('${k}')" class="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm">進入教材</button>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-
-                                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                                    <div class="p-4 bg-gradient-to-r from-purple-500 to-pink-600 text-white font-black flex justify-between items-center">
-                                        <span>CH6 進階資料結構與應用</span>
-                                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-normal">6 模組</span>
-                                    </div>
-                                    <div class="p-4 divide-y divide-slate-100">
-                                        ${['ch6_l1','ch6_l2','ch6_l3','ch6_l4','ch6_l5','ch6_l6'].map(k => `
-                                            <div class="flex justify-between items-center py-3">
-                                                <span class="text-sm font-bold text-slate-700">${LEVEL_NAMES[k]}</span>
-                                                <button onclick="enterLevel('${k}')" class="px-4 py-1.5 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm">進入教材</button>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-
-                                <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm">
-                                    <div class="p-4 bg-gradient-to-r from-orange-500 to-amber-600 text-white font-black flex justify-between items-center">
-                                        <span>CH7 電腦硬體元件與電子產業</span>
-                                        <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-normal">3 模組</span>
-                                    </div>
-                                    <div class="p-4 divide-y divide-slate-100">
-                                        ${['ch7_l1','ch7_l2','ch7_l3'].map(k => `
-                                            <div class="flex justify-between items-center py-3">
-                                                <span class="text-sm font-bold text-slate-700">${LEVEL_NAMES[k]}</span>
-                                                <button onclick="enterLevel('${k}')" class="px-4 py-1.5 bg-orange-600 hover:bg-orange-700 text-white text-xs font-bold rounded-lg transition-all shadow-sm">進入教材</button>
-                                            </div>
-                                        `).join('')}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white rounded-3xl p-5 border border-slate-200 shadow-sm space-y-4">
-                                <div class="border-b border-slate-100 pb-3 flex justify-between items-center">
-                                    <h3 class="font-black text-slate-800 tracking-tight flex items-center gap-1.5">
-                                        <span>📊 雲端學習歷程進度</span>
-                                    </h3>
-                                    <button onclick="loadScores()" class="text-xs font-bold text-indigo-600 hover:text-indigo-700 transition-colors">🔄 重新整理</button>
-                                </div>
-                                <div id="history-scores-list" class="max-h-[580px] overflow-y-auto space-y-2.5 pr-1">
-                                    </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                app.innerHTML = menuHtml;
-                loadScores(); // 進入大廳主畫面時，立即拉取雲端成績
-                return;
-            }
-
-            // ========================================================
-            // 各大章節 20 個原汁原味模組網頁骨架與按鈕功能回填
-            // ========================================================
-            
-            // 4-1 氣泡排序法
-            if (currentView === 'ch4_l1') {
-                app.innerHTML = `
-                    <div class="max-w-4xl mx-auto p-6 pt-20 space-y-6">
-                        <button onclick="changeView('menu')" class="flex items-center text-slate-500 font-bold hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
-                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
-                            <div class="flex justify-between items-center border-b pb-4">
-                                <h2 class="text-xl font-black text-slate-800">${LEVEL_NAMES[currentView]}</h2>
-                                <span id="ch4l1-timer" class="font-mono bg-slate-100 px-3 py-1 rounded-md text-sm font-bold text-slate-600">00:00</span>
-                            </div>
-                            <p class="text-slate-600 text-sm"><b>氣泡排序法 (Bubble Sort)</b> 是相鄰元素兩兩相比，順序不對就交換，直到最大值如同氣泡浮出。請點擊下一步觀察。</p>
-                            <div id="ch4l1-bars" class="h-48 border border-slate-100 bg-slate-50 rounded-2xl flex items-end justify-center gap-6 p-4">
-                                <div class="bg-indigo-500 w-12 text-white font-mono rounded-t-md h-[70px] flex items-end justify-center font-bold">35</div>
-                                <div class="bg-indigo-500 w-12 text-white font-mono rounded-t-md h-[24px] flex items-end justify-center font-bold">12</div>
-                                <div class="bg-indigo-500 w-12 text-white font-mono rounded-t-md h-[178px] flex items-end justify-center font-bold">89</div>
-                                <div class="bg-indigo-500 w-12 text-white font-mono rounded-t-md h-[86px] flex items-end justify-center font-bold">43</div>
-                                <div class="bg-indigo-500 w-12 text-white font-mono rounded-t-md h-[14px] flex items-end justify-center font-bold">7</div>
-                            </div>
-                            <p id="ch4l1-desc" class="p-4 bg-indigo-50 border border-indigo-100 text-indigo-900 rounded-xl font-medium text-sm text-center">初始數列：[35, 12, 89, 43, 7]</p>
-                            <button id="ch4l1-next-btn" onclick="nextCh4L1()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl shadow-md transition-all">下一步觀察</button>
-                        </div>
-                    </div>
-                `;
-                initCh4L1();
-            }
-
-            // 4-2 選擇排序法
-            else if (currentView === 'ch4_l2') {
-                app.innerHTML = `
-                    <div class="max-w-4xl mx-auto p-6 pt-20 space-y-6">
-                        <button onclick="changeView('menu')" class="flex items-center text-slate-500 font-bold hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
-                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
-                            <div class="flex justify-between items-center border-b pb-4">
-                                <h2 class="text-xl font-black text-slate-800">${LEVEL_NAMES[currentView]}</h2>
-                                <span id="ch4l2-timer" class="font-mono bg-slate-100 px-3 py-1 rounded-md text-sm font-bold text-slate-600">00:00</span>
-                            </div>
-                            <p class="text-slate-600 text-sm"><b>選擇排序法 (Selection Sort)</b> 每次從尚未排序的部分挑選出一個「最小值」，並跟尚未排序陣列的最前方元素進行對調位置。請觀察：</p>
-                            <div id="ch4l2-bars" class="h-48 border border-slate-100 bg-slate-50 rounded-2xl flex items-end justify-center gap-6 p-4">
-                                <div class="bg-amber-500 w-12 text-white font-mono rounded-t-md h-[72px] flex items-end justify-center font-bold">24</div>
-                                <div class="bg-amber-500 w-12 text-white font-mono rounded-t-md h-[24px] flex items-end justify-center font-bold">8</div>
-                                <div class="bg-amber-500 w-12 text-white font-mono rounded-t-md h-[165px] flex items-end justify-center font-bold">55</div>
-                                <div class="bg-amber-500 w-12 text-white font-mono rounded-t-md h-[57px] flex items-end justify-center font-bold">19</div>
-                                <div class="bg-amber-500 w-12 text-white font-mono rounded-t-md h-[9px] flex items-end justify-center font-bold">3</div>
-                            </div>
-                            <p id="ch4l2-desc" class="p-4 bg-amber-50 border border-amber-100 text-amber-900 rounded-xl font-medium text-sm text-center">初始數列：[24, 8, 55, 19, 3]</p>
-                            <button id="ch4l2-next-btn" onclick="nextCh4L2()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl shadow-md transition-all">下一步觀察</button>
-                        </div>
-                    </div>
-                `;
-                initCh4L2();
-            }
-
-            // 4-3 循序搜尋法
-            else if (currentView === 'ch4_l3') {
-                app.innerHTML = `
-                    <div class="max-w-4xl mx-auto p-6 pt-20 space-y-6">
-                        <button onclick="changeView('menu')" class="flex items-center text-slate-500 font-bold hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
-                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
-                            <div class="flex justify-between items-center border-b pb-4">
-                                <h2 class="text-xl font-black text-slate-800">${LEVEL_NAMES[currentView]}</h2>
-                                <span id="ch4l3-timer" class="font-mono bg-slate-100 px-3 py-1 rounded-md text-sm font-bold text-slate-600">00:00</span>
-                            </div>
-                            <div class="text-center bg-indigo-50 text-indigo-900 rounded-2xl p-4 border border-indigo-100">
-                                <span class="text-sm font-bold">尋找目標物件：</span>
-                                <span class="text-2xl font-black">61</span>
-                            </div>
-                            <div id="ch4l3-search-box" class="flex flex-wrap gap-3 justify-center py-4"></div>
-                            <p id="ch4l3-desc" class="text-center font-bold text-slate-700 text-sm">請按步操作，體驗一個一個往下比對的過程。</p>
-                            <button id="ch4l3-btn" onclick="stepCh4L3()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md">按步執行比對</button>
-                        </div>
-                    </div>
-                `;
-                initCh4L3();
-            }
-
-            // 4-4 二元搜尋法
-            else if (currentView === 'ch4_l4') {
-                app.innerHTML = `
-                    <div class="max-w-4xl mx-auto p-6 pt-20 space-y-6">
-                        <button onclick="changeView('menu')" class="flex items-center text-slate-500 font-bold hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
-                        <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
-                            <div class="flex justify-between items-center border-b pb-4">
-                                <h2 class="text-xl font-black text-slate-800">${LEVEL_NAMES[currentView]}</h2>
-                                <span id="ch4l4-timer" class="font-mono bg-slate-100 px-3 py-1 rounded-md text-sm font-bold text-slate-600">00:00</span>
-                            </div>
-                            <div class="text-center bg-amber-50 text-amber-900 rounded-2xl p-4 border border-amber-100">
-                                <span class="text-sm font-bold">已排序數列目標：</span><span class="text-2xl font-black">72</span>
-                            </div>
-                            <div id="ch4l4-array-box" class="flex flex-wrap gap-2 justify-center py-2"></div>
-                            <p id="ch4l4-desc" class="text-center p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-700"></p>
-                            <div id="ch4l4-history-box" class="space-y-2"></div>
-                            <button id="ch4l4-btn" onclick="stepCh4L4()" class="w-full py-3 bg-amber-600 hover:bg-amber-700 text-white font-bold rounded-xl transition-all shadow-md">下一步比對 (折半切分)</button>
-                        </div>
-                    </div>
-                `;
-                initCh4L4();
-            }
-
-            // 4-5 至 7-3 的全系列教材關卡，完整填入原有的評測題庫與邏輯機制
-            else {
-                buildQuizLevelStructure(currentView);
-            }
-        }
-
-        // ========================================================
-        // 4-5 至 7-3 教材題庫與作答邏輯的完整構建引擎 (共 16 個關卡)
-        // ========================================================
-        function buildQuizLevelStructure(key) {
-            let config = { title: LEVEL_NAMES[key], desc: "", code: "", q1: "", q2: "", q3: "", checkFn: null };
-
-            if (key === 'ch4_l5') {
-                config.desc = "排序與搜尋觀念大統整挑戰。";
-                config.q1 = "1. 哪種排序法在最壞與最好狀況下時間複雜度皆為 O(N^2)？（答案請填：氣泡排序法 或 選擇排序法）";
-                config.q2 = "2. 二元搜尋法執行的前置必要條件，數列必須具備什麼特性？（填寫：已排序 或 未排序）";
-                config.q3 = "3. 長度為 8 的已排序數列，使用二元搜尋最多需要比對幾次？（填整數數字）";
-                config.checkFn = (a1, a2, a3) => (a1 === '選擇排序法' && a2 === '已排序' && (a3 === '3' || a3 === '4'));
-            }
-            else if (key === 'ch5_l1') {
-                config.desc = "分而治之 (Divide and Conquer) 核心設計概念。";
-                config.q1 = "1. 分而治之的第一步是將大問題切分為小問題，這稱為？（填英文或中文：Divide 或 分割）";
-                config.q2 = "2. 合併排序法 (Merge Sort) 是不是分而治之演算法的一種應用？（填：true 或 false）";
-                config.q3 = "3. 將問題切分到最小無法切分時直接求解的狀態，稱為？（填：基本案例 或 基礎情況）";
-                config.checkFn = (a1, a2, a3) => ((a1.toLowerCase() === 'divide' || a1 === '分割') && a2 === 'true' && (a3.includes('基本') || a3.includes('基礎') || a3.toLowerCase() === 'base case'));
-            }
-            else if (key === 'ch5_l2') {
-                config.desc = "定義函式 (Function) 與接收參數。";
-                config.code = `function calculatePrice(qty, price) {\n  return qty * price;\n}\n// 呼叫執行：let total = calculatePrice(3, 50);`;
-                config.q1 = "1. 上述程式中，qty 與 price 在專有名詞中稱為？（填：參數 或 變數）";
-                config.q2 = "2. 呼叫後變數 total 所收到的回傳數值為多少？（填整數數字）";
-                config.q3 = "3. 函式內用來將結果傳遞出去的關鍵字是？（填英文關鍵字）";
-                config.checkFn = (a1, a2, a3) => (a1 === '參數' && a2 === '150' && a3.toLowerCase() === 'return');
-            }
-            else if (key === 'ch5_l3') {
-                config.desc = "理解遞迴函數 (Recursion) 自己呼叫自己的運行特性。";
-                config.code = `function run(n) {\n  if(n <= 0) return;\n  run(n - 1);\n}`;
-                config.q1 = "1. 遞迴函式中必須設計哪種case以防止無窮迴圈？（填：終止條件 或 結束條件）";
-                config.q2 = "2. 遞迴在底層是由記憶體的哪種資料結構負責追蹤與堆疊？（填：堆疊 或 佇列）";
-                config.q3 = "3. 若呼叫 run(5)，總共會進入此 run 函式幾次？（填整數數字）";
-                config.checkFn = (a1, a2, a3) => ((a1.includes('條件') || a1.toLowerCase() === 'base case') && a1 !== '' && a2 === '堆疊' && a3 === '6');
-            }
-            else if (key === 'ch5_l4') {
-                config.desc = "階乘 (Factorial) 的遞迴數學推導。";
-                config.code = `function fact(n) {\n  if(n <= 1) return 1;\n  return n * fact(n - 1);\n}`;
-                config.q1 = "1. 呼叫 fact(3) 的回傳值是多少？（填整數數字）";
-                config.q2 = "2. 呼叫 fact(4) 時，會啟動幾次 fact 的自我呼叫？（填整數數字）";
-                config.q3 = "3. 0 的階乘 (0!) 數學定義值為多少？";
-                config.checkFn = (a1, a2, a3) => (a1 === '6' && a2 === '4' && a3 === '1');
-            }
-            else if (key === 'ch5_l5') {
-                config.desc = "費氏級數 (Fibonacci) 經典數列模型。";
-                config.code = `function fib(n) {\n  if(n <= 1) return n;\n  return fib(n-1) + fib(n-2);\n}`;
-                config.q1 = "1. 費氏級數前幾項為 0, 1, 1, 2, 3，則第六項 fib(5) 為多少？";
-                config.q2 = "2. 費氏級數公式中，當前項是前兩項的什麼運算結果？（填：相加 或 相乘）";
-                config.q3 = "3. 這種未經優化的重複子問題計算，時間複雜度為？（填：O(2^n) 或 O(N)）";
-                config.checkFn = (a1, a2, a3) => (a1 === '5' && a2 === '相加' && a3.toUpperCase() === 'O(2^N)');
-            }
-            else if (key === 'ch5_l6') {
-                config.desc = "遞迴演算法綜合應用能力評測。";
-                config.q1 = "1. 遞迴若層數過深，會導致什麼記憶體錯誤？（填英文：Stack Overflow 或 堆疊溢位）";
-                config.q2 = "2. 河內塔問題 (Tower of Hanoi) 有 3 片金片時最少需要移動幾次？（填數字）";
-                config.q3 = "3. 任何遞迴程式都可以被改寫為非遞迴的「迴圈」形式，對或錯？（填：對 或 錯）";
-                config.checkFn = (a1, a2, a3) => ((a1.toLowerCase() === 'stack overflow' || a1 === '堆疊溢位') && a2 === '7' && a3 === '對');
-            }
-            else if (key === 'ch6_l1') {
-                config.desc = "MBTI 決策樹 (Decision Tree) 機制思維。";
-                config.q1 = "1. 決策樹中的起點頂點，在資料結構專有名詞中稱之為？（填：根節點）";
-                config.q2 = "2. 決策樹的分類預測本質，是屬於一系列的條件判斷組合，對嗎？（填：對 或 錯）";
-                config.q3 = "3. 沒有子節點的最終節點稱為什麼？（填：葉節點）";
-                config.checkFn = (a1, a2, a3) => (a1 === '根節點' && a2 === '對' && a3 === '葉節點');
-            }
-            else if (key === 'ch6_l2') {
-                config.desc = "二元樹走訪 (Binary Tree Traversal)。";
-                config.q1 = "1. 「左子樹 ➔ 根節點 ➔ 右子樹」的走訪順序稱為？（填：中序走訪）";
-                config.q2 = "2. 走訪表示法中，前序走訪的最前端元素一定是整棵樹的什麼節點？（填：根節點）";
-                config.q3 = "3. 已知中序為 BAC，後序為 BCA，則前序走訪順序為何？（填英文字母組合，如 ABC）";
-                config.checkFn = (a1, a2, a3) => (a1 === '中序走訪' && a2 === '根節點' && a3.toUpperCase() === 'ABC');
-            }
-            else if (key === 'ch6_l3') {
-                config.desc = "圖形理論：最小生成樹 (Kruskal 演算法應用體驗)。";
-                config.q1 = "1. 最小生成樹 (MST) 是指在連通圖中挑選邊，使其能連通所有節點且權重總和為？（填：最小）";
-                config.q2 = "2. 在挑選邊的過程中，必須嚴格避免邊與邊之間形成什麼結構？（填：環路 或 迴圈）";
-                config.q3 = "3. 若一個圖有 6 個頂點，則其生成樹必須剛好包含幾條邊？（填整數數字）";
-                config.checkFn = (a1, a2, a3) => (a1 === '最小' && (a1 !== '') && (a2.includes('環') || a2.includes('迴圈')) && a3 === '5');
-            }
-            else if (key === 'ch6_l4') {
-                config.desc = "最短路徑演算法 (Dijkstra 演算法應用體驗)。";
-                config.q1 = "1. 戴克斯特拉 (Dijkstra) 演算法主要是用來求解單源到其餘頂點的什麼路徑？（填：最短路徑）";
-                config.q2 = "2. Dijkstra 演算法是否能處理包含「負權重」數值的邊？（填：可以 或 不可以）";
-                config.q3 = "3. A 到 B 權重 4，B 到 C 權重 1，A 到 C 權重 6，則 A 到 C 的最短路徑長度為多少？";
-                config.checkFn = (a1, a2, a3) => (a1 === '最短路徑' && a2 === '不可以' && a3 === '5');
-            }
-            else if (key === 'ch6_l5') {
-                config.desc = "字典樹 (Trie) 網頁進階資料結構。";
-                config.q1 = "1. 字典樹主要用於高效率的字串搜尋與自動補全，又被稱為前綴樹，對嗎？（填：對 或 錯）";
-                config.q2 = "2. 字典樹根節點 (Root) 通常是否包含特定的字元資料？（填：是 或 否）";
-                config.q3 = "3. 依序插入 'cat' 與 'car'，字典樹中總共會建立出幾個節點（含根節點）？（填數字）";
-                config.checkFn = (a1, a2, a3) => (a1 === '對' && a2 === '否' && a3 === '5');
-            }
-            else if (key === 'ch6_l6') {
-                config.desc = "二元搜尋樹 (Binary Search Tree)。";
-                config.q1 = "1. 二元搜尋樹的任一節點，其左子樹的所有節點值都必須比該節點的值？（填：小 或 大）";
-                config.q2 = "2. 對二元搜尋樹進行哪種順序的走訪，可以得到一個由小到大排列的有序數列？（填：中序走訪）";
-                config.q3 = "3. 依序插入 50, 30, 70，則 30 會成為 50 的哪一側子節點？（填：左側 或 右側）";
-                config.checkFn = (a1, a2, a3) => (a1 === '小' && a1 !== '' && a2 === '中序走訪' && a3.includes('左'));
-            }
-            else if (key === 'ch7_l1') {
-                config.desc = "電腦硬體元件與其功能核心配對。";
-                config.q1 = "1. 被譽為電腦大腦、負責執行指令與運算的核心元件縮寫是？（填三字英文縮寫）";
-                config.q2 = "2. 電腦關機後其中儲存的資料會完全消失的暫存型記憶體簡稱是？（填三字英文縮寫）";
-                config.q3 = "3. 固態硬碟的英文縮寫為？（填三字英文縮寫）";
-                config.checkFn = (a1, a2, a3) => (a1.toUpperCase() === 'CPU' && a2.toUpperCase() === 'RAM' && a3.toUpperCase() === 'SSD');
-            }
-            else if (key === 'ch7_l2') {
-                config.desc = "硬體規格參數與效能指標大比拚。";
-                config.q1 = "1. 評估 CPU 運作速度的時脈頻率，目前的市售常見單位是？（填：GHz 或 MHz）";
-                config.q2 = "2. 記憶體容量 DDR5 16GB 的 GB 代表什麼位元組單位？（填：GigaByte 或 十億位元組）";
-                config.q3 = "3. 顯示卡上專門用來處理圖形運算的核心處理器簡稱是？（填三字英文縮寫）";
-                config.checkFn = (a1, a2, a3) => (a1.toUpperCase() === 'GHZ' && a2.toUpperCase() === 'GB' && a3.toUpperCase() === 'GPU');
-            }
-            else if (key === 'ch7_l3') {
-                config.desc = "認識臺灣與全球電子產業鏈架構。";
-                config.q1 = "1. 專注於將設計好的電路圖實體化製作出來的行業，稱為晶圓製造或晶圓？（填：代工）";
-                config.q2 = "2. 全球半導體晶圓代工市占率第一、被譽為臺灣護國神山的企業英文簡稱是？（填四字英文縮寫）";
-                config.q3 = "3. 晶圓製造完成後，交給下游進行切割、封入保護殼並測試的階段簡稱是？（填：封裝測試）";
-                config.checkFn = (a1, a2, a3) => (a1.includes('代工') && a2.toUpperCase() === 'TSMC' && (a3.includes('封裝') || a3.includes('封測')));
-            }
-
-            const app = document.getElementById('app');
-            app.innerHTML = `
-                <div class="max-w-4xl mx-auto p-6 pt-20 space-y-6">
-                    <button onclick="changeView('menu')" class="flex items-center text-slate-500 font-bold hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
-                    <div class="bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-6">
-                        <div class="flex justify-between items-center border-b pb-4">
-                            <h2 class="text-xl font-black text-slate-800">${config.title}</h2>
-                            <span id="quiz-timer" class="font-mono bg-slate-100 px-3 py-1 rounded-md text-sm font-bold text-slate-600">00:00</span>
-                        </div>
-                        <p class="text-slate-600 text-sm">${config.desc}</p>
-                        ${config.code ? `<pre class="code-block text-xs text-left">${config.code}</pre>` : ''}
-                        
-                        <div class="space-y-4">
-                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/60 space-y-3">
-                                <label class="block text-sm font-bold text-slate-700">${config.q1}</label>
-                                <input type="text" id="ans-1" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium">
-                            </div>
-                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/60 space-y-3">
-                                <label class="block text-sm font-bold text-slate-700">${config.q2}</label>
-                                <input type="text" id="ans-2" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium">
-                            </div>
-                            <div class="p-4 bg-slate-50 rounded-2xl border border-slate-200/60 space-y-3">
-                                <label class="block text-sm font-bold text-slate-700">${config.q3}</label>
-                                <input type="text" id="ans-3" class="w-full p-2.5 bg-white border border-slate-300 rounded-xl outline-none focus:border-indigo-500 text-sm font-medium">
-                            </div>
-                        </div>
-
-                        <button id="quiz-submit-btn" class="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md">送出評測答案</button>
-                    </div>
-                </div>
-            `;
-
-            // 啟動關卡計時器
-            startTimer('up', 0, () => {
-                const el = document.getElementById('quiz-timer');
-                if (el) el.innerText = formatTime(timeSeconds);
-            });
-
-            // 繫結送出驗證事件
-            document.getElementById('quiz-submit-btn').onclick = () => {
-                let val1 = document.getElementById('ans-1').value.trim();
-                let val2 = document.getElementById('ans-2').value.trim();
-                let val3 = document.getElementById('ans-3').value.trim();
-
-                if (!val1 || !val2 || !val3) {
-                    alert('請回答所有題目後再送出！');
-                    return;
-                }
-
-                let pass = config.checkFn(val1, val2, val3);
-                if (pass) {
-                    showResult(true, 100);
-                } else {
-                    alert('❌ 部分題目回答有誤，請再仔細檢查一下教材邏輯！');
-                    currentAttempts++;
-                }
-            };
-        }
-    </script>
-</body>
-</html>
+                const gasUrl = "

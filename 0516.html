@@ -169,7 +169,7 @@ function render() {
     else if (currentView === 'ch1_l5') renderInputOutputModule(app);
     else if (currentView === 'ch2_l1') renderCh2L1Module(app);
     else if (currentView === 'ch2_l2') renderCh2L2Module(app);
-    //else if (currentView === 'ch2_l3') renderCh2L3Module(app);
+    else if (currentView === 'ch2_l3') renderCh2L3Module(app);
     //else if (currentView === 'ch2_l4') renderCh2L4Module(app);
     //else if (currentView === 'ch2_l5') renderCh2L5Module(app);
     //else if (currentView === 'ch3_l1') renderDivConq(app);
@@ -326,52 +326,6 @@ function updateUIWithUserInfo(className, seatNumber, studentName) {
         displayBox.classList.remove("hidden"); // 顯示左上角
     }
 }
-// --- 登入 ---
-function renderLogin(el) {
-    el.innerHTML = `
-        <div class="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-slate-800 to-indigo-900 text-white relative overflow-hidden p-6">
-            <div class="bg-white/10 backdrop-blur-md p-10 rounded-3xl shadow-2xl border border-white/20 max-w-md w-full text-center z-10 mb-8">
-                <h1 class="text-4xl font-black mb-2 tracking-tight">CS 學習大廳</h1>
-                <p class="mb-8 opacity-80">資訊科學演算法與電腦硬體</p>
-                
-                <div class="space-y-4 text-left mb-6">
-                    <div>
-                        <label class="block text-sm font-bold text-slate-300 mb-1">班級</label>
-                        <select id="class-input" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl font-bold shadow-inner cursor-pointer">
-                            <option value="">請選擇班級</option>
-                            <option value="202">202 班</option>
-                            <option value="204">204 班</option>
-                            <option value="206">206 班</option>
-                            <option value="208">208 班</option>
-                            <option value="210">210 班</option>
-                            <option value="212">212 班</option>
-                            <option value="214">214 班</option>
-                            <option value="216">216 班</option>
-                        </select>
-                    </div>
-                    <div class="flex gap-4">
-                        <div class="w-1/3">
-                            <label class="block text-sm font-bold text-slate-300 mb-1">座號</label>
-                            <input id="seat-input" type="number" placeholder="座號" min="1" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
-                        </div>
-                        <div class="w-2/3">
-                            <label class="block text-sm font-bold text-slate-300 mb-1">姓名</label>
-                            <input id="name-input" type="text" placeholder="請輸入姓名" class="w-full p-4 rounded-2xl bg-white text-slate-800 focus:ring-4 ring-blue-400 outline-none text-xl text-center font-bold shadow-inner">
-                        </div>
-                    </div>
-                </div>
-
-                <button onclick="saveName()" class="w-full py-4 bg-yellow-400 hover:bg-yellow-300 text-slate-900 rounded-2xl font-black text-xl transition-all active:scale-95 shadow-[0_0_20px_rgba(250,204,21,0.4)]">進入大廳</button>
-            </div>
-
-            <div class="bg-slate-900/50 backdrop-blur-sm p-6 rounded-2xl border border-slate-700 max-w-md w-full text-center z-10 flex flex-col items-center">
-                <h2 class="text-xl font-bold text-blue-300 mb-2 flex items-center">⚙️ 教師管理專區</h2>
-                <p class="text-sm text-slate-300 mb-4">設定各關卡開放狀態，並查閱或下載班級成績單。</p>
-                <button onclick="checkTeacher()" class="px-8 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl font-bold transition-colors shadow flex items-center gap-2">進入教師後臺</button>
-            </div>
-        </div>
-    `;
-}
 
 window.checkTeacher = () => {
     const pwd = prompt("請輸入教師密碼：");
@@ -383,42 +337,6 @@ window.checkTeacher = () => {
     }
 };
 
-window.saveName = () => {
-    const classEl = document.getElementById('class-input');
-    const seatEl = document.getElementById('seat-input');
-    const nameEl = document.getElementById('name-input');
-
-    if (!classEl || !seatEl || !nameEl) {
-        alert("系統找不到輸入欄位，請重新整理網頁！");
-        return;
-    }
-
-    const className = classEl.value.trim();
-    const seat = seatEl.value.trim();
-    const name = nameEl.value.trim();
-
-    if (className && seat && name) {
-        // 儲存至瀏覽器快取
-        localStorage.setItem("className", className);
-        localStorage.setItem("seatNumber", seat);
-        localStorage.setItem("studentName", name);
-
-        // 成功賦值並跳轉
-        globalPlayerName = `${seat}號 ${name}`;
-        changeView('menu');
-    } else {
-        alert("請完整選擇班級、並輸入座號與姓名！");
-    }
-};
-window.checkTeacher = () => {
-    const pwd = prompt("請輸入教師密碼：");
-    if (pwd === '393302') {
-        globalPlayerName = 'Teacher';
-        changeView('teacher');
-    } else if (pwd !== null) {
-        alert("密碼錯誤！");
-    }
-};
 
 window.saveName = () => {
     const classEl = document.getElementById('class-input');

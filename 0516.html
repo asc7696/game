@@ -729,15 +729,21 @@ function renderPythonModule(el) {
 
     window.renderPYInner();
 }
-// 1-3
+
 // --- 1-3 數值運算關卡 ---
 if (!window.ch1l3Inputs) window.ch1l3Inputs = { q1: "", q2: "", q3: "" };
 
 function renderArithmeticLogic(el) {
-    // 1. 啟動計時器：500 秒
+    // 1. 啟動計時器：修正回呼函式，只更新時間標籤 `#h13-time`，不破壞整個網頁結構
     startTimer('down', 1000, () => { 
-        const t = document.getElementById('app'); 
-        if (t) t.innerText = formatTime(timeSeconds); 
+        const timeEl = document.getElementById('h13-time'); 
+        if (timeEl) {
+            timeEl.innerText = formatTime(timeSeconds); 
+        } else {
+            // 如果找不到 h13-time（可能切換頁面了），也可以順便在這裡做安全處理
+            const t = document.getElementById('app');
+            // 如果你的系統需要全域兜底再用，否則留著更新 timeEl 即可
+        }
     });
 
     window.renderCh1L3Inner = () => {
@@ -848,7 +854,7 @@ function renderArithmeticLogic(el) {
         // 正確答案：Q1=18, Q2=false, Q3=30
         let isQ1Correct = (a1 === "18");
         let isQ2Correct = (a2 === "false");
-        let isQ3Correct = (a3 === "30.0");
+        let isQ3Correct = (a3 === "30" || a3 === "30.0"); // 兼容一下整數與浮點數寫法
 
         // 更新回饋視覺 (不直接給解答，僅顯示對錯)
         document.getElementById('q13-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 再想一下運算順序';
@@ -866,22 +872,21 @@ function renderArithmeticLogic(el) {
                 showResult(true); // 記錄成績並顯示成功畫面
             }, 500);
         } else {
-            // 抖動特效 (若已有此類別)
-            const btn = event.target;
-            btn.classList.add('animate-shake');
-            setTimeout(() => btn.classList.remove('animate-shake'), 400);
+            // 修正：原程式碼 event.target 在某些瀏覽器或非直接綁定事件中可能會噴錯，調整為透過 id 或確保穩定
+            const btn = document.querySelector('button[onclick="window.submitCh1L3()"]');
+            if (btn) {
+                btn.classList.add('animate-shake');
+                setTimeout(() => btn.classList.remove('animate-shake'), 400);
+            }
         }
     };
 
     window.renderCh1L3Inner();
 }
-
-
 		
 
 //-------------------------------------------------
-        // 預設啟動
-        render();		
+
         // 預設啟動
         render();
 		

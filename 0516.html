@@ -1504,16 +1504,19 @@ function renderStringOperations(el) {
     window.renderCh1L4Inner();
 }	
 
-// --- 1-5 輸入輸出函式關卡 (大字 + IDLE互動模擬 + 閱讀解鎖版) ---
-if (!window.ch1l5Inputs) window.ch1l5Inputs = { q1: "", q2: "", q3: "", q4: "" };
+// --- 1-5 輸入輸出函式關卡 (包含民國轉西元、BMI實作填空與IDLE模擬) ---
+if (!window.ch1l5Inputs) window.ch1l5Inputs = { q1: "", q2: "", q3: "", q4: "", q5_roc: "", q6_bmi: "" };
 if (!window.ch1l5ReadStatus) window.ch1l5ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
 
 // 模擬 IDLE 的獨立狀態
 window.idleState = {
-    currentExample: 1,
+    currentExample: 1, // 1:姓名串接, 2:數字陷阱, 3:民國轉西元, 4:BMI計算
     p1Name: "May",
     p2X: "10",
     p2Y: "20",
+    p3Roc: "115",    // 範例3預設輸入
+    p4Cm: "175",     // 範例4預設身高
+    p4Kg: "70",      // 範例4預設體重
     isRunning: false,
     hasRun: false
 };
@@ -1525,7 +1528,7 @@ function renderInputOutputModule(el) {
         if (timeEl) timeEl.innerText = formatTime(timeSeconds); 
     });
 
-    // 檢查是否所有區塊都讀完了
+    // 檢查是否所有區塊都閱讀確認完畢
     const checkAllRead = () => {
         const s = window.ch1l5ReadStatus;
         const submitBtn = document.getElementById('ch1l5-submit-btn');
@@ -1541,7 +1544,7 @@ function renderInputOutputModule(el) {
         }
     };
 
-    // 點擊檢核鈕
+    // 點擊已讀按鈕
     window.toggleSection15Read = (sectionId, btnEl) => {
         window.ch1l5ReadStatus[sectionId] = true;
         btnEl.innerHTML = '✅ 我已讀懂此區塊（已確認）';
@@ -1550,7 +1553,7 @@ function renderInputOutputModule(el) {
         checkAllRead();
     };
 
-    // 切換 IDLE 範例程式碼
+    // 切換 IDLE 範例
     window.switchIdleExample = (exNum) => {
         window.idleState.currentExample = exNum;
         window.idleState.hasRun = false;
@@ -1563,7 +1566,6 @@ function renderInputOutputModule(el) {
         window.idleState.isRunning = true;
         window.renderCh1L5Inner();
         
-        // 模擬 0.6 秒的電腦運算延遲感
         setTimeout(() => {
             window.idleState.isRunning = false;
             window.idleState.hasRun = true;
@@ -1583,53 +1585,85 @@ function renderInputOutputModule(el) {
             }
         };
 
-        // 根據目前選擇的範例，動態生成 IDLE 內部畫面
+        // 根據選擇的範例，動態生成程式碼與模擬輸出
         let idleCodeHtml = "";
         let idleInputAreaHtml = "";
         let idleOutputHtml = "";
 
         if (window.idleState.currentExample === 1) {
             idleCodeHtml = `player = <span class="text-amber-400">input</span>(<span class="text-emerald-400">'輸入姓名：'</span>)\n<span class="text-amber-400">print</span>(<span class="text-emerald-400">'welcome '</span> + player + <span class="text-emerald-400">'!!!!'</span>)`;
-            
             idleInputAreaHtml = `
                 <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center gap-3">
                     <span class="text-sm font-bold text-slate-400">⌨️ 模擬玩家輸入姓名：</span>
-                    <input type="text" value="${window.idleState.p1Name}" 
-                        oninput="window.idleState.p1Name=this.value" 
-                        class="bg-slate-950 text-yellow-400 border border-slate-600 px-3 py-1 rounded font-mono text-lg focus:outline-none focus:border-indigo-500 w-44">
-                </div>
-            `;
-            
+                    <input type="text" value="${window.idleState.p1Name}" oninput="window.idleState.p1Name=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-3 py-1 rounded font-mono text-lg focus:outline-none focus:border-indigo-500 w-44">
+                </div>`;
             if (window.idleState.hasRun) {
-                idleOutputHtml = `<div class="text-slate-400">輸入姓名：<span class="text-yellow-400">${window.idleState.p1Name}</span></div>\n<div class="text-green-400 font-bold">welcome ${window.idleState.p1Name}!!!!</div>`;
+                idleOutputHtml = `<div class="text-slate-400">輸入姓名：<span class="text-yellow-400">${window.idleState.p1Name}</span></div>\n<div class="text-emerald-400 font-bold">welcome ${window.idleState.p1Name}!!!!</div>`;
             }
-        } else {
+        } 
+        else if (window.idleState.currentExample === 2) {
             idleCodeHtml = `x = <span class="text-amber-400">input</span>(<span class="text-emerald-400">'輸入整數x：'</span>)\ny = <span class="text-amber-400">input</span>(<span class="text-emerald-400">'輸入整數y：'</span>)\n<span class="text-amber-400">print</span>(x + y)`;
-            
             idleInputAreaHtml = `
                 <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex flex-wrap items-center gap-4">
                     <div class="flex items-center gap-2">
                         <span class="text-sm font-bold text-slate-400">⌨️ 輸入 x：</span>
-                        <input type="text" value="${window.idleState.p2X}" 
-                            oninput="window.idleState.p2X=this.value" 
-                            class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-1 rounded font-mono text-lg w-20 text-center">
+                        <input type="text" value="${window.idleState.p2X}" oninput="window.idleState.p2X=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-1 rounded font-mono text-lg w-20 text-center">
                     </div>
                     <div class="flex items-center gap-2">
                         <span class="text-sm font-bold text-slate-400">⌨️ 輸入 y：</span>
-                        <input type="text" value="${window.idleState.p2Y}" 
-                            oninput="window.idleState.p2Y=this.value" 
-                            class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-1 rounded font-mono text-lg w-20 text-center">
+                        <input type="text" value="${window.idleState.p2Y}" oninput="window.idleState.p2Y=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-1 rounded font-mono text-lg w-20 text-center">
                     </div>
-                </div>
-            `;
-            
+                </div>`;
             if (window.idleState.hasRun) {
                 idleOutputHtml = `
                     <div class="text-slate-400">輸入整數x：<span class="text-yellow-400">${window.idleState.p2X}</span></div>
                     <div class="text-slate-400">輸入整數y：<span class="text-yellow-400">${window.idleState.p2Y}</span></div>
-                    <div class="text-rose-400 font-black text-2xl mt-1">💡 輸出結果："${window.idleState.p2X}${window.idleState.p2Y}"</div>
-                    <div class="text-amber-300 text-sm mt-2 font-sans border-t border-slate-800 pt-2">⚠️ 發現了嗎？電腦「沒有」把數值相加！因為 input 接收到的資料一律是「字串（文字）」，所以文字相加會變成直接串接在一起。</div>
-                `;
+                    <div class="text-rose-400 font-black text-xl mt-1">💡 輸出結果："${window.idleState.p2X}${window.idleState.p2Y}"</div>
+                    <div class="text-amber-300 text-xs mt-2 font-sans border-t border-slate-800 pt-1">⚠️ 注意！文字相加會直接串接，沒有進行數學相加。</div>`;
+            }
+        } 
+        else if (window.idleState.currentExample === 3) {
+            // 實作題 1：民國轉西元 (正確公式：西元 = 民國 + 1911)
+            idleCodeHtml = `roc_year = <span class="text-pink-400 underline font-bold">int(input('輸入民國年：'))</span>  <span class="text-slate-500"># 必須轉成整數</span>\nad_year = roc_year + 1911\n<span class="text-amber-400">print</span>(<span class="text-emerald-400">"對應的西元年為："</span>, ad_year)`;
+            idleInputAreaHtml = `
+                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex items-center gap-3">
+                    <span class="text-sm font-bold text-slate-400">⌨️ 實作測試（輸入民國年）：</span>
+                    <input type="text" value="${window.idleState.p3Roc}" oninput="window.idleState.p3Roc=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-3 py-1 rounded font-mono text-lg w-28 text-center">
+                </div>`;
+            if (window.idleState.hasRun) {
+                const rocNum = parseInt(window.idleState.p3Roc);
+                if (isNaN(rocNum)) {
+                    idleOutputHtml = `<span class="text-red-500 font-bold font-mono">ValueError: invalid literal for int()</span>\n<span class="text-red-400 text-sm">錯誤提示：你輸入的不是有效數字，int() 無法轉換！</span>`;
+                } else {
+                    idleOutputHtml = `<div class="text-slate-400">輸入民國年：<span class="text-yellow-400">${window.idleState.p3Roc}</span></div>\n<div class="text-emerald-400 font-bold">對應的西元年為： ${rocNum + 1911}</div>`;
+                }
+            }
+        } 
+        else if (window.idleState.currentExample === 4) {
+            // 實作題 2：BMI 計算 (正確公式：體重 / (身高/100)**2 )
+            idleCodeHtml = `height = <span class="text-sky-400 font-bold">float</span>(<span class="text-amber-400">input</span>(<span class="text-emerald-400">'請輸入身高(cm)：'</span>))\nweight = <span class="text-sky-400 font-bold">float</span>(<span class="text-amber-400">input</span>(<span class="text-emerald-400">'請輸入體重(kg)：'</span>))\n\n<span class="text-slate-500"># 身高公分要先除以 100 變成公尺</span>\nbmi = weight / ((height / 100) ** 2)\n<span class="text-amber-400">print</span>(<span class="text-emerald-400">"您的 BMI 數值為："</span>, bmi)`;
+            idleInputAreaHtml = `
+                <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex flex-wrap items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-slate-400">⌨️ 身高(cm)：</span>
+                        <input type="text" value="${window.idleState.p4Cm}" oninput="window.idleState.p4Cm=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-1 rounded font-mono text-lg w-24 text-center">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-bold text-slate-400">⌨️ 體重(kg)：</span>
+                        <input type="text" value="${window.idleState.p4Kg}" oninput="window.idleState.p4Kg=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-1 rounded font-mono text-lg w-24 text-center">
+                    </div>
+                </div>`;
+            if (window.idleState.hasRun) {
+                const hM = parseFloat(window.idleState.p4Cm) / 100;
+                const wK = parseFloat(window.idleState.p4Kg);
+                if (isNaN(hM) || isNaN(wK) || hM === 0) {
+                    idleOutputHtml = `<span class="text-red-500 font-bold font-mono">ZeroDivisionError / ValueError</span>`;
+                } else {
+                    const resBmi = wK / (hM * hM);
+                    idleOutputHtml = `
+                        <div class="text-slate-400">請輸入身高(cm)：<span class="text-yellow-400">${window.idleState.p4Cm}</span></div>
+                        <div class="text-slate-400">請輸入體重(kg)：<span class="text-yellow-400">${window.idleState.p4Kg}</span></div>\n<div class="text-emerald-400 font-bold">您的 BMI 數值為： ${resBmi.toFixed(2)}</div>`;
+                }
             }
         }
 
@@ -1645,10 +1679,10 @@ function renderInputOutputModule(el) {
                 <div class="bg-blue-50 p-6 rounded-3xl border-2 border-blue-200 shadow-sm">
                     <h2 class="font-black text-2xl text-blue-700 mb-4 flex items-center gap-2">📢 1. 輸出函式 print()</h2>
                     <p class="text-xl text-slate-800 font-bold mb-3 bg-white p-3 rounded-xl border border-blue-100">
-                        <code class="font-mono text-blue-600">print()</code> 是用來將資料「顯示、列印」在螢幕畫面上的功能。
+                        <code class="font-mono text-blue-600">print()</code> 是將資料顯示在螢幕畫面的功能。
                     </p>
                     <div class="text-xl pl-2 space-y-2 text-slate-700 font-medium leading-relaxed">
-                        <li>📌 <b>多個資料同時印：</b>中間可以用逗號 <code class="bg-white px-1 font-mono font-bold">,</code> 隔開，印出時電腦會<b>自動幫你補一個空白鍵</b>。</li>
+                        <li>📌 <b>多個資料同時印：</b>中間可以用逗場 <code class="bg-white px-1 font-mono font-bold">,</code> 隔開，印出時電腦會<b>自動補一個空白鍵</b>。</li>
                         <li class="pl-6 text-slate-500 font-mono text-lg">例如：<code class="bg-white px-1">print("Hi", "May")</code> ➔ 畫面印出 <code class="bg-slate-200 px-1 text-slate-900 font-bold">"Hi May"</code></li>
                         <li>📌 <b>搭配文字串接：</b>也可以用加號 <code class="bg-white px-1 font-mono font-bold">+</code> 把文字黏在一起，但要注意加號兩邊<b>必須全部都是字串</b>。</li>
                     </div>
@@ -1658,12 +1692,12 @@ function renderInputOutputModule(el) {
                 <div class="bg-purple-50 p-6 rounded-3xl border-2 border-purple-200 shadow-sm">
                     <h2 class="font-black text-2xl text-purple-700 mb-4 flex items-center gap-2">📥 2. 輸入函式 input()</h2>
                     <p class="text-xl text-slate-800 font-bold mb-3 bg-white p-3 rounded-xl border border-purple-100 leading-relaxed">
-                        <code class="font-mono text-purple-600">input()</code> 負責「讓玩家從鍵盤輸入文字資料」，括號內放的是給玩家看的「提示文字」。
+                        <code class="font-mono text-purple-600">input()</code> 負責讓玩家從鍵盤輸入文字資料，括號內放的是提示文字。
                     </p>
                     <div class="bg-red-50 p-4 rounded-xl border border-red-200 text-xl font-bold text-red-700 leading-relaxed space-y-1 shadow-inner">
                         <div class="text-2xl">⚠️ 世紀超級大地雷（一定要記住！）：</div>
                         <div>不管玩家在鍵盤輸入的是整數還是小數，<span class="underline decoration-wavy">input() 接收並抓進電腦的資料，一律會自動變成<b>「字串型態 (str)」</b>！</span></div>
-                        <div class="text-base text-red-500 mt-1 font-normal">因此，如果你希望拿它來做數學運算（如加減乘除），後續必須使用 <code class="bg-white px-1 font-mono font-bold">int()</code> 或 <code class="bg-white px-1 font-mono font-bold">float()</code> 把型態強制轉換喔！</div>
+                        <div class="text-base text-red-500 mt-1 font-normal">因此，若要做數學運算，外層必須包上 <code class="bg-white px-1 font-mono font-bold">int()</code> 或 <code class="bg-white px-1 font-mono font-bold">float()</code> 進行型態轉換。</div>
                     </div>
                     ${getBtnHtml('sec2')}
                 </div>
@@ -1674,121 +1708,112 @@ function renderInputOutputModule(el) {
                             <span class="w-3 h-3 rounded-full bg-rose-500"></span>
                             <span class="w-3 h-3 rounded-full bg-amber-500"></span>
                             <span class="w-3 h-3 rounded-full bg-emerald-500"></span>
-                            <h2 class="text-xl font-mono font-black text-slate-200 ml-2">💻 Python IDLE Interactive Simulator</h2>
+                            <h2 class="text-xl font-mono font-black text-slate-200 ml-2">💻 Python IDLE 互動模擬器</h2>
                         </div>
                         
-                        <div class="flex gap-2 bg-slate-800 p-1 rounded-xl text-sm font-bold">
-                            <button onclick="window.switchIdleExample(1)" class="px-4 py-2 rounded-lg transition-all ${window.idleState.currentExample===1 ? 'bg-indigo-600 text-white':'text-slate-400 hover:text-slate-200'}">📄 範例 1 (姓名串接)</button>
-                            <button onclick="window.switchIdleExample(2)" class="px-4 py-2 rounded-lg transition-all ${window.idleState.currentExample===2 ? 'bg-indigo-600 text-white':'text-slate-400 hover:text-slate-200'}">📄 範例 2 (數字陷阱)</button>
+                        <div class="flex flex-wrap gap-1 bg-slate-800 p-1 rounded-xl text-xs font-bold">
+                            <button onclick="window.switchIdleExample(1)" class="px-3 py-2 rounded-lg transition-all ${window.idleState.currentExample===1 ? 'bg-indigo-600 text-white':'text-slate-400 hover:text-slate-200'}">📄 範例 1 (姓名)</button>
+                            <button onclick="window.switchIdleExample(2)" class="px-3 py-2 rounded-lg transition-all ${window.idleState.currentExample===2 ? 'bg-indigo-600 text-white':'text-slate-400 hover:text-slate-200'}">📄 範例 2 (數字陷阱)</button>
+                            <button onclick="window.switchIdleExample(3)" class="px-3 py-2 rounded-lg transition-all ${window.idleState.currentExample===3 ? 'bg-pink-600 text-white':'text-slate-400 hover:text-slate-200'}">🛠️ 實作 3 (民國轉西元)</button>
+                            <button onclick="window.switchIdleExample(4)" class="px-3 py-2 rounded-lg transition-all ${window.idleState.currentExample===4 ? 'bg-sky-600 text-white':'text-slate-400 hover:text-slate-200'}">🛠️ 實作 4 (BMI計算)</button>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 space-y-4 flex flex-col justify-between">
                             <div>
-                                <span class="block text-xs text-slate-500 font-mono mb-2">// Python Editor:</span>
-                                <pre class="font-mono text-lg text-slate-300 whitespace-pre-line leading-relaxed">${idleCodeHtml}</pre>
+                                <span class="block text-xs text-slate-500 font-mono mb-2">// Python Script Editor:</span>
+                                <pre class="font-mono text-base text-slate-300 whitespace-pre-line leading-relaxed">${idleCodeHtml}</pre>
                             </div>
                             
                             <div class="pt-4 border-t border-slate-800">
                                 ${idleInputAreaHtml}
                                 <button onclick="window.runSimulation()" ${window.idleState.isRunning ? 'disabled':''} 
                                     class="w-full mt-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-black text-lg rounded-xl shadow transition active:scale-95 disabled:opacity-50">
-                                    ${window.idleState.isRunning ? '⏳ 運算中...' : '▶ 點擊執行程式 (Run)'}
+                                    ${window.idleState.isRunning ? '⏳ 正在編譯執行...' : '▶ 點擊執行程式 (Run Module)'}
                                 </button>
                             </div>
                         </div>
 
                         <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 min-h-[220px] font-mono flex flex-col justify-between">
                             <div>
-                                <span class="block text-xs text-slate-500 mb-2">// Console Shell Output:</span>
-                                <pre class="text-lg text-slate-200 whitespace-pre-line leading-relaxed">${window.idleState.hasRun ? idleOutputHtml : '<span class="text-slate-600 italic">等待執行...請點選左側「執行程式」按鈕</span>'}</pre>
+                                <span class="block text-xs text-slate-500 mb-2">// Python Shell Output:</span>
+                                <pre class="text-base text-slate-200 whitespace-pre-line leading-relaxed">${window.idleState.hasRun ? idleOutputHtml : '<span class="text-slate-600 italic">等待執行...請點選左側「執行程式」按鈕</span>'}</pre>
                             </div>
-                            <div class="text-right text-xs text-slate-600 font-sans">Python 3.10.2 Shell</div>
+                            <div class="text-right text-xs text-slate-600 font-sans">Python 3.10 控制台</div>
                         </div>
-                    </div>
-
-                    <div class="bg-slate-800 p-4 rounded-2xl border border-slate-700 text-base text-slate-300">
-                        ${window.idleState.currentExample === 1 ? `
-                            <b class="text-indigo-400 text-lg">💡 範例 1 重點解析：</b><br>
-                            當程式執行到第一行時，電腦會卡住等待使用者輸入姓名並按下 Enter。接著將玩家名字放入變數 <code class="text-yellow-400 font-mono">player</b> 盒子。第二行透過加號 <code class="text-yellow-400 font-mono">+</code> 把文字、變數、與引號驚嘆號完全頭尾串接在一起。
-                        ` : `
-                            <b class="text-indigo-400 text-lg">💡 範例 2 重點解析：</b><br>
-                            雖然我們在鍵盤打了數字，但 <code class="text-rose-400 font-mono">input()</code> 抓進去的 x 與 y 其實是 <b class="text-rose-400">"文字型態的數字"</b>。所以最後 <code class="text-yellow-400 font-mono">print(x + y)</code> 被判定成「文字加文字」，才會印出拼接的文字！
-                        `}
                     </div>
                     ${getBtnHtml('sec3')}
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-lg border-2 border-slate-200">
                     <h2 class="font-black text-2xl text-slate-800 mb-3 flex items-center gap-2">
-                        <span class="bg-yellow-400 w-2 h-6 rounded-full"></span> 💡 4. 如何正確把輸入資料轉成數字？
+                        <span class="bg-yellow-400 w-2 h-6 rounded-full"></span> 💡 4. 資料型態轉換重點大對決
                     </h2>
-                    <p class="text-xl text-slate-700 font-medium mb-4 leading-relaxed">
-                        如果我們想要讓範例 2 能夠正常進行「數學的加法」，就必須在變數外層套上資料型態轉換器：
-                    </p>
-                    <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-base text-emerald-400 space-y-2">
-                        <div>x = <span class="text-amber-400">int</span>(<span class="text-indigo-400">input</span>(<span class="text-slate-400">'輸入整數x：'</span>)) <span class="text-slate-500">// ➔ 使用 int() 包起來，強制將輸入的文字轉成整數箱</span></div>
-                        <div>y = <span class="text-amber-400">int</span>(<span class="text-indigo-400">input</span>(<span class="text-slate-400">'輸入整數y：'</span>))</div>
-                        <div><span class="text-amber-400">print</span>(x + y) <span class="text-slate-500">// ➔ 此時電腦就會印出正常的數學加法結果囉！</span></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-base font-mono">
+                        <div class="p-4 bg-slate-900 text-emerald-400 rounded-xl border border-slate-800">
+                            <span class="text-slate-400 block mb-1">// 民國轉西元關鍵：加 1911</span>
+                            roc = <span class="text-amber-400">int</span>(<span class="text-indigo-400">input</span>()) <br>
+                            west = roc + 1911
+                        </div>
+                        <div class="p-4 bg-slate-900 text-emerald-400 rounded-xl border border-slate-800">
+                            <span class="text-slate-400 block mb-1">// BMI 關鍵：公分轉公尺、雙星號次方針</span>
+                            h = <span class="text-amber-400">float</span>(<span class="text-indigo-400">input</span>()) <br>
+                            bmi = w / ((h / 100) ** 2)
+                        </div>
                     </div>
                     ${getBtnHtml('sec4')}
                 </div>
 
                 <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-indigo-200">
-                    <h2 class="font-black text-3xl text-indigo-700 mb-6 pb-2 border-b-2 border-indigo-100">📝 挑戰練習：輸入輸出大檢核</h2>
+                    <h2 class="font-black text-3xl text-indigo-700 mb-6 pb-2 border-b-2 border-indigo-100">📝 綜合大檢核：輸入輸出與實作填空</h2>
                     
-                    <div class="space-y-8 text-2xl">
+                    <div class="space-y-8 text-xl">
                         <div class="flex flex-col gap-2">
-                            <label class="font-bold text-slate-800">1. 若執行 <code class="bg-slate-100 px-1 font-mono text-indigo-600">print("Hello", "World")</code>，中間使用逗號隔開，請問輸出結果是什麼？</label>
-                            <div class="flex flex-wrap items-center gap-4">
-                                <input type="text" id="q15-1" value="${window.ch1l5Inputs.q1}" 
-                                    oninput="window.ch1l5Inputs.q1=this.value" 
-                                    placeholder="輸入包含前後引號內的實際文字"
-                                    class="w-80 p-4 border-2 border-slate-300 rounded-xl font-mono focus:border-indigo-500 outline-none text-2xl shadow-sm">
-                                <span id="q15-1-feedback" class="text-2xl"></span>
-                            </div>
+                            <label class="font-bold text-slate-800">1. 若執行 <code class="bg-slate-100 px-1 font-mono text-indigo-600">print("Hello", "World")</code>，中間使用逗號隔開，輸出結果為何？</label>
+                            <input type="text" id="q15-1" value="${window.ch1l5Inputs.q1}" oninput="window.ch1l5Inputs.q1=this.value" placeholder="輸入結果文字" class="w-80 p-3 border-2 border-slate-300 rounded-xl font-mono focus:border-indigo-500 outline-none">
+                            <span id="q15-1-feedback" class="text-base"></span>
                         </div>
 
                         <div class="flex flex-col gap-2">
-                            <label class="font-bold text-slate-800">2. 核心觀念：利用 <code class="bg-slate-100 px-1 font-mono text-indigo-600">input()</code> 函式讓玩家在鍵盤輸入了數字 <code class="font-mono text-red-600">88</code> 之後，這個變數在電腦中的「資料型態」是什麼？(填 int / float / str / bool)</label>
-                            <div class="flex flex-wrap items-center gap-4">
-                                <input type="text" id="q15-2" value="${window.ch1l5Inputs.q2}" 
-                                    oninput="window.ch1l5Inputs.q2=this.value" 
-                                    placeholder="填入型態代稱"
-                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
-                                <span id="q15-2-feedback" class="text-2xl"></span>
-                            </div>
+                            <label class="font-bold text-slate-800">2. 利用 <code class="bg-slate-100 px-1 font-mono text-indigo-600">input()</code> 函式讓玩家輸入數字 <code class="font-mono text-red-600">88</code> 之後，該變數在電腦中的「資料型態」是什麼？(填 int / float / str / bool)</label>
+                            <input type="text" id="q15-2" value="${window.ch1l5Inputs.q2}" oninput="window.ch1l5Inputs.q2=this.value" placeholder="填入型態代稱" class="w-52 p-3 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold">
+                            <span id="q15-2-feedback" class="text-base"></span>
                         </div>
 
                         <div class="flex flex-col gap-3">
-                            <label class="font-bold text-slate-800">3. 程式追蹤：假設玩家在下方程式執行時，鍵盤依序輸入了 <code class="font-mono text-rose-500">7</code> 與 <code class="font-mono text-rose-500">3</code>，求最終 <code class="bg-slate-100 px-1 font-mono text-indigo-600">print(x + y)</code> 列印出的結果：</label>
-                            <pre class="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-lg leading-normal w-fit">
-x = input('輸入x')
-y = input('輸入y')
-print(x + y)</pre>
-                            <div class="flex flex-wrap items-center gap-4">
-                                <input type="text" id="q15-3" value="${window.ch1l5Inputs.q3}" 
-                                    oninput="window.ch1l5Inputs.q3=this.value" 
-                                    placeholder="填寫輸出值"
-                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-mono font-bold text-2xl shadow-sm">
-                                <span id="q15-3-feedback" class="text-2xl"></span>
-                            </div>
+                            <label class="font-bold text-slate-800">3. 程式追蹤：若玩家依序輸入 <code class="font-mono text-rose-500">7</code> 與 <code class="font-mono text-rose-500">3</code>，求下列程式列印結果：</label>
+                            <pre class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-sm w-fit">x = input('輸入x')\ny = input('輸入y')\nprint(x + y)</pre>
+                            <input type="text" id="q15-3" value="${window.ch1l5Inputs.q3}" oninput="window.ch1l5Inputs.q3=this.value" placeholder="填寫輸出值" class="w-52 p-3 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-mono font-bold">
+                            <span id="q15-3-feedback" class="text-base"></span>
                         </div>
 
                         <div class="flex flex-col gap-3">
-                            <label class="font-bold text-slate-800">4. 強制型態轉換：修正後的程式碼如下，同樣依序輸入 <code class="font-mono text-rose-500">7</code> 與 <code class="font-mono text-rose-500">3</code>，求最終輸出結果：</label>
-                            <pre class="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-lg leading-normal w-fit">
-x = int(input('輸入x'))
-y = int(input('輸入y'))
-print(x + y)</pre>
-                            <div class="flex flex-wrap items-center gap-4">
-                                <input type="text" id="q15-4" value="${window.ch1l5Inputs.q4}" 
-                                    oninput="window.ch1l5Inputs.q4=this.value" 
-                                    placeholder="填寫輸出值"
-                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-mono font-bold text-2xl shadow-sm">
-                                <span id="q15-4-feedback" class="text-2xl"></span>
-                            </div>
+                            <label class="font-bold text-slate-800">4. 型態轉換：同樣依序輸入 <code class="font-mono text-rose-500">7</code> 與 <code class="font-mono text-rose-500">3</code>，求下列程式輸出結果：</label>
+                            <pre class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-sm w-fit">x = int(input('輸入x'))\ny = int(input('輸入y'))\nprint(x + y)</pre>
+                            <input type="text" id="q15-4" value="${window.ch1l5Inputs.q4}" oninput="window.ch1l5Inputs.q4=this.value" placeholder="填寫輸出值" class="w-52 p-3 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-mono font-bold">
+                            <span id="q15-4-feedback" class="text-base"></span>
+                        </div>
+
+                        <div class="flex flex-col gap-3 p-4 bg-pink-50 rounded-2xl border border-pink-200">
+                            <label class="font-bold text-pink-900">5. 🛠️ 程式填空題：設計一個將「民國年轉西元年」的程式，請補齊挖空處：</label>
+                            <pre class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-sm w-fit">
+roc = ___________(input("請輸入民國年："))  # 填空處：要確保能進行數學加法
+west = roc + 1911
+print(west)</pre>
+                            <input type="text" id="q15-5" value="${window.ch1l5Inputs.q5_roc}" oninput="window.ch1l5Inputs.q5_roc=this.value" placeholder="請填寫挖空處的型態轉換函式" class="w-64 p-3 border-2 border-pink-300 rounded-xl focus:border-pink-500 outline-none font-mono font-bold">
+                            <span id="q15-5-feedback" class="text-base"></span>
+                        </div>
+
+                        <div class="flex flex-col gap-3 p-4 bg-sky-50 rounded-2xl border border-sky-200">
+                            <label class="font-bold text-sky-900">6. 🛠️ 程式填空題：設計一個計算 BMI 的程式（體重公斤 / 身高公尺平方），身高請用 float 讀取，請補齊挖空的算式部分：</label>
+                            <pre class="bg-slate-900 text-emerald-400 p-3 rounded-xl font-mono text-sm w-fit">
+h = float(input("請輸入身高(cm)："))
+w = float(input("請輸入體重(kg)："))
+bmi = w / ________________________  # 填空處：身高公分轉公尺後的「平方」算式
+print(bmi)</pre>
+                            <input type="text" id="q15-6" value="${window.ch1l5Inputs.q6_bmi}" oninput="window.ch1l5Inputs.q6_bmi=this.value" placeholder="例如: ((h/100)**2)" class="w-80 p-3 border-2 border-sky-300 rounded-xl focus:border-sky-500 outline-none font-mono font-bold">
+                            <span id="q15-6-feedback" class="text-base"></span>
                         </div>
                     </div>
 
@@ -1807,39 +1832,47 @@ print(x + y)</pre>
         checkAllRead();
     };
 
-    // 挑戰答案驗證邏輯
+    // 提交答案總檢核驗證
     window.submitCh1L5 = () => {
-        const cleanStr = (val) => val.trim().replace(/['"“”]/g, "");
+        const cleanStr = (val) => val.trim().replace(/['"“”\s]/g, ""); // 移除引號與所有空格
         
-        const a1 = cleanStr(window.ch1l5Inputs.q1);
-        const a2 = cleanStr(window.ch1l5Inputs.q2).toLowerCase(); 
-        const a3 = cleanStr(window.ch1l5Inputs.q3);
-        const a4 = cleanStr(window.ch1l5Inputs.q4); 
+        const a1 = val => val.trim().replace(/['"“”]/g, ""); // Q1 需保留內部空格
+        const v1 = a1(window.ch1l5Inputs.q1);
+        const v2 = cleanStr(window.ch1l5Inputs.q2).toLowerCase(); 
+        const v3 = cleanStr(window.ch1l5Inputs.q3);
+        const v4 = cleanStr(window.ch1l5Inputs.q4); 
+        const v5 = cleanStr(window.ch1l5Inputs.q5_roc).toLowerCase();
+        const v6 = cleanStr(window.ch1l5Inputs.q6_bmi).toLowerCase();
 
-        // 答案檢查
-        // Q1: Hello World (中間自動補一個空白鍵)
-        // Q2: str (input抓到的絕對是字串)
-        // Q3: 73 (未轉型文字串接)
-        // Q4: 10 (int轉型後的數學加法 7+3=10)
-        let isQ1Correct = (a1 === "Hello World");
-        let isQ2Correct = (a2 === "str" || a2 === "string");
-        let isQ3Correct = (a3 === "73");
-        let isQ4Correct = (a4 === "10"); 
+        // 正確答案判定條件
+        let isQ1Correct = (v1 === "Hello World");
+        let isQ2Correct = (v2 === "str" || v2 === "string");
+        let isQ3Correct = (v3 === "73");
+        let isQ4Correct = (v4 === "10"); 
+        let isQ5Correct = (v5 === "int" || v5 === "int()");
+        // 接受 ((h/100)**2) 或 (h/100)**2 或 (h/100)*(h/100)
+        let isQ6Correct = (v6 === "((h/100)**2)" || v6 === "(h/100)**2" || v6 === "(h/100)*(h/100)");
 
-        // 更新視覺反饋
-        document.getElementById('q15-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 注意逗號隔開時，電腦會自動在字與字中間補上一個「空白」喔';
+        // 畫面即時批改反饋
+        document.getElementById('q15-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 逗號隔開時，電腦會自動在兩字中間補上一個「空白」喔！';
         document.getElementById('q15-1-feedback').className = isQ1Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
         
-        document.getElementById('q15-2-feedback').innerHTML = isQ2Correct ? '✅ 正確' : '❌ 踩到地雷了！input 抓進來的資料一律是 str 型態！';
+        document.getElementById('q15-2-feedback').innerHTML = isQ2Correct ? '✅ 正確' : '❌ input 抓進來的資料一律是 str (字串) 型態喔！';
         document.getElementById('q15-2-feedback').className = isQ2Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
 
-        document.getElementById('q15-3-feedback').innerHTML = isQ3Correct ? '✅ 正確' : '❌ 未經過強制轉型時，文字 "7" + 文字 "3" 會黏在一起';
+        document.getElementById('q15-3-feedback').innerHTML = isQ3Correct ? '✅ 正確' : '❌ 未經轉型時，文字 "7" + 文字 "3" 會直接黏成 "73"';
         document.getElementById('q15-3-feedback').className = isQ3Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
 
-        document.getElementById('q15-4-feedback').innerHTML = isQ4Correct ? '✅ 正確' : '❌ 答對了！套上 int() 轉成數字後，就能進行數學運算了';
+        document.getElementById('q15-4-feedback').innerHTML = isQ4Correct ? '✅ 正確' : '❌ 轉成整數後，就能進行數學加法 7 + 3 = 10';
         document.getElementById('q15-4-feedback').className = isQ4Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
 
-        if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
+        document.getElementById('q15-5-feedback').innerHTML = isQ5Correct ? '✅ 正確' : '❌ 年份是整數，所以挖空處要填寫 int 將其強制轉型。';
+        document.getElementById('q15-5-feedback').className = isQ5Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+
+        document.getElementById('q15-6-feedback').innerHTML = isQ6Correct ? '✅ 正確' : '❌ 提示：身高公分要先除以100 (h/100)，再使用次方運算子 **2。';
+        document.getElementById('q15-6-feedback').className = isQ6Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+
+        if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct && isQ5Correct && isQ6Correct) {
             stopTimer();
             setTimeout(() => {
                 showResult(true); 

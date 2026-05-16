@@ -3,17 +3,24 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CS 互動學習大廳 - 第四~七章</title>
+    <title>CS 互動學習大廳</title>
+    
     <script>
-        const originalWarn = console.warn;
-        console.warn = function (...args) {
-            if (args[0] && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
-                return; // 直接吃掉這個警告，不顯示在 Console 中
-            }
-            originalWarn.apply(console, args);
-        };
+        (function() {
+            const originalWarn = console.warn;
+            console.warn = function (...args) {
+                // 安全檢查：必須確保 args[0] 存在，且真的是「字串」，才可以呼叫 .includes
+                if (args[0] && typeof args[0] === 'string' && args[0].includes('cdn.tailwindcss.com should not be used in production')) {
+                    return; // 成功的吃掉警告
+                }
+                // 其餘正常的警告原封不動丟回給系統
+                originalWarn.apply(console, args);
+            };
+        })();
     </script>
+
     <script src="https://cdn.tailwindcss.com"></script>
+    
     <style>
         @keyframes shake { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-5px, 0); } 50% { transform: translate(5px, 0); } 75% { transform: translate(-5px, 0); } }
         .animate-shake { animation: shake 0.4s ease-in-out; }
@@ -28,7 +35,7 @@
         .toggle-label { width: 3rem; height: 1.5rem; background-color: #cbd5e1; border-radius: 9999px; transition: all 0.3s; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans">
+    <body class="bg-slate-50 text-slate-800 font-sans">
     <div id="app" class="min-h-screen">  
         <div id="user-display-info" class="fixed top-4 left-4 z-50 text-xs font-semibold text-slate-700 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow border border-slate-200 hidden">
             班級：<span id="display-class" class="text-blue-600"></span> | 

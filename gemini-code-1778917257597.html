@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CS 互動學習大廳 - 第四~七章</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes shake { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-5px, 0); } 50% { transform: translate(5px, 0); } 75% { transform: translate(-5px, 0); } }
+        .animate-shake { animation: shake 0.4s ease-in-out; }
+        .code-block { font-family: 'Courier New', Courier, monospace; background: #1e293b; color: #f8fafc; padding: 1rem; border-radius: 0.5rem; line-height: 1.5; }
+        .indent-1 { padding-left: 1.5rem; } .indent-2 { padding-left: 3rem; }
+        .drop-zone { min-width: 40px; min-height: 40px; border: 2px dashed #cbd5e1; border-radius: 0.5rem; display: flex; align-items: center; justify-content: center; background: #f8fafc; transition: all 0.2s; font-weight: bold; }
+        .drop-zone.active { border-color: #3b82f6; background-color: #eff6ff; }
+        .sort-item { transition: transform 0.5s ease-in-out, background-color 0.3s; }
+        .toggle-checkbox:checked { right: 0; border-color: #22c55e; }
+        .toggle-checkbox:checked + .toggle-label { background-color: #22c55e; }
+        .toggle-checkbox { right: 0; z-index: 1; border-color: #e2e8f0; transition: all 0.3s; }
+        .toggle-label { width: 3rem; height: 1.5rem; background-color: #cbd5e1; border-radius: 9999px; transition: all 0.3s; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans">
+    <div id="app" class="min-h-screen">  
+        <div id="user-display-info" class="fixed top-4 left-4 z-50 text-xs font-semibold text-slate-700 bg-white/90 backdrop-blur px-3 py-1.5 rounded-lg shadow border border-slate-200 hidden">
+            班級：<span id="display-class" class="text-blue-600"></span> | 
+            座號：<span id="display-seat" class="text-blue-600"></span> | 
+            姓名：<span id="display-name" class="text-blue-600"></span>
+        </div>  
+    </div>
+
+    <script>
+        // ================= 全局狀態與後臺數據 =================
+        let currentView = 'login';
+        let timerInterval = null;
+        let timeSeconds = 0;
+        let isCountingDown = false;
+        let initialDuration = 0;
+        let currentAnimation = null;
+
+        // ================= 玩家資料 =================
+        let globalPlayerName = '';
+        let globalClassName = '';
+
+        // ================= 本地成績 =================
+        let scores = JSON.parse(localStorage.getItem('cs_lobby_scores')) || {};
+
+        let unlockedLevels = {
+            ch1_l1: true, ch1_l2: true,
+            ch4_l1: true, ch4_l2: true, ch4_l3: true, ch4_l4: true, ch4_l5: true,
+            ch5_l1: true, ch5_l2: true, ch5_l3: true, ch5_l4: true, ch5_l5: true, ch5_l6: true,
+            ch6_l1: true, ch6_l2: true, ch6_l3: true, ch6_l4: true, ch6_l5: true, ch6_l6: true,
+            ch7_l1: true, ch7_l2: true, ch7_l3: true
+        };
+
+        let studentScores = {
+            "1號 示範學生": {
+                ch4_l1: { time: 85, date: "2024/05/20 14:30:12" }
+            }
+        };
+
+        const LEVEL_NAMES = {
+            ch4_l1: "4-1 氣泡排序法", ch4_l2: "4-2 選擇排序法", ch4_l3: "4-3 循序搜尋法", ch4_l4: "4-4 二元搜尋法", ch4_l5: "4-5 排序與搜尋挑戰",
+            ch5_l1: "5-1 分而治之演算法", ch5_l2: "5-2 函式定義與呼叫", ch5_l3: "5-3 遞迴函數概念", ch5_l4: "5-4 階乘推導", ch5_l5: "5-5 費氏級數推導", ch5_l6: "5-6 遞迴牛刀小試",
+            ch6_l1: "6-1 MBTI 決策樹", ch6_l2: "6-2 二元樹走訪", ch6_l3: "6-3 最小生成樹", re_6_4: "6-4 最短路徑", ch6_l5: "6-5 字典樹", ch6_l6: "6-6 二元搜尋樹",
+            ch7_l1: "7-1 元件與功能配對", ch7_l2: "7-2 規格大比拚", ch7_l3: "7-3 認識電子產業"
+        };
+
+        // 輔助函式：根據秒數判定獎牌
+        function getMedalByTime(s) {
+            if (s <= 60) return "🥇 金牌";
+            if (s <= 150) return "🥈 銀牌";
+            return "🥉 銅牌";
+        }
+
+        function formatTime(s) {
+            const m = Math.floor(s / 60).toString().padStart(2, '0');
+            const sec = (s % 60).toString().padStart(2, '0');
+            return `${m}:${sec}`;
+        }
+
+        function getNowString() {
+            const now = new Date();
+            return `${now.getFullYear()}/${String(now.getMonth()+1).padStart(2,'0')}/${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}:${String(now.getSeconds()).padStart(2,'0')}`;
+        }
+
+        function startTimer(mode = 'up', duration = 600, callback) {
+            clearInterval(timerInterval);
+            initialDuration = duration;
+            if (mode === 'down') { timeSeconds = duration; isCountingDown = true; } else { timeSeconds = 0; isCountingDown = false; }
+            timerInterval = setInterval(() => {
+                if (isCountingDown) {
+                    timeSeconds--;
+                    if (timeSeconds <= 0) { clearInterval(timerInterval); showResult(false); }
+                } else { timeSeconds++; }
+                if (callback) callback();
+            }, 1000);
+        }
+
+        function stopTimer() { clearInterval(timerInterval); }
+
+        function changeView(view) {
+            stopTimer();
+            if (currentAnimation) { clearInterval(currentAnimation); currentAnimation = null; }
+            currentView = view;
+            window.scrollTo(0, 0);
+            render();
+        }
+
+        const Icons = {
+            ArrowLeft: `<svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>`,
+            Check: `<svg class="w-12 h-12 text-green-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`,
+            X: `<svg class="w-12 h-12 text-red-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>`,
+            Lock: `<svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`
+        };
+
+        // ==========================================
+        // 核心功能：非同步載入歷史成績 (GET)
+        // ==========================================
+        async function loadScores() {
+            const scoreContainer = document.getElementById("history-scores-list");
+            if (!scoreContainer) return;
+
+            scoreContainer.innerHTML = `<p class="text-slate-400 text-center py-4 text-sm animate-pulse">🔄 正在同步雲端學習進度...</p>`;
+
+            // 從目前的玩家名稱過濾純姓名
+            const seatMatch = globalPlayerName.match(/^(\d+)\s*[號号]\s*(.+)$/);
+            const studentName = seatMatch ? seatMatch[2] : globalPlayerName;
+
+            if (!studentName || studentName === 'Teacher') {
+                scoreContainer.innerHTML = `<p class="text-slate-400 text-center py-4 text-sm">歡迎維護模式，目前不載入成績。</p>`;
+                return;
+            }
+
+            try {
+                const gasUrl = "https://script.google.com/macros/s/AKfycbzjsNXVz5O0mY8x8CzayKhaU7vriOfocJy_Vozyr1jabmeu4wAiTqCYW3wBoUH3BE6y/exec";
+                // 帶入 action 與姓名參數向 GAS 要求撈取
+                const response = await fetch(`${gasUrl}?action=getScores&studentName=${encodeURIComponent(studentName)}`, {
+                    method: "GET",
+                    mode: "cors"
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.status === "success" && result.data) {
+                        const scoreData = result.data;
+                        if (scoreData.length === 0) {
+                            scoreContainer.innerHTML = `<p class="text-slate-400 text-center py-4 text-sm">目前尚無雲端紀錄，開始你的第一場挑戰吧！</p>`;
+                            return;
+                        }
+
+                        // 渲染紀錄清單
+                        scoreContainer.innerHTML = scoreData.map(item => `
+                            <div class="flex justify-between items-center p-3.5 bg-slate-50 rounded-xl border border-slate-200/60 text-sm hover:bg-slate-100/50 transition-colors">
+                                <div class="space-y-0.5">
+                                    <span class="font-bold text-slate-800">${LEVEL_NAMES[item.level] || item.level}</span>
+                                    <span class="text-[11px] text-slate-400 block">${item.timestamp}</span>
+                                </div>
+                                <div class="text-right flex items-center gap-3">
+                                    <span class="text-xs px-2 py-0.5 bg-white border border-slate-200 rounded-md font-medium text-slate-600">${item.medal || '無獎牌'}</span>
+                                    <span class="font-mono font-black text-indigo-600 text-base">${item.score} 分</span>
+                                </div>
+                            </div>
+                        `).join('');
+                    } else {
+                        scoreContainer.innerHTML = `<p class="text-rose-500 text-center py-4 text-sm">❌ 讀取失敗：${result.message}</p>`;
+                    }
+                }
+            } catch (error) {
+                console.error("無法同步雲端紀錄:", error);
+                scoreContainer.innerHTML = `<p class="text-rose-500 text-center py-4 text-sm">📡 網路連線逾時，已切換至本機快取模式</p>`;
+            }
+        }
+
+        // ==========================================
+        // 核心頁面控制器：處理登入與大廳主畫面的渲染
+        // ==========================================
+        function render() {
+            const app = document.getElementById('app');
+            const infoBar = document.getElementById('user-display-info');
+
+            if (currentView === 'login') {
+                infoBar.classList.add('hidden');
+                app.innerHTML = `
+                    <div class="flex flex-col items-center justify-center min-h-screen bg-slate-100 p-6">
+                        <div class="bg-white p-8 rounded-3xl shadow-xl max-w-md w-full border border-slate-200">
+                            <h2 class="text-2xl font-black text-center text-slate-800 mb-2">CS 資訊科學學習大廳</h2>
+                            <p class="text-slate-400 text-sm text-center mb-6">請輸入資訊以進入系統</p>
+                            <div class="space-y-4 mb-6">
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">班級 (如：201)</label>
+                                    <input type="text" id="input-class" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-bold" placeholder="例如：201">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">座號</label>
+                                    <input type="number" id="input-seat" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500 font-mono" placeholder="填寫數字">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-bold text-slate-700 mb-1">真實姓名</label>
+                                    <input type="text" id="input-name" class="w-full p-3 border border-slate-300 rounded-xl outline-none focus:border-indigo-500" placeholder="姓名">
+                                </div>
+                            </div>
+                            <button onclick="handleLogin()" class="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-md">進入大廳</button>
+                        </div>
+                    </div>
+                `;
+            } 
+            else if (currentView === 'menu') {
+                // 更新上方資訊欄
+                infoBar.classList.remove('hidden');
+                document.getElementById('display-class').innerText = globalClassName;

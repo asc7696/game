@@ -727,8 +727,7 @@ function renderPythonModule(el) {
     };
 
     window.renderPYInner();
-}
-// --- 1-3 數值運算關卡 (大字 + 閱讀解鎖版) ---
+}// --- 1-3 數值運算關卡 (大字 + 閱讀解鎖版) ---
 if (!window.ch1l3Inputs) window.ch1l3Inputs = { q1: "", q2: "", q3: "", q4: "" };
 // 紀錄各區塊閱讀狀態
 if (!window.ch1l3ReadStatus) window.ch1l3ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
@@ -849,8 +848,184 @@ function renderArithmeticLogic(el) {
 
                     <div class="bg-white p-4 rounded-2xl border-2 border-purple-200 overflow-x-auto">
                         <span class="block text-xl font-black text-slate-800 mb-3">📊 邏輯運算真值表（重要！）</span>
-                        <table class="w-full text-
+                        <table class="w-full text-left border-collapse text-xl">
+                            <thead>
+                                <tr class="bg-slate-100 text-slate-800 font-bold">
+                                    <th class="p-3 border-2">A</th>
+                                    <th class="p-3 border-2">B</th>
+                                    <th class="p-3 border-2 font-mono text-purple-700">A and B</th>
+                                    <th class="p-3 border-2 font-mono text-purple-700">A or B</th>
+                                    <th class="p-3 border-2 font-mono text-purple-700">not A</th>
+                                </tr>
+                            </thead>
+                            <tbody class="text-slate-700 font-mono font-bold">
+                                <tr><td class="p-3 border-2 text-green-600">True</td><td class="p-3 border-2 text-green-600">True</td><td class="p-3 border-2 text-green-600">True</td><td class="p-3 border-2 text-green-600">True</td><td class="p-3 border-2 text-red-500">False</td></tr>
+                                <tr class="bg-slate-50"><td class="p-3 border-2 text-green-600">True</td><td class="p-3 border-2 text-red-500">False</td><td class="p-3 border-2 text-red-500">False</td><td class="p-3 border-2 text-green-600">True</td><td class="p-3 border-2 text-red-500">False</td></tr>
+                                <tr><td class="p-3 border-2 text-red-500">False</td><td class="p-3 border-2 text-green-600">True</td><td class="p-3 border-2 text-red-500">False</td><td class="p-3 border-2 text-green-600">True</td><td class="p-3 border-2 text-green-600">True</td></tr>
+                                <tr class="bg-slate-50"><td class="p-3 border-2 text-red-500">False</td><td class="p-3 border-2 text-red-500">False</td><td class="p-3 border-2 text-red-500">False</td><td class="p-3 border-2 text-red-500">False</td><td class="p-3 border-2 text-green-600">True</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    ${getBtnHtml('sec3')}
+                </div>
 
+                <div class="bg-white p-6 rounded-3xl shadow-lg border-2 border-slate-200">
+                    <h2 class="font-black text-2xl text-slate-800 mb-2 flex items-center gap-2">
+                        <span class="bg-yellow-400 w-2 h-6 rounded-full"></span> 💡 4. 運算優先順序逐步看
+                    </h2>
+                    <p class="text-xl font-black text-orange-700 mb-4 bg-orange-50 px-4 py-3 rounded-xl border border-orange-200">
+                        👑 核心大原則：數值運算 ＞ 關係運算 ＞ 邏輯運算
+                    </p>
+                    
+                    <div class="space-y-6 text-xl">
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-mono font-bold text-blue-600 text-2xl">範例一：10 + 2 ** 3 * 2</p>
+                            <p class="text-sm font-bold text-slate-500 mt-1">解析：算術微觀順序（次方 → 乘除 → 加減）</p>
+                            <p class="mt-2 text-slate-800 leading-relaxed font-medium">1. 先算次方：2**3 = 8 <br> 2. 再算乘法：8 * 2 = 16 <br> 3. 最後加法：10 + 16 = <span class="font-black text-orange-600">26</span></p>
+                        </div>
+                        
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-mono font-bold text-blue-600 text-2xl">範例二：15 % 4 == 3</p>
+                            <p class="text-sm font-bold text-slate-500 mt-1">解析：先做 數值運算，再做 關係比較</p>
+                            <p class="mt-2 text-slate-800 leading-relaxed font-medium">1. 15 除以 4 餘數為 3 <br> 2. 判斷 3 == 3 <br> 3. 結果為 <span class="font-black text-green-600">True</span></p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-mono font-bold text-blue-600 text-2xl">範例三：5 + 2 * 3 &gt;= 12 or 4 != 4</p>
+                            <p class="text-sm font-bold text-slate-500 mt-1">解析：綜合練習（數值 ＞ 關係 ＞ 邏輯）</p>
+                            <p class="mt-2 text-slate-800 leading-relaxed font-medium">
+                                1. 先做數值：5 + 6 得到 11<br>
+                                2. 再做關係：11 &gt;= 12 得到 False，以及 4 != 4 得到 False<br>
+                                3. 最後做邏輯：False or False 結果為 <span class="font-black text-red-500">False</span>
+                            </p>
+                        </div>
+
+                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
+                            <p class="font-mono font-bold text-blue-600 text-2xl">範例四：not 10 // 3 == 3 and 7 &lt; 9</p>
+                            <p class="text-sm font-bold text-slate-500 mt-1">解析：綜合練習（包含邏輯微觀優先序 not ＞ and）</p>
+                            <p class="mt-2 text-slate-800 leading-relaxed font-medium">
+                                1. 先做數值：10 // 3 得到 3<br>
+                                2. 再做關係：3 == 3 得到 True，以及 7 &lt; 9 得到 True<br>
+                                3. 處理邏輯：式子簡化成 <code class="bg-white px-1 font-bold">not True and True</code><br>
+                                4. 依優先序先做 not：not True 變成 False<br>
+                                5. 最後做 and：False and True 結果為 <span class="font-black text-red-500">False</span>
+                            </p>
+                        </div>
+                    </div>
+                    ${getBtnHtml('sec4')}
+                </div>
+
+                <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-indigo-200">
+                    <h2 class="font-black text-3xl text-indigo-700 mb-6 pb-2 border-b-2 border-indigo-100">📝 挑戰練習：請計算出結果</h2>
+                    
+                    <div class="space-y-8 text-2xl">
+                        <div class="flex flex-col gap-3">
+                            <label class="font-bold text-slate-800">1. 計算 <code class="text-rose-600 font-bold bg-rose-50 px-2 rounded font-mono">30 - 5 * 2 ** 2 + 8</code> 的結果：</label>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <input type="text" id="q13-1" value="${window.ch1l3Inputs.q1}" 
+                                    oninput="window.ch1l3Inputs.q1=this.value" 
+                                    placeholder="填寫數字"
+                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-mono font-bold text-2xl shadow-sm">
+                                <span id="q13-1-feedback" class="text-2xl"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <label class="font-bold text-slate-800">2. 判斷 <code class="text-rose-600 font-bold bg-rose-50 px-2 rounded font-mono">10 // 3 > 2 and 5 != 5</code> 的結果 (填 True/False)：</label>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <input type="text" id="q13-2" value="${window.ch1l3Inputs.q2}" 
+                                    oninput="window.ch1l3Inputs.q2=this.value" 
+                                    placeholder="填 True 或 False"
+                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
+                                <span id="q13-2-feedback" class="text-2xl"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <label class="font-bold text-slate-800">3. 計算 <code class="text-rose-600 font-bold bg-rose-50 px-2 rounded font-mono">20 % 7 * (3 + 2)</code> 的結果：</label>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <input type="text" id="q13-3" value="${window.ch1l3Inputs.q3}" 
+                                    oninput="window.ch1l3Inputs.q3=this.value" 
+                                    placeholder="填寫數字"
+                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-mono font-bold text-2xl shadow-sm">
+                                <span id="q13-3-feedback" class="text-2xl"></span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <label class="font-bold text-slate-800">4. 綜合練習：判斷 <code class="text-rose-600 font-bold bg-rose-50 px-2 rounded font-mono">not 12 % 5 &lt;= 1 or 3 ** 2 != 9</code> 的結果 (填 True/False)：</label>
+                            <div class="flex flex-wrap items-center gap-4">
+                                <input type="text" id="q13-4" value="${window.ch1l3Inputs.q4}" 
+                                    oninput="window.ch1l3Inputs.q4=this.value" 
+                                    placeholder="填 True 或 False"
+                                    class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
+                                <span id="q13-4-feedback" class="text-2xl"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-10">
+                        <p id="ch1l3-lock-msg" class="text-xl font-bold text-amber-600 text-center bg-amber-50 py-2 rounded-xl border border-amber-200 mb-3">
+                            ⚠️ 請先將上方 1 至 4 個說明區塊點擊「確認讀懂」按鈕，方可解鎖提交答案。
+                        </p>
+                        <button id="ch1l3-submit-btn" onclick="window.submitCh1L3()" disabled 
+                            class="w-full py-5 text-white rounded-2xl font-black text-3xl shadow-lg transition-all active:scale-95 opacity-50 cursor-not-allowed bg-slate-400">
+                            提交答案
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+        
+        // 渲染完後立刻呼叫一次，以防重複進出頁面時解鎖狀態重設
+        checkAllRead();
+    };
+
+    // 提交檢核邏輯
+    window.submitCh1L3 = () => {
+        const a1 = window.ch1l3Inputs.q1.trim();
+        const a2 = window.ch1l3Inputs.q2.trim().toLowerCase(); 
+        const a3 = window.ch1l3Inputs.q3.trim();
+        const a4 = window.ch1l3Inputs.q4.trim().toLowerCase(); 
+
+        // 正確答案判定
+        // 新Q4拆解：12%5=2 -> 2<=1為False -> not False為True。
+        // 後半段：3**2=9 -> 9!=9為False。
+        // 綜合：True or False 最終答案為 true！
+        let isQ1Correct = (a1 === "18");
+        let isQ2Correct = (a2 === "false");
+        let isQ3Correct = (a3 === "30" || a3 === "30.0");
+        let isQ4Correct = (a4 === "true"); 
+
+        // 更新回饋視覺 (大字體)
+        document.getElementById('q13-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 再想一下運算順序';
+        document.getElementById('q13-1-feedback').className = isQ1Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+        
+        document.getElementById('q13-2-feedback').innerHTML = isQ2Correct ? '✅ 正確' : '❌ 檢查邏輯閘運算';
+        document.getElementById('q13-2-feedback').className = isQ2Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+
+        document.getElementById('q13-3-feedback').innerHTML = isQ3Correct ? '✅ 正確' : '❌ 先處理括號內的運算';
+        document.getElementById('q13-3-feedback').className = isQ3Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+
+        document.getElementById('q13-4-feedback').innerHTML = isQ4Correct ? '✅ 正確' : '❌ 依序檢查：數值 -> 關係 -> not -> or';
+        document.getElementById('q13-4-feedback').className = isQ4Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+
+        if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
+            stopTimer();
+            setTimeout(() => {
+                showResult(true); 
+            }, 500);
+        } else {
+            const btn = document.getElementById('ch1l3-submit-btn');
+            if (btn) {
+                btn.classList.add('animate-shake');
+                setTimeout(() => btn.classList.remove('animate-shake'), 400);
+            }
+        }
+    };
+
+    window.renderCh1L3Inner();
+}
+		
 // --- 1-4 字串運算關卡 (大字 + 閱讀解鎖版) ---
 if (!window.ch1l4Inputs) window.ch1l4Inputs = { q1: "", q2: "", q3: "", q4: "" };
 // 紀錄各區塊閱讀狀態
@@ -889,6 +1064,7 @@ function renderStringOperations(el) {
     };
 
     window.renderCh1L4Inner = () => {
+	
         if (typeof currentView !== 'undefined' && currentView !== 'ch1_l4') return; 
 
         const getBtnHtml = (secId) => {
@@ -1154,11 +1330,116 @@ function renderStringOperations(el) {
 
     window.renderCh1L4Inner();
 }	
-	
+
+
+
+		
+	//--------------------?
+  // 預設啟動
+        render();
+		
+    </script>
+<script>
+
+//--------------------?
+const GAS_URL = "https://script.google.com/macros/s/AKfycbxA3ApCJG_9Nyzii9tNTB2ntkPV6y7HoPbxmlkvWMnzQySNlSvR5qKzBZcvMBQNA8c9/exec";
+
+
+// =========================
+// 送成績
+// =========================
+// 新增一個全域鎖定變數，放在函式外面
+let isSubmittingScore = false;
+
+async function submitScore(level, score, timeUsed, attempts) {
+  // 💡 1. 核心安全鎖：如果目前正在上傳中，直接攔截，不執行任何動作
+  if (isSubmittingScore) {
+    console.log("阻擋重複點擊：成績正在上傳中...");
+    return;
+  }
+
+  // 💡 2. 立刻上鎖
+  isSubmittingScore = true;
+
+  // 嘗試在畫面上找出送出按鈕或結果視窗的按鈕，讓它變灰、無法點擊
+  // 這樣能給學生極佳的視覺反饋
+  const activeButtons = document.querySelectorAll('#app button');
+  activeButtons.forEach(btn => {
+      if(btn.innerText.includes("再試一次") || btn.innerText.includes("返回選單")) {
+          btn.disabled = true;
+          btn.style.opacity = "0.5";
+          btn.style.cursor = "not-allowed";
+      }
+  });
+
+  const savedClass = localStorage.getItem("className") || "201";
+  const seatMatch = globalPlayerName.match(/^(\d+)\s*[號号]\s*(.+)$/);
+  const seatNumber = seatMatch ? seatMatch[1] : "";
+  const studentName = seatMatch ? seatMatch[2] : globalPlayerName;
+
+  const payload = {
+    className: savedClass,
+    seatNumber: seatNumber,
+    studentName: studentName,
+    level: level,
+    score: score,
+    timeUsed: timeUsed,
+    attempts: attempts,
+    userAgent: navigator.userAgent
+  };
+
+  console.log("送出資料", payload);
+
+  try {
+    const response = await fetch(
+      "https://script.google.com/macros/s/AKfycbzjsNXVz5O0mY8x8CzayKhaU7vriOfocJy_Vozyr1jabmeu4wAiTqCYW3wBoUH3BE6y/exec",
+      {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "text/plain"
+        },
+        body: JSON.stringify(payload)
+      }
+    ).catch(err => {
+      console.warn("Fetch 被瀏覽器套件干擾...", err);
+      return null;
+    });
+
+    if (!response) {
+      alert("連線失敗，請檢查網路或確認 GAS 網址是否正確。");
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP 錯誤！狀態碼: ${response.status}`);
+    }
+
+    const result = await response.json();
+    console.log("伺服器回傳結果:", result);
+    
+    if (result.status === "success") {
+      alert("成績上傳成功！");
+    } else {
+      alert("資料庫儲存失敗：" + result.message);
+    }
+
+  } catch (error) {
+    console.error("送出失敗", error);
+    alert("上傳失敗，請檢查網路連線或通知老師。");
+  } finally {
+    // 💡 3. 解鎖：不論成功或失敗，最後都把鎖解開，並讓按鈕恢復正常
+    isSubmittingScore = false;
+    activeButtons.forEach(btn => {
+        btn.disabled = false;
+        btn.style.opacity = "1";
+        btn.style.cursor = "pointer";
+    });
+  }
+}  
 	//--------------------?
 </script>
 
 
-	
-
 </body></html>
+

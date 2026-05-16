@@ -729,8 +729,10 @@ function renderPythonModule(el) {
 
     window.renderPYInner();
 }
-// --- 1-3 數值運算關卡 (擴充版) ---
+// --- 1-3 數值運算關卡 (大字 + 閱讀解鎖版) ---
 if (!window.ch1l3Inputs) window.ch1l3Inputs = { q1: "", q2: "", q3: "", q4: "" };
+// 紀錄各區塊閱讀狀態
+if (!window.ch1l3ReadStatus) window.ch1l3ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
 
 function renderArithmeticLogic(el) {
     // 啟動計時器：只更新時間標籤 `#h13-time`
@@ -739,234 +741,116 @@ function renderArithmeticLogic(el) {
         if (timeEl) timeEl.innerText = formatTime(timeSeconds); 
     });
 
-    window.renderCh1L3Inner = () => {
-        if (typeof currentView !== 'undefined' && currentView !== 'ch1_l3') return; 
-
-        el.innerHTML = `
-            <div class="p-6 max-w-6xl mx-auto">
-                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">${Icons.ArrowLeft} 返回大廳</button>
-                
-                <div class="flex justify-between items-center mb-6">
-                    <h1 class="text-3xl font-black text-slate-800">關卡 1-3：數值、關係與邏輯運算</h1>
-                    <div class="text-xl font-mono bg-slate-800 text-white px-6 py-2 rounded-full shadow-md">限時：<span id="h13-time">${formatTime(timeSeconds)}</span></div>
-                </div>
-
-                <div class="bg-blue-50 p-6 rounded-3xl border border-blue-200 mb-6">
-                    <h3 class="font-black text-xl text-blue-700 mb-3">🔢 算術運算</h3>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-700 mb-4">
-                        <ul class="space-y-1">
-                            <li><code class="bg-white px-1 font-bold">+</code> 加法 (如 10+3=13)</li>
-                            <li><code class="bg-white px-1 font-bold">-</code> 減法 (如 10-3=7)</li>
-                            <li><code class="bg-white px-1 font-bold">*</code> 乘法 (如 10*3=30)</li>
-                            <li><code class="bg-white px-1 font-bold">/</code> 除法 (如 10/3=3.3333333333333335)</li>
-                        </ul>
-                        <ul class="space-y-1">
-                            <li><code class="bg-white px-1 font-bold">**</code> 次方 (如 10**3=1000)</li>
-                            <li><code class="bg-white px-1 font-bold">%</code> 取餘數 (如 10%3=1)</li>
-                            <li><code class="bg-white px-1 font-bold">//</code> 整數除法 (如 7//2=3)</li>
-                        </ul>
-                    </div>
-                    <div class="bg-white p-3 rounded-xl border border-blue-100 text-xs text-slate-600">
-                        <span class="font-bold text-blue-600">📌 算術運算子優先順序（相同順序由左而右）：</span><br>
-                        括號 <code class="bg-slate-100 px-1">( )</code> &gt; 次方 <code class="bg-slate-100 px-1">**</code> &gt; 乘、除、取餘數、整除 <code class="bg-slate-100 px-1">*</code>、<code class="bg-slate-100 px-1">/</code>、<code class="bg-slate-100 px-1">%</code>、<code class="bg-slate-100 px-1">//</code> &gt; 加、減 <code class="bg-slate-100 px-1">+</code>、<code class="bg-slate-100 px-1">-</code>
-                    </div>
-                </div>
-
-                <div class="bg-green-50 p-6 rounded-3xl border border-green-200 mb-6">
-                    <h3 class="font-black text-xl text-green-700 mb-2">⚖️ 關係運算</h3>
-                    <p class="text-sm text-slate-600 mb-3">共有 6 個，關係運算的結果必為一個布林值（真 <span class="text-green-600 font-bold">True</span> / 假 <span class="text-red-500 font-bold">False</span>）</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-slate-700">
-                        <ul class="space-y-1">
-                            <li><code class="bg-white px-1 font-bold">&gt;</code> 大於 (如 7&gt;2 = True)</li>
-                            <li><code class="bg-white px-1 font-bold">&gt;=</code> 大於等於 (如 7&gt;=2 = True)</li>
-                            <li><code class="bg-white px-1 font-bold">&lt;</code> 小於 (如 7&lt;2 = False)</li>
-                        </ul>
-                        <ul class="space-y-1">
-                            <li><code class="bg-white px-1 font-bold">&lt;=</code> 小於等於 (如 7&lt;=2 = False)</li>
-                            <li><code class="bg-white px-1 font-bold">==</code> 等於 (如 7==2 = False)</li>
-                            <li><code class="bg-white px-1 font-bold">!=</code> 不等於 (如 7!=2 = True)</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="bg-purple-50 p-6 rounded-3xl border border-purple-200 mb-8">
-                    <h3 class="font-black text-xl text-purple-700 mb-2">🧩 邏輯運算</h3>
-                    <p class="text-sm text-slate-600 mb-4">針對布林值進行邏輯運算，結果也是布林值。<strong>優先順序為：not &gt; and &gt; or</strong></p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div class="bg-white p-3 rounded-xl border border-purple-100 text-sm">
-                            <span class="font-bold text-purple-600">and (且)</span><br>兩者皆真才為真
-                        </div>
-                        <div class="bg-white p-3 rounded-xl border border-purple-100 text-sm">
-                            <span class="font-bold text-purple-600">or (或)</span><br>其中之一為真即為真
-                        </div>
-                        <div class="bg-white p-3 rounded-xl border border-purple-100 text-sm">
-                            <span class="font-bold text-purple-600">not (非)</span><br>反轉真假值
-                        </div>
-                    </div>
-
-                    <div class="bg-white p-4 rounded-2xl border border-purple-100 overflow-x-auto">
-                        <span class="block text-sm font-bold text-slate-700 mb-2">📊 邏輯運算真值表</span>
-                        <table class="w-full text-left border-collapse text-xs md:text-sm">
-                            <thead>
-                                <tr class="bg-slate-100 text-slate-700">
-                                    <th class="p-2 border">A</th>
-                                    <th class="p-2 border">B</th>
-                                    <th class="p-2 border font-mono text-purple-600">A and B</th>
-                                    <th class="p-2 border font-mono text-purple-600">A or B</th>
-                                    <th class="p-2 border font-mono text-purple-600">not A</th>
-                                </tr>
-                            </thead>
-                            <tbody class="text-slate-600 font-mono">
-                                <tr><td class="p-2 border text-green-600 font-bold">True</td><td class="p-2 border text-green-600 font-bold">True</td><td class="p-2 border text-green-600">True</td><td class="p-2 border text-green-600">True</td><td class="p-2 border text-red-500">False</td></tr>
-                                <tr class="bg-slate-50"><td class="p-2 border text-green-600 font-bold">True</td><td class="p-2 border text-red-500 font-bold">False</td><td class="p-2 border text-red-500">False</td><td class="p-2 border text-green-600">True</td><td class="p-2 border text-red-500">False</td></tr>
-                                <tr><td class="p-2 border text-red-500 font-bold">False</td><td class="p-2 border text-green-600 font-bold">True</td><td class="p-2 border text-red-500">False</td><td class="p-2 border text-green-600">True</td><td class="p-2 border text-green-600">True</td></tr>
-                                <tr class="bg-slate-50"><td class="p-2 border text-red-500 font-bold">False</td><td class="p-2 border text-red-500 font-bold">False</td><td class="p-2 border text-red-500">False</td><td class="p-2 border text-red-500">False</td><td class="p-2 border text-green-600">True</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-3xl shadow-lg border border-slate-100 mb-8">
-                    <h2 class="font-black text-xl text-slate-800 mb-2 flex items-center gap-2">
-                        <span class="bg-yellow-400 w-2 h-6 rounded-full"></span> 💡 運算優先順序逐步看
-                    </h2>
-                    <p class="text-sm font-bold text-orange-600 mb-4 bg-orange-50 px-3 py-2 rounded-xl">👑 核心大原則：數值運算 ＞ 關係運算 ＞ 邏輯運算</p>
-                    
-                    <div class="space-y-4">
-                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <p class="font-mono text-base font-bold text-blue-600">範例一：10 + 2 ** 3 * 2</p>
-                            <p class="text-xs text-slate-500">解析：微觀算術優先序（次方 → 乘除 → 加減）</p>
-                            <p class="mt-2 text-sm text-slate-700">1. 先算次方：2**3 = 8 <br> 2. 再算乘法：8 * 2 = 16 <br> 3. 最後加法：10 + 16 = <span class="font-bold text-orange-600">26</span></p>
-                        </div>
-                        
-                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <p class="font-mono text-base font-bold text-blue-600">範例二：15 % 4 == 3</p>
-                            <p class="text-xs text-slate-500">解析：先做 數值運算，再做 關係比較</p>
-                            <p class="mt-2 text-sm text-slate-700">1. 15 除以 4 餘數為 3 <br> 2. 判斷 3 == 3 <br> 3. 結果為 <span class="font-bold text-green-600">True</span></p>
-                        </div>
-
-                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <p class="font-mono text-base font-bold text-blue-600">範例三：5 + 2 * 3 &gt;= 12 or 4 != 4</p>
-                            <p class="text-xs text-slate-500">解析：綜合練習（數值 ＞ 關係 ＞ 邏輯）</p>
-                            <p class="mt-2 text-sm text-slate-700">
-                                1. 先做數值：5 + 6 得到 11<br>
-                                2. 再做關係：11 &gt;= 12 得到 False，以及 4 != 4 得到 False<br>
-                                3. 最後做邏輯：False or False 結果為 <span class="font-bold text-red-500">False</span>
-                            </p>
-                        </div>
-
-                        <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                            <p class="font-mono text-base font-bold text-blue-600">範例四：not 10 // 3 == 3 and 7 &lt; 9</p>
-                            <p class="text-xs text-slate-500">解析：綜合練習（包含邏輯微觀優先序 not ＞ and）</p>
-                            <p class="mt-2 text-sm text-slate-700">
-                                1. 先做數值：10 // 3 得到 3<br>
-                                2. 再做關係：3 == 3 得到 True，以及 7 &lt; 9 得到 True<br>
-                                3. 處理邏輯：式子變成 <code class="bg-white px-1">not True and True</code><br>
-                                4. 依優先序先做 not：not True 變成 False<br>
-                                5. 最後做 and：False and True 結果為 <span class="font-bold text-red-500">False</span>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-3xl shadow-xl border-2 border-indigo-100">
-                    <h2 class="font-black text-xl text-indigo-700 mb-6">📝 挑戰練習：請計算出結果</h2>
-                    
-                    <div class="space-y-8">
-                        <div class="flex flex-col gap-2">
-                            <label class="font-bold text-slate-700">1. 計算 <code class="text-rose-500">30 - 5 * 2 ** 2 + 8</code> 的結果：</label>
-                            <div class="flex flex-wrap items-center gap-4">
-                                <input type="text" id="q13-1" value="${window.ch1l3Inputs.q1}" 
-                                    oninput="window.ch1l3Inputs.q1=this.value" 
-                                    placeholder="填寫數字"
-                                    class="w-40 p-3 border-2 border-slate-200 rounded-xl focus:border-indigo-500 outline-none font-mono text-xl">
-                                <span id="q13-1-feedback"></span>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <label class="font-bold text-slate-700">2. 判斷 <code class="text-rose-500">10 // 3 > 2 and 5 != 5</code> 的結果 (填 True/False)：</label>
-                            <div class="flex flex-wrap items-center gap-4">
-                                <input type="text" id="q13-2" value="${window.ch1l3Inputs.q2}" 
-                                    oninput="window.ch1l3Inputs.q2=this.value" 
-                                    placeholder="填 True 或 False"
-                                    class="w-40 p-3 border-2 border-slate-200 rounded-xl focus:border-indigo-500 outline-none font-bold">
-                                <span id="q13-2-feedback"></span>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <label class="font-bold text-slate-700">3. 計算 <code class="text-rose-500">20 % 7 * (3 + 2)</code> 的結果：</label>
-                            <div class="flex flex-wrap items-center gap-4">
-                                <input type="text" id="q13-3" value="${window.ch1l3Inputs.q3}" 
-                                    oninput="window.ch1l3Inputs.q3=this.value" 
-                                    placeholder="填寫數字"
-                                    class="w-40 p-3 border-2 border-slate-200 rounded-xl focus:border-indigo-500 outline-none font-mono text-xl">
-                                <span id="q13-3-feedback"></span>
-                            </div>
-                        </div>
-
-                        <div class="flex flex-col gap-2">
-                            <label class="font-bold text-slate-700">4. 綜合練習：判斷 <code class="text-rose-500">not 12 % 5 &lt;= 1 or 3 ** 2 == 9</code> 的結果 (填 True/False)：</label>
-                            <div class="flex flex-wrap items-center gap-4">
-                                <input type="text" id="q13-4" value="${window.ch1l3Inputs.q4}" 
-                                    oninput="window.ch1l3Inputs.q4=this.value" 
-                                    placeholder="填 True 或 False"
-                                    class="w-40 p-3 border-2 border-slate-200 rounded-xl focus:border-indigo-500 outline-none font-bold">
-                                <span id="q13-4-feedback"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <button onclick="window.submitCh1L3()" class="w-full mt-10 py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-black text-2xl shadow-lg transition-all active:scale-95">提交答案</button>
-                </div>
-            </div>`;
-    };
-
-    // 提交檢核邏輯
-    window.submitCh1L3 = () => {
-        const a1 = window.ch1l3Inputs.q1.trim();
-        const a2 = window.ch1l3Inputs.q2.trim().toLowerCase(); 
-        const a3 = window.ch1l3Inputs.q3.trim();
-        const a4 = window.ch1l3Inputs.q4.trim().toLowerCase(); // 新增 Q4 答案取得與轉小寫
-
-        // 正確答案判定
-        // Q4 拆解提示：12%5=2 -> 2<=1(False) -> not False(True) -> or 後面 3**2==9(True) -> True or True 為 true
-        let isQ1Correct = (a1 === "18");
-        let isQ2Correct = (a2 === "false");
-        let isQ3Correct = (a3 === "30" || a3 === "30.0");
-        let isQ4Correct = (a4 === "true"); 
-
-        // 更新回饋視覺
-        document.getElementById('q13-1-feedback').innerHTML = isQ1Correct ? '✅ 正確' : '❌ 再想一下運算順序';
-        document.getElementById('q13-1-feedback').className = isQ1Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
+    // 檢查是否所有區塊都讀完了
+    const checkAllRead = () => {
+        const s = window.ch1l3ReadStatus;
+        const submitBtn = document.getElementById('ch1l3-submit-btn');
+        const lockMsg = document.getElementById('ch1l3-lock-msg');
         
-        document.getElementById('q13-2-feedback').innerHTML = isQ2Correct ? '✅ 正確' : '❌ 檢查邏輯閘運算';
-        document.getElementById('q13-2-feedback').className = isQ2Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
-
-        document.getElementById('q13-3-feedback').innerHTML = isQ3Correct ? '✅ 正確' : '❌ 先處理括號內的運算';
-        document.getElementById('q13-3-feedback').className = isQ3Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
-
-        document.getElementById('q13-4-feedback').innerHTML = isQ4Correct ? '✅ 正確' : '❌ 依序檢查：數值 -> 關係 -> not -> or';
-        document.getElementById('q13-4-feedback').className = isQ4Correct ? 'text-green-600 font-bold' : 'text-red-500 font-bold';
-
-        if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
-            stopTimer();
-            setTimeout(() => {
-                showResult(true); 
-            }, 500);
-        } else {
-            const btn = document.querySelector('button[onclick="window.submitCh1L3()"]');
-            if (btn) {
-                btn.classList.add('animate-shake');
-                setTimeout(() => btn.classList.remove('animate-shake'), 400);
+        if (s.sec1 && s.sec2 && s.sec3 && s.sec4) {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                submitBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-700');
             }
+            if (lockMsg) lockMsg.classList.add('hidden');
         }
     };
 
-    window.renderCh1L3Inner();
-}
+    // 點擊檢核鈕的觸發函式
+    window.toggleSectionRead = (sectionId, btnEl) => {
+        window.ch1l3ReadStatus[sectionId] = true;
+        btnEl.innerHTML = '✅ 我已讀懂此區塊（已確認）';
+        btnEl.className = "w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow-md border-2 border-emerald-700 transition-all text-center";
+        btnEl.onclick = null; // 防止重複點擊觸發
+        checkAllRead();
+    };
+
+    window.renderCh1L3Inner = () => {
+        if (typeof currentView !== 'undefined' && currentView !== 'ch1_l3') return; 
+
+        // 判斷檢核鈕的樣式與文字（防止切換畫面後狀態遺失）
+        const getBtnHtml = (secId) => {
+            if (window.ch1l3ReadStatus[secId]) {
+                return `<button class="w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow-md border-2 border-emerald-700 text-center">✅ 我已讀懂此區塊（已確認）</button>`;
+            } else {
+                return `<button onclick="window.toggleSectionRead('${secId}', this)" class="w-full mt-4 py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-bold text-xl rounded-xl shadow-md border-2 border-amber-600 transition-all active:scale-95 text-center animate-pulse">📖 我已讀懂此區塊，點擊確認</button>`;
+            }
+        };
+
+        el.innerHTML = `
+            <div class="p-6 max-w-6xl mx-auto space-y-8">
+                <button onclick="changeView('menu')" class="mb-2 flex items-center text-xl text-slate-500 hover:text-slate-800 transition-colors font-bold">${Icons.ArrowLeft} 返回大廳</button>
+                
+                <div class="flex justify-between items-center pb-4 border-b-2 border-slate-200">
+                    <h1 class="text-4xl font-black text-slate-800">關卡 1-3：數值、關係與邏輯運算</h1>
+                    <div class="text-2xl font-mono bg-slate-800 text-white px-8 py-3 rounded-full shadow-md">限時：<span id="h13-time">${formatTime(timeSeconds)}</span></div>
+                </div>
+
+                <div class="bg-blue-50 p-6 rounded-3xl border-2 border-blue-200 shadow-sm">
+                    <h2 class="font-black text-2xl text-blue-700 mb-4 flex items-center gap-2">🔢 1. 算術運算</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xl text-slate-800 mb-4 font-medium">
+                        <ul class="space-y-2">
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">+</code> 加法 (如 10+3=13)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">-</code> 減法 (如 10-3=7)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">*</code> 乘法 (如 10*3=30)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">/</code> 除法 (如 10/3=3.3333333333333335)</li>
+                        </ul>
+                        <ul class="space-y-2">
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">**</code> 次方 (如 10**3=1000)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">%</code> 取餘數 (如 10%3=1)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-blue-600">//</code> 整數除法 (如 7//2=3)</li>
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-xl border border-blue-200 text-lg text-slate-700 leading-relaxed">
+                        <span class="font-bold text-blue-700">📌 算術運算子優先順序（相同順序由左而右）：</span><br>
+                        括號 <code class="bg-slate-100 px-1 font-mono font-bold">( )</code> &gt; 次方 <code class="bg-slate-100 px-1 font-mono font-bold">**</code> &gt; 乘、除、取餘數、整除 <code class="bg-slate-100 px-1 font-mono font-bold">*</code>, <code class="bg-slate-100 px-1 font-mono font-bold">/</code>, <code class="bg-slate-100 px-1 font-mono font-bold">%</code>, <code class="bg-slate-100 px-1 font-mono font-bold">//</code> &gt; 加、減 <code class="bg-slate-100 px-1 font-mono font-bold">+</code>, <code class="bg-slate-100 px-1 font-mono font-bold">-</code>
+                    </div>
+                    ${getBtnHtml('sec1')}
+                </div>
+
+                <div class="bg-green-50 p-6 rounded-3xl border-2 border-green-200 shadow-sm">
+                    <h2 class="font-black text-2xl text-green-700 mb-3">⚖️ 2. 關係運算</h2>
+                    <p class="text-xl text-slate-800 font-bold mb-4 bg-white p-3 rounded-xl border border-green-100">
+                        共有 6 個，關係運算的結果必為一個布林值（真 <span class="text-green-600 font-black text-2xl">True</span> / 假 <span class="text-red-500 font-black text-2xl">False</span>）
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xl text-slate-800 font-medium">
+                        <ul class="space-y-2">
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-green-600">&gt;</code> 大於 (如 7&gt;2 = True)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-green-600">&gt;=</code> 大於等於 (如 7&gt;=2 = True)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-green-600">&lt;</code> 小於 (如 7&lt;2 = False)</li>
+                        </ul>
+                        <ul class="space-y-2">
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-green-600">&lt;=</code> 小於等於 (如 7&lt;=2 = False)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-green-600">==</code> 等於 (如 7==2 = False)</li>
+                            <li><code class="bg-white px-2 py-0.5 border border-slate-300 rounded font-bold text-green-600">!=</code> 不等於 (如 7!=2 = True)</li>
+                        </ul>
+                    </div>
+                    ${getBtnHtml('sec2')}
+                </div>
+
+                <div class="bg-purple-50 p-6 rounded-3xl border-2 border-purple-200 shadow-sm">
+                    <h2 class="font-black text-2xl text-purple-700 mb-3">🧩 3. 邏輯運算</h2>
+                    <p class="text-xl text-slate-800 font-bold mb-4 bg-white p-3 rounded-xl border border-purple-100">
+                        針對布林值進行邏輯運算，結果也是布林值。<br>
+                        <span class="text-purple-700 font-black text-2xl">🌟 邏輯運算子的運算順序：not &gt; and &gt; or</span>
+                    </p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 text-xl">
+                        <div class="bg-white p-4 rounded-xl border border-purple-200 font-medium">
+                            <span class="font-black text-purple-700 text-2xl">and (且)</span><br>兩者皆真才為真
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-purple-200 font-medium">
+                            <span class="font-black text-purple-700 text-2xl">or (或)</span><br>其中之一為真即為真
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-purple-200 font-medium">
+                            <span class="font-black text-purple-700 text-2xl">not (非)</span><br>反轉真假值
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-4 rounded-2xl border-2 border-purple-200 overflow-x-auto">
+                        <span class="block text-xl font-black text-slate-800 mb-3">📊 邏輯運算真值表（重要！）</span>
+                        <table class="w-full text-
 //-------------------------------------------------
 
         // 預設啟動

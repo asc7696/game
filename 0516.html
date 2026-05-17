@@ -2295,48 +2295,60 @@ function renderCh2L4Module(el) {
           </div>
 
           <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-            <label class="text-xl font-bold text-slate-900">2. 觀察以下程式碼，若輸入的 `score` 為 85，`absent` 為 False，最後會印出什麼？</label>
-            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-base">
-if score >= 60:
-    if not absent:
-        print("表現優良")
-    else:
-        print("及格但常缺席")
-else:
-    print("不及格")</pre>
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-base">
-              ${['A) 表現優良', 'B) 及格但常缺席', 'C) 不及格'].map(ans => {
-                const code = ans.charAt(0);
-                const isSel = window.ch2l4Inputs.q2 === code;
-                return `<button onclick="window.ch2l4Inputs.q2='${code}'; window.renderCh2L4Inner();" class="text-left p-3 rounded-xl border-2 transition ${isSel ? 'border-cyan-600 bg-cyan-50 font-bold text-cyan-800' : 'border-slate-200 bg-white hover:bg-slate-50'}">${ans}</button>`;
-              }).join('')}
-            </div>
-          </div>
+    <label class="text-xl font-bold text-slate-900">2. 觀察以下程式碼，若輸入的 `score` 為 85，`absent` 為 False，最後會印出什麼？</label>
+    <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+        <pre class="font-mono text-base text-slate-100 whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-purple-400">if</span> score >= <span class="text-amber-400">60</span>:
+    <span class="text-purple-400">if</span> <span class="text-purple-400">not</span> absent:
+        <span class="text-green-400">print</span>(<span class="text-orange-300">"表現優良"</span>)
+    <span class="text-purple-400">else</span>:
+        <span class="text-green-400">print</span>(<span class="text-orange-300">"及格但常缺席"</span>)
+<span class="text-purple-400">else</span>:
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"不及格"</span>)</pre>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-base pt-2">
+        ${['A) 表現優良', 'B) 及格但常缺席', 'C) 不及格'].map(ans => {
+            const code = ans.charAt(0);
+            const isSel = window.ch2l4Inputs.q2 === code;
+            return `<button onclick="window.ch2l4Inputs.q2='${code}'; window.renderCh2L4Inner();" class="text-left p-3 rounded-xl border-2 transition ${isSel ? 'border-cyan-600 bg-cyan-50 font-bold text-cyan-800' : 'border-slate-200 bg-white hover:bg-slate-50'}">${ans}</button>`;
+        }).join('')}
+    </div>
+</div>
+	<div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+    <div class="flex items-center gap-2 text-slate-800 font-black text-lg">
+        <span class="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
+        <label>填空題：若要讓變數 `x` 在大於 10 且同時為「偶數」時才印出 "Success"，請補全下方程式碼：</label>
+    </div>
+    <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+        <pre class="font-mono text-base text-slate-100 whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-purple-400">if</span> x > <span class="text-amber-400">10</span>:
+    <span class="text-purple-400">if</span> <span class="text-emerald-400">【請在下方方框輸入條件式】</span>:
+        <span class="text-green-400">print</span>(<span class="text-orange-300">"Success"</span>)</pre>
+    </div>
+    <div class="flex items-center gap-2 pt-1">
+        <span class="font-bold text-slate-700 font-mono text-sm">if 後方應填入：</span>
+        <input type="text" value="${window.ch2l4Inputs.q3}" oninput="window.ch2l4Inputs.q3=this.value.trim()" placeholder="例如：x % 2 == 0" class="w-72 p-2.5 border-2 border-slate-300 rounded-xl focus:border-cyan-500 outline-none font-mono text-base shadow-sm bg-white text-slate-800">
+        <span class="font-bold text-slate-700 font-mono text-lg">:</span>
+    </div>
+</div>
 
-          <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-            <label class="text-xl font-bold text-slate-900">3. 填空題：若要讓變數 `x` 在大於 10 且同時為「偶數」時才印出 "Success"，請補全下方程式碼：</label>
-            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-base">
-if x > 10:
-    if <input type="text" value="${window.ch2l4Inputs.q3}" oninput="window.ch2l4Inputs.q3=this.value.trim()" placeholder="填入條件式，例如 x % 2 == 0" class="w-64 mx-2 px-2 py-1 text-slate-900 rounded border font-mono text-center outline-none bg-white">:
-        print("Success")</pre>
-          </div>
-
-          <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-            <label class="text-xl font-bold text-slate-900">4. 填空題：觀察以下巢狀結構，若 `age = 15` 且 `has_ticket = True`，則最後輸出結果為：</label>
-            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-base">
-if age >= 12:
-    if has_ticket:
-        print("允許入場")
-    else:
-        print("請補票")
-else:
-    print("年齡未達標準")</pre>
-            <div class="flex items-center gap-2">
-              <span class="font-bold">答案：</span>
-              <input type="text" value="${window.ch2l4Inputs.q4}" oninput="window.ch2l4Inputs.q4=this.value.trim()" placeholder="請填入精確的輸出字串" class="w-64 p-3 border-2 border-slate-300 rounded-xl focus:border-cyan-500 outline-none font-bold text-xl shadow-sm">
-            </div>
-          </div>
-
+<div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+    <div class="flex items-center gap-2 text-slate-800 font-black text-lg">
+        <span class="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span>
+        <label>填空題：觀察以下巢狀結構，若 `age = 15` 且 `has_ticket = True`，則最後輸出結果為：</label>
+    </div>
+    <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+        <pre class="font-mono text-base text-slate-100 whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-purple-400">if</span> age >= <span class="text-amber-400">12</span>:
+    <span class="text-purple-400">if</span> has_ticket:
+        <span class="text-green-400">print</span>(<span class="text-orange-300">"允許入場"</span>)
+    <span class="text-purple-400">else</span>:
+        <span class="text-green-400">print</span>(<span class="text-orange-300">"請補票"</span>)
+<span class="text-purple-400">else</span>:
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"年齡未達標準"</span>)</pre>
+    </div>
+    <div class="flex items-center gap-2 pt-2">
+        <span class="font-bold text-slate-700">終端機輸出答案：</span>
+        <input type="text" value="${window.ch2l4Inputs.q4}" oninput="window.ch2l4Inputs.q4=this.value.trim()" placeholder="請填入精確的輸出字串" class="w-72 p-3 border-2 border-slate-300 rounded-xl focus:border-cyan-500 outline-none font-bold text-xl shadow-sm bg-white text-slate-800">
+    </div>
+</div>
           <div class="pt-4 border-t border-slate-100">
             <button id="ch2l4-submit-btn" onclick="window.submitCh2L4()" class="w-full py-5 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-black text-3xl rounded-2xl shadow-xl transition-all active:scale-95">
               提交 2-4 挑戰評分

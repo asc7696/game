@@ -2,7 +2,7 @@
 <!DOCTYPE html>
 <!-- saved from url=(0041)https://asc7696.github.io/game/ch1-3.html -->
 
-<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; char3-1文字框無法打字set=UTF-8">
+<html lang="zh-TW"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CS 互動學習大廳 - 第一~三章</title>
@@ -350,6 +350,18 @@ function render() {
 		
 // 全域變數
 let globalPlayerName = ""; 
+let currentView = 'login';
+let timerInterval = null;
+et timerInterval = null;
+// ... (其他您原本的變數)
+
+// 💡 補上 3-1 所需的 ch1State 狀態防呆初始化，防止網頁因找不到物件而崩潰空白
+if (!window.ch1State) {
+    window.ch1State = {
+        quizAns: { q1: "", q2: "", q3: "", q4: "" },
+        quizStatus: "normal"
+    };
+}
 
 function renderMenu(el) {
     const savedClass = localStorage.getItem("className") || "";
@@ -3687,18 +3699,24 @@ function renderCh2L6Module(el) {
 // ⚙️ 3-1 專屬：就地去紅框函式 (100% 防止 Focus 流失)
 // ==========================================
 window.setInternalFillAns31 = (id, val) => {
-    // 1. 僅儲存資料，絕對不呼叫 renderCh3L1Inner() 或任何重刷頁面的函式！
-    window.ch1State.quizAns[id] = val;
-    
-    // 2. 如果目前是錯誤狀態（有紅框），直接透過原生 DOM 精準把紅框拔掉，回復正常暗色背景
+	const state = window.ch3l1State || window.ch1State; 
+    const status = window.ch3l1Status || "normal";
+	
+    // 確保物件存在
+    if (!window.ch1State) {
+        window.ch1State = { quizAns: {}, quizStatus: "normal" };
+    }
+    if (!window.ch1State.quizAns) window.ch1State.quizAns = {};
+
+    // 1. 僅儲存資料
+    window.ch1State.quizAns[id] = val; 
+
+    // 2. 如果目前是錯誤狀態
     if (window.ch1State.quizStatus === "error") {
-        // 根據答題的 id 判斷它屬於哪一個場景區塊 (s1, s2...)
-        let groupId = "s1"; 
-        if (["q3", "q4"].includes(id)) groupId = "s2"; // 依您 3-1 的實際題目分類
-        
+        let groupId = "s1";
+        if (["q3", "q4"].includes(id)) groupId = "s2"; 
         const groupEl = document.getElementById(`quiz-1group-${groupId}`);
         if (groupEl) {
-            // 精準恢復成原本的深色低調邊框，不驚動正在打字的 Input
             groupEl.classList.remove('border-rose-500', 'bg-rose-950/40');
             groupEl.classList.add('border-slate-800', 'bg-slate-950/40');
         }

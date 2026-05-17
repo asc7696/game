@@ -148,6 +148,24 @@ function resetLevelState(view) {
     // ⚡【新增】徹底清除 2-1 關卡的拖曳暫存紀錄
     window.ch2l1Answers = { slot1: null, slot2: null };
 
+	// 💡 關卡 1-1 清除
+    window.cpStep = 0;
+    window.cpAns = {};
+    window.cpStatus = 'normal';
+
+    // 💡 關卡 1-2 徹底清除 (修復重入殘留問題)
+    window.swapStep = 0;
+    window.pyStatus = 'normal';
+    window.pyAns = {
+        fill_a: "", fill_b: "",
+        t1: "", t2: "", t3: "", t4: "",
+        q1: "", q2: "", q3: "", q4: ""
+    };
+
+    // 💡 關卡 1-3 徹底清除 (修復重入殘留問題)
+    window.ch1l3Inputs = { q1: "", q2: "", q3: "", q4: "" };
+    window.ch1l3ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
+	
     // 徹底清除 1-4 關卡狀態
     window.ch1l4Inputs = { q1: "", q2: "", q3: "", q4: "" };
     window.ch1l4ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
@@ -159,6 +177,10 @@ function resetLevelState(view) {
         currentExample: 1, p1Name: "May", p2X: "10", p2Y: "20", p3Roc: "115", p4Cm: "175", p4Kg: "70",
         isRunning: false, hasRun: false
     };
+	// 💡 第三章特定變數安全清空
+    if (typeof listData !== 'undefined') {
+        listData = []; 
+    }
 
     if (typeof listData !== 'undefined') listData = []; 
     

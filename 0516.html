@@ -121,10 +121,11 @@ function changeView(view) {
     render();
 }
 // 🚀 萬能重置機制：確保重複進入任何關卡時，作答紀錄 100% 清空且重新計時
+// 🚀 萬能重置機制：確保重複進入任何關卡時，作答紀錄 100% 清空且重新計時
 function resetLevelState(view) {
     if (timerInterval) clearInterval(timerInterval); // 終止舊計時器
     
-    // 💡 1. 判定正計時或倒計時
+    // 判定正計時或倒計時
     if (view === 'ch1_l1' || view === 'ch1_l2') {
         isCountingDown = true;
         initialDuration = 600;
@@ -135,45 +136,37 @@ function resetLevelState(view) {
         timeSeconds = 0;
     }
     
-    // 💡 2. 萬能清空全域基礎遊玩狀態
+    // 清空通用遊玩指針
     currentQuestionIndex = 0; 
     currentStep = 1;
     score = 0;
     gameOver = false;
     gameActive = true;
-    
-    // 💡 3. 強制重置通用選擇與拖拽暫存物件
     selectedOptions = {}; 
     dragData = {};
     
-    // 💡 4. ⚡【深度修復】針對 1-4 關卡的輸入與閱讀狀態徹底重置
+    // ⚡【新增】徹底清除 2-1 關卡的拖曳暫存紀錄
+    window.ch2l1Answers = { slot1: null, slot2: null };
+
+    // 徹底清除 1-4 關卡狀態
     window.ch1l4Inputs = { q1: "", q2: "", q3: "", q4: "" };
     window.ch1l4ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
 
-    // 💡 5. ⚡【深度修復】針對 1-5 關卡的文字填空、閱讀狀態與 IDLE 模擬器徹底還原
+    // 徹底清除 1-5 關卡狀態
     window.ch1l5Inputs = { q1: "", q2: "", q3: "", q4: "", q5_roc: "", q6_bmi: "" };
     window.ch1l5ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
     window.idleState = {
-        currentExample: 1, // 預設回到範例 1
-        p1Name: "May",     // 恢復原作者預設文字
-        p2X: "10",
-        p2Y: "20",
-        p3Roc: "115",
-        p4Cm: "175",
-        p4Kg: "70",
-        isRunning: false,  // 停止編譯中狀態
-        hasRun: false      // 恢復成尚未執行（清除 Shell Output 殘留紀錄）
+        currentExample: 1, p1Name: "May", p2X: "10", p2Y: "20", p3Roc: "115", p4Cm: "175", p4Kg: "70",
+        isRunning: false, hasRun: false
     };
 
-    // 💡 6. 針對其餘章節特定變數（例如第三章串列）做安全清空
-    if (typeof listData !== 'undefined') {
-        listData = []; 
-    }
+    if (typeof listData !== 'undefined') listData = []; 
     
-    // 💡 7. 重啟全新計時器
     startTimer();
 }
-		// 💡 挑戰完畢結果對話框
+		
+		
+// 💡 挑戰完畢結果對話框
 function showResult(success, mbtiResult = '') {
     const savedClass = localStorage.getItem("className") || "";
     const app = document.getElementById('app');
@@ -1969,371 +1962,133 @@ print(bmi)</pre>
     window.renderCh1L5Inner();
 }
 
-// --- 2-1 if 條件結構關卡 (已修正拖曳格子寬度不足問題) ---
-if (!window.ch2l1Inputs) window.ch2l1Inputs = { q1: "", q2: "" };
-if (!window.ch2l1ReadStatus) window.ch2l1ReadStatus = { sec1: false, sec2: false };
-
-// 拖曳狀態管理
-window.drag21State = {
-    slots: {
-        t1_1: "", t1_2: "", t1_3: "", t1_4: "", t1_5: "", t1_5_action: "",
-        t2_1: "", t2_2: ""
-    }
-};
-
-window.idle21State = {
-    currentExample: 1, 
-    hp: "25",
-    gold: "100",
-    isRunning: false,
-    hasRun: false
-};
-
+// 💡 修正版：2-1 流程控制與分支 渲染模組
 function renderCh2L1Module(el) {
-    if (typeof startTimer === 'function') startTimer('up');
-
-    // 解鎖提交控管
-    const checkAllRead = () => {
-        const s = window.ch2l1ReadStatus;
-        const btn = document.getElementById('ch2l1-submit-btn');
-        const msg = document.getElementById('ch2l1-lock-msg');
-        if (s.sec1 && s.sec2) {
-            if (btn) { btn.disabled = false; btn.className = "w-full py-5 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-3xl rounded-2xl shadow-xl transition-all active:scale-95"; }
-            if (msg) msg.classList.add('hidden');
-        }
+    const data = {
+        title: "2-1 流程控制與分支結構",
+        desc: "學習如何使用 if-else 讓程式擁有判斷能力！請觀察程式碼，並將正確的執行結果拖曳到對應的終端機輸出框中。",
+        // 🚀 程式碼區塊：加上完美的強制縮排
+        codeExample: `age = 18\n\nif age >= 18:\n    print("你已經成年了")\n    print("可以考取駕照")\nelse:\n    print("你還未成年")\n    print("再等幾年吧")`,
+        quiz: "挑戰：如果將第一行的 age 改為 16，請問畫面上會輸出什麼？請將正確的程式碼方塊拖入下方的「執行結果顯示區」。",
+        options: [
+            { id: "opt1", text: '"你已經成年了"' },
+            { id: "opt2", text: '"可以考取駕照"' },
+            { id: "opt3", text: '"你還未成年"' },
+            { id: "opt4", text: '"再等幾年吧"' }
+        ]
     };
 
-    window.toggleSec21Read = (secId, btnEl) => {
-        window.ch2l1ReadStatus[secId] = true;
-        btnEl.innerHTML = '✅ 我已讀懂此區塊（已確認）';
-        btnEl.className = "w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow-md border-2 border-emerald-700 text-center";
-        btnEl.onclick = null;
-        checkAllRead();
-    };
+    // 初始化此關卡的拖曳答案快取（若無則建立）
+    if (!window.ch2l1Answers) {
+        window.ch2l1Answers = { slot1: null, slot2: null };
+    }
 
-    window.switchIdle21 = (exNum) => {
-        window.idle21State.currentExample = exNum;
-        window.idle21State.hasRun = false;
-        if(exNum === 1) window.idle21State.hp = "25";
-        else window.idle21State.gold = "100";
-        window.renderCh2L1Inner();
-    };
+    el.innerHTML = `
+        <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
+            <div class="flex justify-between items-center mb-6">
+                <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
+                <div class="flex items-center gap-2">
+                    <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-black">第 2 章</span>
+                    <span class="text-sm font-bold text-slate-500">⏱️ 限時挑戰中</span>
+                </div>
+            </div>
 
-    window.runIdle21 = () => {
-        window.idle21State.isRunning = true;
-        window.renderCh2L1Inner();
-        setTimeout(() => {
-            window.idle21State.isRunning = false;
-            window.idle21State.hasRun = true;
-            window.renderCh2L1Inner();
-        }, 500);
-    };
+            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6">
+                <h1 class="text-2xl font-black text-slate-800 mb-2 flex items-center gap-2">💻 ${data.title}</h1>
+                <p class="text-slate-600 font-medium mb-6 leading-relaxed">${data.desc}</p>
 
-    // --- 拖曳事件處理器 ---
-    window.handleCh21DragStart = (e, text) => {
-        e.dataTransfer.setData("text/plain", text);
-    };
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                    <div class="bg-slate-900 rounded-2xl p-4 shadow-inner">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3 text-xs font-mono text-slate-500">
+                            <span>📄 main.py</span>
+                            <span class="text-emerald-500">● Python 3.x</span>
+                        </div>
+                        <pre class="font-mono text-sm text-slate-100 leading-raw whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-blue-400">age</span> = <span class="text-amber-400">16</span>  <span class="text-slate-500"># 已將年齡修改為 16</span>
 
-    window.handleCh21AllowDrop = (e) => {
-        e.preventDefault();
-    };
-
-    window.handleCh21Drop = (e, slotId) => {
-        e.preventDefault();
-        const text = e.dataTransfer.getData("text/plain");
-        window.drag21State.slots[slotId] = text;
-        window.renderCh2L1Inner();
-    };
-
-    window.clearCh21Slot = (slotId) => {
-        window.drag21State.slots[slotId] = "";
-        window.renderCh2L1Inner();
-    };
-
-    window.renderCh2L1Inner = () => {
-        const app = document.getElementById('app') || el;
-        
-        let codeHtml = "";
-        let inputHtml = "";
-        let outputHtml = "";
-
-        if (window.idle21State.currentExample === 1) {
-            codeHtml = `hp = <span class="text-amber-400">int</span>(<span class="text-indigo-400">input</span>(<span class="text-emerald-400">'請輸入目前血量：'</span>))\n<span class="text-pink-400 font-bold">if hp &lt; 30:</span>\n    <span class="text-amber-400">print</span>(<span class="text-rose-400">'🚨 警告：血量過低，畫面閃爍紅燈！'</span>)\n<span class="text-amber-400">print</span>(<span class="text-slate-400">'檢查完畢'</span>)`;
-            inputHtml = `<span class="text-sm font-bold text-slate-400">⌨️ 測試目前 HP：</span><input type="text" value="${window.idle21State.hp}" oninput="window.idle21State.hp=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-3 py-1 rounded font-mono text-lg w-24 text-center focus:outline-none focus:border-indigo-500">`;
-            if (window.idle21State.hasRun) {
-                const val = parseInt(window.idle21State.hp);
-                if (isNaN(val)) outputHtml = `<span class="text-red-500 font-mono">ValueError</span>`;
-                else if (val < 30) outputHtml = `<div class="text-slate-400">請輸入目前血量：${val}</div>\n<div class="text-rose-400 font-bold">🚨 警告：血量過低，畫面閃爍紅燈！</div>\n<div class="text-slate-200">檢查完畢</div>`;
-                else outputHtml = `<div class="text-slate-400">請輸入目前血量：${val}</div>\n<div class="text-slate-200">檢查完畢</div>`;
-            }
-        } else {
-            codeHtml = `gold = <span class="text-amber-400">int</span>(<span class="text-indigo-400">input</span>(<span class="text-emerald-400">'請輸入金幣：'</span>))\n<span class="text-pink-400 font-bold">if gold == 100:</span>\n    <span class="text-amber-400">print</span>(<span class="text-yellow-400">'🏆 恭喜解鎖：百金富翁稱號！'</span>)\n<span class="text-amber-400">print</span>(<span class="text-slate-400">'檢查完畢'</span>)`;
-            inputHtml = `<span class="text-sm font-bold text-slate-400">⌨️ 測試金幣數：</span><input type="text" value="${window.idle21State.gold}" oninput="window.idle21State.gold=this.value" class="bg-slate-950 text-yellow-400 border border-slate-600 px-3 py-1 rounded font-mono text-lg w-24 text-center focus:outline-none focus:border-indigo-500">`;
-            if (window.idle21State.hasRun) {
-                const val = parseInt(window.idle21State.gold);
-                if (isNaN(val)) outputHtml = `<span class="text-red-500 font-mono">ValueError</span>`;
-                else if (val === 100) outputHtml = `<div class="text-slate-400">請輸入金幣：100</div>\n<div class="text-yellow-400 font-bold">🏆 恭喜解鎖：百金富翁稱號！</div>\n<div class="text-slate-200">檢查完畢</div>`;
-                else outputHtml = `<div class="text-slate-400">請輸入金幣：${val}</div>\n<div class="text-slate-200">檢查完畢</div>\n<span class="text-slate-500 italic">(因條件不成立，跳過縮排指令)</span>`;
-            }
-        }
-
-        const pool1 = ["if", "and", "or", "not", "hp = 0", "hp == 0", "time = 0", "time == 0", ":", ";", "print(\"GameOver\")", "    print(\"GameOver\")"];
-        const pool2 = ["if temp = 28:", "if temp > 28:", "if temp == 28:", "if temp >= 28:", "print(\"關冷氣\")", "print(\"開冷氣\")", "    print(\"開冷氣\")", "    print(\"關冷氣\")"];
-
-        // ⭐ 關鍵修正：移除了 w-36 固定寬度，改用 min-w-[120px] 搭配 w-auto 與 px-3，能隨文字長度彈性伸縮
-        const makeSlotHtml = (slotId, placeholder) => {
-            const val = window.drag21State.slots[slotId];
-            if (val) {
-                return `<span onclick="window.clearCh21Slot('${slotId}')" class="bg-indigo-600 text-white font-mono px-3 py-1 rounded-lg cursor-pointer hover:bg-red-600 transition-colors inline-block text-base shadow shadow-indigo-800 animate-fade-in">${val}</span>`;
-            }
-            return `<span ondragover="window.handleCh21AllowDrop(event)" ondrop="window.handleCh21Drop(event, '${slotId}')" class="inline-block min-w-[120px] w-auto max-w-full px-3 h-8 border-2 border-dashed border-slate-400 bg-slate-950 rounded-lg text-center text-xs text-slate-400 leading-7 font-sans align-middle cursor-pointer">${placeholder}</span>`;
-        };
-
-        app.innerHTML = `
-            <div class="p-6 max-w-6xl mx-auto space-y-8 text-slate-800">
-                <button onclick="changeView('menu')" class="flex items-center text-xl text-slate-500 font-bold transition-colors hover:text-slate-800">${Icons.ArrowLeft} 返回主選單</button>
-                <h1 class="text-4xl font-black text-slate-800 border-b-4 border-amber-500 pb-2">關卡 2-1：單向 if 條件結構</h1>
-                
-                <div class="bg-amber-50 p-6 rounded-3xl border-2 border-amber-200 space-y-4">
-                    <h2 class="font-black text-2xl text-amber-800 flex items-center gap-2">💡 1. 什麼是 if 條件判斷？</h2>
-                    <p class="text-xl leading-relaxed">當程式不再只是死板地「由上往下」執行，我們希望它能根據<b>不同的狀況（條件）</b>來決定「要不要做某件事」，這就是條件結構！</p>
-                    
-                    <div class="bg-white p-5 rounded-2xl border border-amber-200 space-y-3 shadow-inner">
-                        <div class="text-xl font-bold text-slate-900 flex items-center gap-1">📋 Python 的 if 語法公式：</div>
-                        <pre class="bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-lg shadow-md leading-relaxed">
-<span class="text-pink-400 font-bold">if</span> <span class="text-sky-300 font-bold">條件式</span><span class="text-amber-400 font-black">:</span>
-    <span class="text-yellow-200">當條件成立(True)時，才會執行的指令程式碼</span>
-                        </pre>
-                        <p class="text-base text-slate-600">當條件式為 <code class="font-mono bg-slate-100 px-1 text-emerald-600">True</code> 就會執行內部縮排的程式碼；如果是 <code class="font-mono bg-slate-100 px-1 text-rose-600">False</code> 則直接跳過。</p>
+<span class="text-purple-400">if</span> age >= <span class="text-amber-400">18</span>:
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"你已經成年了"</span>)
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"可以考取駕照"</span>)
+<span class="text-purple-400">else</span>:
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"你還未成年"</span>)
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"再等幾年吧"</span>)</pre>
                     </div>
 
-                    <div class="bg-red-50 p-4 rounded-xl border border-red-200 font-bold text-red-700 text-lg">
-                        ⚠️ 語法兩大鐵律：<br>
-                        1. 條件寫完後面一定要加<b>英文冒號 <code class="font-mono text-xl text-black font-black">:</code></b>！<br>
-                        2. 屬於 if 內部的指令，前方一定要<b>縮排（按 Tab 鍵或 4 個空白鍵）</b>！
+                    <div class="bg-slate-950 rounded-2xl p-4 shadow-inner flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center border-b border-slate-800 pb-2 mb-3 text-xs font-mono text-slate-500">
+                                <span>🖥️ Python Shell Output</span>
+                            </div>
+                            <p class="text-xs text-slate-500 font-mono mb-4">>>> 正在模擬執行結果...</p>
+                            
+                            <div class="space-y-3">
+                                <div id="slot1" class="drop-zone min-h-[56px] w-full bg-slate-900/60 border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-xl flex items-center justify-center p-2 font-mono text-sm text-emerald-400 transition"
+                                     ondragover="allowDrop(event)" ondrop="handleCh2L1Drop(event, 'slot1')">
+                                    ${window.ch2l1Answers.slot1 ? `<div class="bg-slate-800 text-slate-200 border border-slate-700 px-4 py-2 rounded-lg font-bold w-full text-center shadow">${window.ch2l1Answers.slot1}</div>` : '<span class="text-slate-600 font-bold text-xs">【拖曳第一行輸出到此處】</span>'}
+                                </div>
+                                <div id="slot2" class="drop-zone min-h-[56px] w-full bg-slate-900/60 border-2 border-dashed border-slate-700 hover:border-emerald-500 rounded-xl flex items-center justify-center p-2 font-mono text-sm text-emerald-400 transition"
+                                     ondragover="allowDrop(event)" ondrop="handleCh2L1Drop(event, 'slot2')">
+                                    ${window.ch2l1Answers.slot2 ? `<div class="bg-slate-800 text-slate-200 border border-slate-700 px-4 py-2 rounded-lg font-bold w-full text-center shadow">${window.ch2l1Answers.slot2}</div>` : '<span class="text-slate-600 font-bold text-xs">【拖曳第二行輸出到此處】</span>'}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-2 border-t border-slate-900 flex justify-end">
+                            <button onclick="checkCh2L1Result()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white text-sm font-black rounded-xl transition shadow-md shadow-emerald-900/20">▶ 驗證執行結果</button>
+                        </div>
                     </div>
-                    ${window.ch2l1ReadStatus.sec1 ? `<button class="w-full mt-2 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow">✅ 已確認讀懂語法公式</button>` : `<button onclick="window.toggleSec21Read('sec1', this)" class="w-full mt-2 py-3 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xl rounded-xl transition active:scale-95 animate-pulse">📖 我已讀懂此語法公式，點擊確認</button>`}
                 </div>
 
-                <div class="bg-slate-900 p-6 rounded-3xl border-4 border-slate-700 space-y-4 shadow-2xl">
-                    <div class="flex justify-between items-center flex-wrap gap-4">
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full bg-rose-500 animate-ping"></span>
-                            <h2 class="text-xl font-mono font-black text-slate-200">💻 Python IDLE 互動模擬環境</h2>
-                        </div>
-                        <div class="flex gap-2 bg-slate-800 p-1 rounded-xl text-xs font-bold">
-                            <button onclick="window.switchIdle21(1)" class="px-3 py-1.5 rounded-lg transition ${window.idle21State.currentExample===1?'bg-indigo-600 text-white':'text-slate-400 hover:text-slate-200'}">範例 1 (HP警告)</button>
-                            <button onclick="window.switchIdle21(2)" class="px-3 py-1.5 rounded-lg transition ${window.idle21State.currentExample===2?'bg-indigo-600 text-white':'text-slate-400 hover:text-slate-200'}">範例 2 (稱號解鎖)</button>
-                        </div>
-                    </div>
-
-                    <div class="bg-slate-950 border border-indigo-900/50 p-4 rounded-xl text-base text-indigo-200 leading-relaxed font-sans shadow-inner">
-                        <div class="font-bold text-indigo-400 flex items-center gap-1">🎯 模擬器任務指引：</div>
-                        <div>👉 <b>請在下方輸入資料，執行範例 1 與範例 2：</b></div>
-                        <div class="pl-4 mt-1 space-y-1 text-slate-300 text-sm">
-                            <li>• <b>範例 1：</b>切換至範例 1，請分別輸入 <code class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-400 font-mono font-bold">45</code> 與 <code class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-400 font-mono font-bold">25</code>，點擊執行，比較輸出結果的差別。</li>
-                            <li>• <b>範例 2：</b>切換至範例 2，請分別輸入 <code class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-400 font-mono font-bold">99</code> 與 <code class="bg-slate-800 px-1.5 py-0.5 rounded text-yellow-400 font-mono font-bold">100</code>，點擊執行，比較輸出結果的差別。</li>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 flex flex-col justify-between min-h-[220px]">
-                            <div>
-                                <span class="text-xs text-slate-500 block mb-2 font-mono">// Python Editor:</span>
-                                <pre class="font-mono text-base text-slate-300 leading-relaxed whitespace-pre-line">${codeHtml}</pre>
+                <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5">
+                    <h3 class="text-sm font-black text-slate-700 mb-3 flex items-center gap-1">👉 ${data.quiz}</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        ${data.options.map(opt => `
+                            <div id="${opt.id}" draggable="true" ondragstart="handleCh2L1DragStart(event, '${opt.text}')"
+                                 class="cursor-grab active:cursor-grabbing bg-white hover:bg-slate-100 border-2 border-slate-200 hover:border-emerald-400 p-4 rounded-xl text-center font-bold text-slate-700 text-sm shadow-sm transition transform hover:-translate-y-0.5 active:scale-95 select-none">
+                                📋 ${opt.text}
                             </div>
-                            <div class="pt-4 border-t border-slate-800 mt-4 space-y-3">
-                                ${inputHtml}
-                                <button onclick="window.runIdle21()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 rounded-xl text-lg shadow transition active:scale-95">▶ 點擊執行 (Run Module)</button>
-                            </div>
-                        </div>
-                        <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 min-h-[220px] flex flex-col justify-between font-mono">
-                            <div>
-                                <span class="text-xs text-slate-500 block mb-2">// Shell Output:</span>
-                                <pre class="text-base text-slate-200 whitespace-pre-line">${window.idle21State.hasRun ? outputHtml : '<span class="text-slate-600 italic">等待執行...請依上方指引輸入數值並按下執行</span>'}</pre>
-                            </div>
-                            <div class="text-right text-xs text-slate-600">Python 3.10 控制台</div>
-                        </div>
-                    </div>
-                    ${window.ch2l1ReadStatus.sec2 ? `<button class="w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow">✅ 已完成兩大範例數列比較</button>` : `<button onclick="window.toggleSec21Read('sec2', this)" class="w-full mt-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-xl rounded-xl transition active:scale-95">🕹️ 我已照指引輸入多組數字、完成結果比較，點擊確認</button>`}
-                </div>
-s
-                <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-indigo-200 space-y-8">
-                    <h2 class="font-black text-3xl text-indigo-700 border-b-2 border-indigo-100 pb-3 flex items-center gap-2">📝 學習挑戰：實戰條件結構設計</h2>
-                    
-                    <div class="space-y-8">
-                        
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                            <div class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-sm">1</span>
-                                請問下方程式碼執行後，螢幕上會印出幾次 "Hello"？
-                            </div>
-                            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-base shadow-inner">
-x = 10
-if x > 5:
-    print("Hello")
-print("Hello")
-                            </pre>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                ${['0次', '1次', '2次'].map(opt => `
-                                    <button onclick="window.ch2l1Inputs.q1='${opt}'; window.renderCh2L1Inner();" class="p-3 rounded-xl border text-left font-bold text-lg transition-all ${window.ch2l1Inputs.q1 === opt ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white hover:bg-slate-100 border-slate-300'}" >${opt}</button>
-                                `).join('')}
-                            </div>
-                        </div>
-
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                            <div class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-sm">2</span>
-                                請問下方程式碼中，哪一行犯了「漏掉縮排」的錯誤？
-                            </div>
-                            <pre class="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-base shadow-inner">
-行1: score = 90
-行2: if score >= 60:
-行3: print("及格！")
-                            </pre>
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                ${['行1', '行2', '行3'].map(opt => `
-                                    <button onclick="window.ch2l1Inputs.q2='${opt}'; window.renderCh2L1Inner();" class="p-3 rounded-xl border text-left font-bold text-lg transition-all ${window.ch2l1Inputs.q2 === opt ? 'bg-indigo-600 text-white border-indigo-600 shadow-md' : 'bg-white hover:bg-slate-100 border-slate-300'}" >${opt}</button>
-                                `).join('')}
-                            </div>
-                        </div>
-
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-                            <div class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-sm">3</span>
-                                任務：如果血量(hp)等於0 或是 時間(time)終了(等於0)，則遊戲結束。請拖曳下方正確的拼圖。
-                            </div>
-                            
-                            <div class="bg-slate-900 p-4 rounded-xl font-mono text-base text-emerald-400 space-y-3 shadow-inner overflow-x-auto">
-                                <div class="flex items-center flex-wrap gap-2 pb-1">
-                                    ${makeSlotHtml("t1_1", "if 判斷")}
-                                    <span class="text-slate-300 font-bold">hp</span>
-                                    ${makeSlotHtml("t1_2", "條件等號 1")}
-                                    ${makeSlotHtml("t1_3", "邏輯運算子")}
-                                    <span class="text-slate-300 font-bold">time</span>
-                                    ${makeSlotHtml("t1_4", "條件等號 2")}
-                                    ${makeSlotHtml("t1_5", "結尾符號")}
-                                </div>
-                                <div class="pl-8 flex items-center gap-2">
-                                    ${makeSlotHtml("t1_5_action", "縮排指令區區塊")}
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <div class="text-xs text-slate-500 font-bold">🛒 可拖曳的程式碼元件（按住並拖曳至上方對應空格）：</div>
-                                <div class="flex flex-wrap gap-2 bg-white p-3 rounded-xl border border-slate-300 shadow-sm">
-                                    ${pool1.map(item => `
-                                        <div draggable="true" ondragstart="window.handleCh21DragStart(event, '${item}')" class="bg-slate-100 hover:bg-indigo-50 text-slate-800 border border-slate-400 font-mono px-3 py-1 rounded-lg cursor-grab active:cursor-grabbing text-sm font-bold shadow-sm transition-transform hover:scale-105 select-none">
-                                            ${item.replace(/ /g, "&nbsp;")}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            <span id="drag-q3-feedback" class="text-base block"></span>
-                        </div>
-
-                        <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
-                            <div class="text-xl font-bold text-slate-900 flex items-center gap-2">
-                                <span class="bg-indigo-600 text-white w-6 h-6 rounded-full inline-flex items-center justify-center text-sm">4</span>
-                                任務：如果溫度(temp)超過 28 度，則開啟冷氣。請填補挖空：
-                            </div>
-                            
-                            <div class="bg-slate-900 p-4 rounded-xl font-mono text-base text-emerald-400 space-y-3 shadow-inner">
-                                <div class="flex items-center flex-wrap gap-2">
-                                    ${makeSlotHtml("t2_1", "條件判斷首行")}
-                                </div>
-                                <div class="pl-8 flex items-center gap-2">
-                                    ${makeSlotHtml("t2_2", "內部縮排執行行")}
-                                </div>
-                            </div>
-
-                            <div class="space-y-2">
-                                <div class="text-xs text-slate-500 font-bold">🛒 可拖曳的程式碼元件：</div>
-                                <div class="flex flex-wrap gap-2 bg-white p-3 rounded-xl border border-slate-300 shadow-sm">
-                                    ${pool2.map(item => `
-                                        <div draggable="true" ondragstart="window.handleCh21DragStart(event, '${item}')" class="bg-slate-100 hover:bg-sky-50 text-slate-800 border border-slate-400 font-mono px-3 py-1 rounded-lg cursor-grab active:cursor-grabbing text-sm font-bold shadow-sm transition hover:scale-105 select-none">
-                                            ${item.replace(/ /g, "&nbsp;")}
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                            <span id="drag-q4-feedback" class="text-base block"></span>
-                        </div>
-
-                    </div>
-
-                    <div class="pt-4 border-t border-slate-100">
-                        <p id="ch2l1-lock-msg" class="text-xl font-bold text-amber-600 text-center bg-amber-50 py-2 rounded-xl mb-3">
-                            ⚠️ 請先點選上方知識區與 IDLE 模擬器下方的「確認」按鈕，方可解鎖提交挑戰。
-                        </p>
-                        <button id="ch2l1-submit-btn" disabled onclick="window.submitCh2L1()" 
-                            class="w-full py-5 bg-slate-400 text-white font-black text-3xl rounded-2xl cursor-not-allowed opacity-50 shadow-inner">
-                            提交挑戰評分
-                        </button>
+                        `).join('')}
                     </div>
                 </div>
             </div>
-        `;
-    };
-
-    // 提交驗證批改邏輯
-    window.submitCh2L1 = () => {
-        const slots = window.drag21State.slots;
-        const inputs = window.ch2l1Inputs;
-
-        const isQ1Correct = (inputs.q1 === '2次');
-        const isQ2Correct = (inputs.q2 === '行3');
-
-        const isQ3Correct = (
-            slots.t1_1 === "if" &&
-            slots.t1_2 === "hp == 0" &&
-            slots.t1_3 === "or" &&
-            slots.t1_4 === "time == 0" &&
-            slots.t1_5 === ":" &&
-            slots.t1_5_action === "    print(\"GameOver\")"
-        );
-
-        const isQ4Correct = (
-            slots.t2_1 === "if temp > 28:" &&
-            slots.t2_2 === "    print(\"開冷氣\")"
-        );
-
-        const f3 = document.getElementById('drag-q3-feedback');
-        if (isQ3Correct) {
-            f3.innerHTML = "✅ 第三題完全正確！成功掌握 or 邏輯、雙等號判定與縮排！";
-            f3.className = "text-green-600 font-bold mt-2 text-base animate-pulse";
-        } else {
-            f3.innerHTML = "❌ 第三題組合錯誤。提示：1. 判斷相等要用 <code class='font-mono text-rose-600 font-bold'>==</code> 2.「或是」是 <code class='font-mono text-rose-600 font-bold'>or</code> 3. 結尾要 <code class='font-mono text-rose-600 font-bold'>:</code> 4. 執行的動作必須有**四個空白縮排**！";
-            f3.className = "text-red-500 font-bold mt-2 text-base";
-        }
-
-        const f4 = document.getElementById('drag-q4-feedback');
-        if (isQ4Correct) {
-            f4.innerHTML = "✅ 第四題完全正確！「超過」是 >，且冷氣成功開啟！";
-            f4.className = "text-green-600 font-bold mt-2 text-base animate-pulse";
-        } else {
-            f4.innerHTML = "❌ 第四題組裝錯誤。提示：1.「超過」28度不包含28度，要選 <code class='font-mono text-rose-600 font-bold'>&gt;</code> 2. 內部的 print 指令務必選前方有**四個空白縮排**的元件！";
-            f4.className = "text-red-500 font-bold mt-2 text-base";
-        }
-
-        if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
-            if (typeof stopTimer === 'function') stopTimer();
-            setTimeout(() => {
-                showResult(true); 
-            }, 600);
-        } else {
-            alert(`批改完畢！請檢查有錯誤或未填寫的題目：\n\n第一題(計數): ${isQ1Correct?'✅':'❌'}\n第二題(縮排): ${isQ2Correct?'✅':'❌'}\n第三題(遊戲血量拼圖): ${isQ3Correct?'✅':'❌'}\n第四題(冷氣控溫拼圖): ${isQ4Correct?'✅':'❌'}`);
-            const btn = document.getElementById('ch2l1-submit-btn');
-            if (btn) {
-                btn.classList.add('animate-shake');
-                setTimeout(() => btn.classList.remove('animate-shake'), 400);
-            }
-        }
-    };
-
-    window.renderCh2L1Inner();
+        </div>
+    `;
 }
 
+// 💡 2-1 專屬：滑鼠開始拖曳
+function handleCh2L1DragStart(ev, text) {
+    ev.dataTransfer.setData("text/plain", text);
+}
+
+// 💡 2-1 專屬：處理放置事件 (大範圍接收)
+function handleCh2L1Drop(ev, slotId) {
+    ev.preventDefault();
+    const text = ev.dataTransfer.getData("text/plain");
+    if (text) {
+        window.ch2l1Answers[slotId] = text;
+        renderCh2L1Module(document.getElementById('app')); // 即時重繪，刷新槽內狀態
+    }
+}
+
+// 💡 2-1 專屬：驗證答案
+function checkCh2L1Result() {
+    if (!window.ch2l1Answers || !window.ch2l1Answers.slot1 || !window.ch2l1Answers.slot2) {
+        alert("⚠️ 終端機尚未偵測到完整的輸出結果！請將兩行對應的輸出都拖曳進去。");
+        return;
+    }
+
+    // 當 age = 16 時，應該執行 else 分支，輸出分別是 "你還未成年" 與 "再等幾年吧"
+    const isCorrect = (window.ch2l1Answers.slot1 === '"你還未成年"' && window.ch2l1Answers.slot2 === '"再等幾年吧"');
+
+    if (isCorrect) {
+        showResult(true);
+    } else {
+        alert("❌ 執行結果不正確喔！請仔細比對 if (age >= 18) 條件不成立時，程式會走向哪裡。");
+        // 答錯自動清空，讓學生秒重試
+        window.ch2l1Answers = { slot1: null, slot2: null };
+        renderCh2L1Module(document.getElementById('app'));
+    }
+}
+		
 // --- 2-2 if-else 條件結構關卡 ---
 if (!window.ch2l2ReadStatus) window.ch2l2ReadStatus = { sec1: false, sec2: false };
 

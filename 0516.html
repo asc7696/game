@@ -69,7 +69,7 @@ const Icons = {
 
         const LEVEL_NAMES = {       
             ch1_l1: "1-1 程式設計的概念", ch1_l2: "1-2 Python 程式語言簡介", ch1_l3: "1-3 數值運算", ch1_l4: "1-4 字串運算", ch1_l5: "1-5 輸入輸出函式",
-			ch2_l1: "2-1 if條件", ch2_l2: "2-2 if else條件", ch2_l3: "2-3 if elif else條件", ch2_l4: "2-4 range函式", ch2_l5: "2-5 for range重複", ch2_l6: "2-6 while重複",
+			ch2_l1: "2-1 if條件", ch2_l2: "2-2 if else條件", ch2_l3: "2-3 if elif else條件", ch2_l4: "2-4 巢狀if結構", ch2_l5: "2-5 for range重複", ch2_l6: "2-6 while重複",
             ch3_l1: "3-1 串列list", ch3_l2: "3-2 串列走訪", ch3_l3: "3-3 串列操作", ch3_l4: "3-4 in 與 not in", ch3_l5: "3-5 隨機模組+串列",ch3_l6: "3-6 隨機模組",
             all_l1: "綜合練習 身分證末2碼", all_l2: "綜合練習 生命靈數", all_l3: "綜合練習 大樂透", all_l4: "綜合練習 大樂透", all_l5: "綜合練習 大樂透", all_l6: "綜合練習 大樂透"
         };
@@ -2859,25 +2859,22 @@ function renderCh2L4Module(el) {
     window.renderCh2L4Inner();
 }
 
-// ==========================================
-// 💡 2-5 for 迴圈與 range() 狀態初始化
-// ==========================================
-if (!window.ch2l5State) {
-    window.ch2l5State = {
-        // 各區塊目前的執行步數 (0 代表尚未開始執行)
-        ex1Step: 0,
-        ex2Step: 0,
-        ex3Step: 0,
-        // 各區塊是否已經完成檢核
-        checked: { ex1: false, ex2: false, ex3: false },
-        // 🛠️ 新增：挑戰題答案與驗證狀態
-        quizAns: { q1: "", q2: "", q3: "", q4: "" },
-        quizStatus: "normal" // 'normal' | 'error'
-    };
-}
-
 function renderCh2L5Module(el) {
     if (typeof startTimer === 'function') startTimer();
+
+    // ==========================================
+    // 🛡️ 全域狀態防呆初始化 (防止未定義時報錯)
+    // ==========================================
+    if (!window.ch2l5State) {
+        window.ch2l5State = {
+            ex1Step: 0,
+            ex2Step: 0,
+            ex3Step: 0,
+            checked: { ex1: false, ex2: false, ex3: false },
+            quizAns: { q1: "", q2: "", q3: "", q4: "" },
+            quizStatus: "normal"
+        };
+    }
 
     window.renderCh2L5Inner = () => {
         const app = document.getElementById('app') || el;
@@ -2937,7 +2934,7 @@ function renderCh2L5Module(el) {
                                 <tr class="bg-emerald-600 text-white text-lg font-black">
                                     <th class="p-4">語法結構</th>
                                     <th class="p-4">詳細說明</th>
-                                    <th class="p-4">生活實例數字序列</th>
+                                    <th class="p-4">數字序列範例</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 text-base font-medium text-slate-700">
@@ -2962,7 +2959,6 @@ function renderCh2L5Module(el) {
                 </div>
 
                 <div class="space-y-8 mb-12">
-                    
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
                         <div class="flex justify-between items-center border-b pb-2">
                             <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">⚡ 實例一：range(b) 數值放大</h2>
@@ -3069,7 +3065,6 @@ function renderCh2L5Module(el) {
                             </button>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="bg-slate-900 rounded-3xl p-6 shadow-xl border-4 border-indigo-500/30 text-slate-100 space-y-6">
@@ -3079,14 +3074,14 @@ function renderCh2L5Module(el) {
                     </div>
 
                     <div class="space-y-6">
-                        ${quizItems.select.map((q, idx) => {
+                        ${quizItems.select.map((q) => {
                             const isErr = state.quizStatus === 'error' && state.quizAns[q.id] !== q.ans;
                             return `
-                                <div class="p-4 rounded-xl border transition-all ${isErr ? 'border-rose-500 bg-rose-950/40' : 'border-slate-800 bg-slate-950/60'}">
+                                <div id="quiz-box-${q.id}" class="p-4 rounded-xl border transition-all ${isErr ? 'border-rose-500 bg-rose-950/40' : 'border-slate-800 bg-slate-950/60'}">
                                     <label class="block text-lg font-bold mb-3 text-slate-200">${q.text}</label>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         ${q.options.map(opt => `
-                                            <button onclick="window.setQuizAns25('${q.id}', '${opt}')" class="p-3 text-left rounded-lg text-base font-bold transition border ${state.quizAns[q.id] === opt ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-700 hover:bg-slate-800 text-slate-300'}">
+                                            <button onclick="window.setSelectQuizAns25('${q.id}', '${opt}')" class="p-3 text-left rounded-lg text-base font-bold transition border ${state.quizAns[q.id] === opt ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-700 hover:bg-slate-800 text-slate-300'}">
                                                 ${opt}
                                             </button>
                                         `).join('')}
@@ -3098,11 +3093,11 @@ function renderCh2L5Module(el) {
                         ${quizItems.fill.map((q) => {
                             const isErr = state.quizStatus === 'error' && state.quizAns[q.id] !== q.ans;
                             return `
-                                <div class="p-4 rounded-xl border transition-all ${isErr ? 'border-rose-500 bg-rose-950/40' : 'border-slate-800 bg-slate-950/60'} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                                <div id="quiz-box-${q.id}" class="p-4 rounded-xl border transition-all ${isErr ? 'border-rose-500 bg-rose-950/40' : 'border-slate-800 bg-slate-950/60'} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <label class="text-lg font-bold text-slate-200 flex-1">${q.text}</label>
                                     <input type="text" 
                                            value="${state.quizAns[q.id] || ''}" 
-                                           oninput="window.setQuizAns25('${q.id}', this.value.trim())" 
+                                           oninput="window.setInternalFillAns25('${q.id}', this.value.trim())" 
                                            placeholder="請輸入答案數字" 
                                            class="p-3 w-full sm:w-48 rounded-xl bg-slate-900 border border-slate-700 text-center font-black text-xl text-cyan-400 focus:outline-none focus:border-indigo-500" />
                                 </div>
@@ -3142,10 +3137,25 @@ function renderCh2L5Module(el) {
         window.renderCh2L5Inner();
     };
 
-    window.setQuizAns25 = (id, val) => {
+    // 選擇題點擊：立即刷新 UI
+    window.setSelectQuizAns25 = (id, val) => {
         window.ch2l5State.quizAns[id] = val;
-        window.ch2l5State.quizStatus = "normal"; // 輸入時自動重置錯誤紅框
+        window.ch2l5State.quizStatus = "normal"; 
         window.renderCh2L5Inner();
+    };
+
+    // 填空題輸入（關鍵修正）：只記錄狀態，不刷新 DOM，避免 input 失去焦點
+    window.setInternalFillAns25 = (id, val) => {
+        window.ch2l5State.quizAns[id] = val;
+        
+        // 如果原本是錯誤狀態，當使用者開始改答案時，悄悄把該題的外框紅字移除
+        if (window.ch2l5State.quizStatus === "error") {
+            const quizBox = document.getElementById(`quiz-box-${id}`);
+            if (quizBox) {
+                quizBox.classList.remove('border-rose-500', 'bg-rose-950/40');
+                quizBox.classList.add('border-slate-800', 'bg-slate-950/60');
+            }
+        }
     };
 
     window.submitCh2L5All = () => {
@@ -3171,10 +3181,10 @@ function renderCh2L5Module(el) {
 
         if (isCorrect) {
             if (typeof stopTimer === 'function') stopTimer();
-            showResult(true);
+            if (typeof showResult === 'function') showResult(true);
         } else {
             state.quizStatus = "error";
-            window.renderCh2L5Inner();
+            window.renderCh2L5Inner(); // 答錯時刷新 UI，秀出紅框
             
             // 彈跳動畫反饋
             const btn = document.getElementById('ch2l5-final-btn');
@@ -3188,6 +3198,7 @@ function renderCh2L5Module(el) {
 
     window.renderCh2L5Inner();
 }
+
 		
 // ==========================================
 // 💡 2-6 while 迴圈 狀態初始化與擴充

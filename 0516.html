@@ -98,42 +98,68 @@
             Lock: `<svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>`
         };
 
-        function showResult(success, mbtiResult = '') {
-			// 💡 先從 localStorage 拿取班級
-    		const savedClass = localStorage.getItem("className") || "";
-            const app = document.getElementById('app');
-            const actualUsedTime = isCountingDown ? (initialDuration - timeSeconds) : timeSeconds;
-            const scoreStr = isCountingDown ? `剩餘時間: ${formatTime(timeSeconds)}` : `完成耗時: ${formatTime(timeSeconds)}`;
-            
-            if (success && globalPlayerName !== 'Teacher') {
-                if (!studentScores[globalPlayerName]) studentScores[globalPlayerName] = {};
-                studentScores[globalPlayerName][currentView] = { time: actualUsedTime, date: getNowString() };
-				submitScore(currentView,    success ? 100 : 0,    actualUsedTime,    1);////////////////////////////////////////////////////////////////////////////////////////////////
-            }
-			
-            const modal = document.createElement('div');
-            modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-[100] px-4";
-            modal.innerHTML = `
-                <div class="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 animate-fade-in">
-        <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-slate-100 max-w-md w-full text-center">
-            <div class="text-6xl mb-4">${success ? '🎉' : '❌'}</div>
-            <h2 class="text-3xl font-black mb-2 text-slate-800">${success ? '挑戰成功！' : '挑戰失敗'}</h2>
-            
-            
-            <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 mb-6 font-bold text-slate-600">
-                <div>👤 玩家：${savedClass}班 ${globalPlayerName}</div>
-                <div>⏱️ 使用時間：${formatTime(actualUsedTime)}</div>
-               
-            </div>
-            
-            <div class="flex gap-4">
-                <button onclick="changeView('menu')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">返回大廳</button>
+       function showResult(success, mbtiResult = '') {
+    // 💡 先從 localStorage 拿取班級
+    const savedClass = localStorage.getItem("className") || "";
+    const app = document.getElementById('app');
+    const actualUsedTime = isCountingDown ? (initialDuration - timeSeconds) : timeSeconds;
+    const scoreStr = isCountingDown ? `剩餘時間: ${formatTime(timeSeconds)}` : `完成耗時: ${formatTime(timeSeconds)}`;
+    
+    // 🏆 新增變數 award 計算邏輯 (時間單位為秒，故 2分鐘 = 120秒，依此類推)
+    let award = "";
+    if (success) {
+        if (actualUsedTime >= 0 && actualUsedTime <= 120) {
+            award = "金牌";
+        } else if (actualUsedTime > 120 && actualUsedTime <= 240) {
+            award = "銀牌";
+        } else if (actualUsedTime > 240 && actualUsedTime <= 360) {
+            award = "銅牌";
+        } else if (actualUsedTime > 360 && actualUsedTime <= 600) {
+            award = "挑戰成功";
+        } else {
+            award = "挑戰成功"; // 超過10分鐘但若判定仍算成功時的保底
+        }
+    } else {
+        award = "挑戰失敗";
+    }
+    
+    if (success && globalPlayerName !== 'Teacher') {
+        if (!studentScores[globalPlayerName]) studentScores[globalPlayerName] = {};
+        
+        // 💾 同步將 award 紀錄到本機成績中，這樣 renderReportCard 就能讀取到
+        studentScores[globalPlayerName][currentView] = { 
+            time: actualUsedTime, 
+            date: getNowString(),
+            award: award 
+        };
+        localStorage.setItem("studentScores", JSON.stringify(studentScores));
+        
+        // 🚀 將 award 當作第五個參數傳給 submitScore 函式
+        submitScore(currentView, success ? 100 : 0, actualUsedTime, 1, award);
+    }
+    
+    const modal = document.createElement('div');
+    modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-[100] px-4";
+    modal.innerHTML = `
+        <div class="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 animate-fade-in">
+            <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-slate-100 max-w-md w-full text-center">
+                <div class="text-6xl mb-4">${success ? '🎉' : '❌'}</div>
+                <h2 class="text-3xl font-black mb-2 text-slate-800">${success ? '挑戰成功！' : '挑戰失敗'}</h2>
+                
+                <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 mb-6 font-bold text-slate-600">
+                    <div>👤 玩家：${savedClass}班 ${globalPlayerName}</div>
+                    <div>⏱️ 使用時間：${formatTime(actualUsedTime)}</div>
+                    ${success ? `<div class="text-indigo-600">🏆 獲得獎勵：${award}</div>` : ''}
+                </div>
+                
+                <div class="flex gap-4">
+                    <button onclick="changeView('menu')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">返回大廳</button>
+                </div>
             </div>
         </div>
-    </div>            `;
-            app.appendChild(modal);
-        }
-
+    `;
+    app.appendChild(modal);
+}
         window.drag = (ev, type, id) => { ev.dataTransfer.setData("type", type); ev.dataTransfer.setData("id", id); };
         window.allowDrop = (ev) => ev.preventDefault();
 
@@ -408,7 +434,8 @@ function renderReportCard(el) {
     const rows = Object.keys(LEVEL_NAMES).map(key => {
         const sData = myScores[key];
         const status = sData ? `<span class="bg-green-100 text-green-700 px-3 py-1 rounded-full font-bold text-sm">已完成</span>` : `<span class="bg-slate-100 text-slate-500 px-3 py-1 rounded-full font-bold text-sm">未完成</span>`;
-        return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 font-bold text-slate-700">${LEVEL_NAMES[key]}</td><td class="p-4 text-center">${status}</td><td class="p-4 text-center font-mono font-bold text-blue-600">${sData ? formatTime(sData.time) + ' (' + sData.time + 's)' : '-'}</td><td class="p-4 text-center text-xs text-slate-500">${sData ? sData.date : '-'}</td></tr>`;
+        const displayAward = record?.award ? record.award : (record ? "挑戰成功" : "---"); // 讀取獎牌，若舊資料沒有則預設顯示挑戰成功
+		return `<tr class="border-b border-slate-100 hover:bg-slate-50"><td class="p-4 font-bold text-slate-700">${LEVEL_NAMES[key]}</td><td class="p-4 text-center">${status}</td><td class="p-4 text-center font-mono font-bold text-blue-600">${sData ? formatTime(sData.time) + ' (' + sData.time + 's)' : '-'}</td><td>${displayAward}</td><td class="p-4 text-center text-xs text-slate-500">${sData ? sData.date : '-'}</td></tr>`;
     }).join('');
     
     // 💡 這裡將 ${savedClass}班 完美拼接到「查詢對象：」後面
@@ -2842,6 +2869,7 @@ async function submitScore(level, score, timeUsed, attempts) {
     score: score,
     timeUsed: timeUsed,
     attempts: attempts,
+	award: award, // 🚀 成功將 award 包進送往 Google Sheet 的資料包中
     userAgent: navigator.userAgent
   };
 

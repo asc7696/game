@@ -536,8 +536,8 @@ function renderConceptModule(el) {
 
         let correct = challengeItems.every(q => window.cpAns[q.id] === q.ans);
         if(correct) {
-            if(typeof stopTimer === 'function') stopTimer();
-            showResult(true);
+            if(typeof stopTimer === 'function') {stopTimer();showResult(true);}
+            
         } else {
             window.cpStatus = 'error';
             window.renderCPInner();

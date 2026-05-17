@@ -1994,278 +1994,476 @@ print(bmi)</pre>
 }
 
 // ==========================================
-// 💡 2-1 流程控制與分支（還原原始內容 + 改為單選題）
+// 💡 2-1 if 狀態初始化
 // ==========================================
+if (!window.ch2l1Inputs) {
+    window.ch2l1Inputs = { q1: "", q2: "", q3: "", q4: "" };
+}
+
 function renderCh2L1Module(el) {
-    const data = {
-        title: "2-1 流程控制與分支結構",
-        desc: "學習如何使用 if-else 讓程式擁有判斷能力！請觀察左側的 Python 程式碼，並在右側模擬終端機中選擇正確的執行結果。",
-        quiz: "挑戰：如果將第一行的 age 改為 16，請問畫面上會輸出什麼？",
-        // 🚀 四個選項按鈕
-        options: [
-            { text: '你已經成年了\n可以考取駕照', isCorrect: false },
-            { text: '你還未成年\n再等幾年吧', isCorrect: true },
-            { text: '你已經成年了\n再等幾年吧', isCorrect: false },
-            { text: '你還未成年\n可以考取駕照', isCorrect: false }
-        ]
-    };
+    if (typeof startTimer === 'function') startTimer();
 
-    // 初始化快取
-    if (typeof window.ch2l1Selected === 'undefined') window.ch2l1Selected = null;
+    window.renderCh2L1Inner = () => {
+        const app = document.getElementById('app') || el;
+        const state = window.ch2l1Inputs;
 
-    el.innerHTML = `
-        <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
-            <div class="flex justify-between items-center mb-6">
-                <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
-                <div class="flex items-center gap-2">
-                    <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-black">第 2 章</span>
-                    <span class="text-sm font-bold text-slate-500">⏱️ 限時挑戰中</span>
+        app.innerHTML = `
+            <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
+                    <span class="bg-cyan-100 text-cyan-600 px-3 py-1 rounded-full text-xs font-black">第 2 章 條件與迴圈</span>
                 </div>
-            </div>
 
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6">
-                <h1 class="text-2xl font-black text-slate-800 mb-2 flex items-center gap-2">💻 ${data.title}</h1>
-                <p class="text-slate-600 font-medium mb-6 leading-relaxed">${data.desc}</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-slate-900 rounded-2xl p-4 shadow-inner">
-                        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-3 text-xs font-mono text-slate-500">
-                            <span>📄 main.py</span>
-                            <span class="text-emerald-500">● Python 3.x</span>
-                        </div>
-                        <pre class="font-mono text-sm text-slate-100 leading-raw whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-blue-400">age</span> = <span class="text-amber-400">16</span>  <span class="text-slate-500"># 原始碼設定年齡為 16</span>
-
-<span class="text-purple-400">if</span> age >= <span class="text-amber-400">18</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"你已經成年了"</span>)
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"可以考取駕照"</span>)
-<span class="text-purple-400">else</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"你還未成年"</span>)
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"再等幾年吧"</span>)</pre>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-6">
+                    <div>
+                        <h1 class="text-2xl font-black text-slate-800 mb-2 flex items-center gap-2">🌿 2-1 單向條件結構 (if)</h1>
+                        <p class="text-slate-600 font-medium leading-relaxed">
+                            在程式設計中，<b>「條件判斷」</b>就像是人生中的十字路口。<code>if</code> 是最基礎的單向選擇：<b>當指定的條件成立（True）時，才會執行內部的程式碼</b>；如果條件不成立（False），程式就會直接跳過，什麼都不做。
+                        </p>
                     </div>
 
-                    <div class="bg-slate-950 rounded-2xl p-4 shadow-inner flex flex-col justify-between min-h-[300px]">
-                        <div>
-                            <div class="flex items-center border-b border-slate-800 pb-2 mb-3 text-xs font-mono text-slate-500">
-                                <span>🖥️ Python Shell Output</span>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-sm">
+                        <div class="space-y-2">
+                            <h3 class="font-bold text-cyan-700 flex items-center gap-1">📌 語法規則</h3>
+                            <pre class="bg-slate-900 text-slate-100 p-3 rounded-xl font-mono leading-relaxed"><span class="text-purple-400">if</span> 條件式<span class="text-rose-400">:</span>\n    ⚡ 條件成立時執行的程式碼 (必須縮排 4 格)</pre>
+                            <p class="text-slate-500 text-xs">⚠️ <b>重要提醒：</b>Python 規定條件式結尾必須加上冒號 <code>:</code>，且內層程式碼必須精確<b>縮排 4 個空格</b>！</p>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="font-bold text-cyan-700 flex items-center gap-1">💡 生活生活範例：下雨出門</h3>
+                            <div class="bg-slate-900 text-slate-100 p-3 rounded-xl font-mono leading-relaxed">
+                                is_raining = <span class="text-purple-400">True</span>\n<span class="text-purple-400">if</span> is_raining:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"記得帶傘出門！"</span>)
                             </div>
-                            <p class="text-xs text-amber-400 font-mono mb-4">👉 ${data.quiz}</p>
-                            
-                            <div class="space-y-2.5">
-                                ${data.options.map((opt, idx) => {
-                                    const isCurrent = window.ch2l1Selected === idx;
+                            <p class="text-slate-500 text-xs">當 <code>is_raining</code> 為 True，終端機就會印出提醒；若為 False 則無任何輸出。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-8">
+                    <h2 class="text-xl font-black text-slate-800 border-b pb-2 flex items-center gap-2">🎯 任務挑戰：語法與邏輯驗證</h2>
+
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                            <p>在 Python 中，關於 <code>if</code> 敘述的語法規定，下列何者「錯誤」？</p>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2.5 text-sm font-mono">
+                            ${[
+                                { key: 'A', text: 'A) if 條件句的結尾必須放冒號屬性 (:)' },
+                                { key: 'B', text: 'B) 條件成立時要執行的程式碼，必須縮排 4 個空格' },
+                                { key: 'C', text: 'C) Python 不強迫縮排，程式碼對齊最左邊也能正常執行' },
+                                { key: 'D', text: 'D) 當 if 後方的條件結果為 False 時，縮排區塊內的程式會被跳過' }
+                            ].map(opt => {
+                                const isSelected = state.q1 === opt.key;
+                                return `
+                                    <button onclick="window.ch2l1Inputs.q1='${opt.key}'; window.renderCh2L1Inner();"
+                                            class="w-full text-left p-3 rounded-xl border transition flex items-center gap-3 ${isSelected ? 'bg-cyan-950 border-cyan-500 text-cyan-400 font-bold' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                                        <span class="w-5 h-5 rounded-full border text-xs flex items-center justify-center ${isSelected ? 'border-cyan-400 bg-cyan-500 text-slate-950 font-bold' : 'border-slate-400'}">${opt.key}</span>
+                                        <span>${opt.text}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                            <p>觀察下方 Python 程式碼，若輸入的 <code>age</code> 為 20，最後會印出什麼結果？</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                            <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+                                <pre class="font-mono text-sm text-slate-100 whitespace-pre" style="font-family: 'Courier New', Courier, monospace;">age = <span class="text-amber-400">20</span>\n<span class="text-purple-400">if</span> age >= <span class="text-amber-400">18</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"可以投票"</span>)\n<span class="text-green-400">print</span>(<span class="text-orange-300">"檢查結束"</span>)</pre>
+                            </div>
+                            <div class="grid grid-cols-1 gap-2 text-sm font-mono">
+                                ${[
+                                    { key: 'A', text: 'A) 只會印出：可以投票' },
+                                    { key: 'B', text: 'B) 只會印出：檢查結束' },
+                                    { key: 'C', text: 'C) 依序印出：可以投票，然後印出：檢查結束' },
+                                    { key: 'D', text: 'D) 發生語法縮排錯誤，沒有任何輸出' }
+                                ].map(opt => {
+                                    const isSelected = state.q2 === opt.key;
                                     return `
-                                        <button onclick="window.ch2l1Selected = ${idx}; renderCh2L1Module(document.getElementById('app'));"
-                                                class="w-full text-left p-3 rounded-xl border text-sm font-mono transition flex flex-col whitespace-pre-line ${
-                                                    isCurrent 
-                                                    ? 'bg-emerald-950/80 border-emerald-500 text-emerald-400 font-bold shadow-md shadow-emerald-950/50' 
-                                                    : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900 hover:border-slate-700'
-                                                }">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-5 h-5 rounded-full border flex items-center justify-center text-xs ${isCurrent ? 'border-emerald-400 bg-emerald-500 text-slate-950 font-black' : 'border-slate-600'}">${idx + 1}</span>
-                                                <span class="leading-relaxed">${opt.text}</span>
-                                            </div>
+                                        <button onclick="window.ch2l1Inputs.q2='${opt.key}'; window.renderCh2L1Inner();"
+                                                class="w-full text-left p-3 rounded-xl border transition flex items-center gap-3 ${isSelected ? 'bg-cyan-950 border-cyan-500 text-cyan-400 font-bold' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                                            <span class="w-5 h-5 rounded-full border text-xs flex items-center justify-center ${isSelected ? 'border-cyan-400 bg-cyan-500 text-slate-950 font-bold' : 'border-slate-400'}">${opt.key}</span>
+                                            <span>${opt.text}</span>
                                         </button>
                                     `;
                                 }).join('')}
                             </div>
                         </div>
+                    </div>
 
-                        <div class="mt-4 pt-2 border-t border-slate-900 flex justify-end">
-                            <button onclick="checkCh2L1Result()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-white text-sm font-black rounded-xl transition shadow-md">▶ 驗證執行結果</button>
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3 & 4</span>
+                            <p>填空任務：請補齊下方程式碼，讓系統在分數 <code>score</code> 達 60 分及格時，印出 "Pass"：</p>
                         </div>
+                        <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+                            <pre class="font-mono text-sm text-slate-100 whitespace-pre" style="font-family: 'Courier New', Courier, monospace;">score = <span class="text-amber-400">75</span>\n<span class="bg-cyan-950 border border-cyan-700 px-1 rounded text-cyan-400 font-bold">填空 (三)</span> score >= <span class="text-amber-400">60</span><span class="bg-cyan-950 border border-cyan-700 px-1 rounded text-cyan-400 font-bold">填空 (四)</span>\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"Pass"</span>)</pre>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">填空 (三) 開頭關鍵字：</label>
+                                <input type="text" value="${state.q3}" oninput="window.ch2l1Inputs.q3=this.value.trim()" placeholder="例如: if" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-cyan-500 bg-white text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">填空 (四) 結尾必須符號：</label>
+                                <input type="text" value="${state.q4}" oninput="window.ch2l1Inputs.q4=this.value.trim()" placeholder="例如: :" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-cyan-500 bg-white text-slate-800">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex justify-end">
+                        <button id="ch2l1-submit-btn" onclick="window.checkCh2L1Result()" class="px-8 py-3 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-700 hover:to-blue-700 text-white font-black text-lg rounded-xl transition shadow-md shadow-cyan-100 transform active:scale-95">
+                            ▶ 驗證 2-1 執行結果
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
+    };
+    window.renderCh2L1Inner();
 }
 
-function checkCh2L1Result() {
-    if (window.ch2l1Selected === null) {
-        alert("⚠️ 請先選擇一個你認為正確的輸出結果選項！");
+window.checkCh2L1Result = function() {
+    const state = window.ch2l1Inputs;
+    if (!state.q1 || !state.q2 || !state.q3 || !state.q4) {
+        alert("⚠️ 還有欄位尚未填寫完成喔！");
         return;
     }
-    // 答案是索引值為 1 的選項 (你還未成年)
-    if (window.ch2l1Selected === 1) {
+    const isQ1Correct = (state.q1 === 'C');
+    const isQ2Correct = (state.q2 === 'C');
+    const isQ3Correct = (state.q3.toLowerCase() === 'if');
+    const isQ4Correct = (state.q4 === ':');
+
+    if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
+        if (typeof stopTimer === 'function') stopTimer();
         showResult(true);
     } else {
-        alert("❌ 執行結果不正確喔！當 age 為 16 時， age >= 18 不成立，程式會執行 else 底下的區塊。");
+        const btn = document.getElementById('ch2l1-submit-btn');
+        if (btn) {
+            btn.classList.add('animate-shake', 'bg-red-600');
+            setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-600'), 400);
+        }
+        alert("❌ 答案有些不對喔！請檢查 Python 關於縮排、if 關鍵字以及結尾冒號的規範！");
     }
+};
+
+// ==========================================
+// 💡 2-2 if-else 狀態初始化
+// ==========================================
+if (!window.ch2l2Inputs) {
+    window.ch2l2Inputs = { q1: "", q2: "", q3: "", q4: "" };
 }
 
-
-// ==========================================
-// 💡 2-2 巢狀選擇結構（改為單選題）
-// ==========================================
 function renderCh2L2Module(el) {
-    const data = {
-        title: "2-2 巢狀選擇結構 (Nested if)",
-        desc: "學習如何在 if 判斷式內部再放入另一個 if 判斷。請觀察左側程式碼，判斷當分數分別為 85 與 55 時的執行結果。",
-        quiz: "挑戰：如果學生的 score = 85，程式輸出什麼？如果 score = 55，又會輸出什麼？",
-        options: [
-            { text: 'score=85 輸出: 及格, 優秀\nscore=55 輸出: 不及格', isCorrect: true },
-            { text: 'score=85 輸出: 及格\nscore=55 輸出: 不及格, 加油', isCorrect: false },
-            { text: 'score=85 輸出: 優秀\nscore=55 輸出: 什麼都不輸出', isCorrect: false },
-            { text: 'score=85 輸出: 及格, 優秀\nscore=55 輸出: 什麼都不輸出', isCorrect: false }
-        ]
-    };
+    if (typeof startTimer === 'function') startTimer();
 
-    if (typeof window.ch2l2Selected === 'undefined') window.ch2l2Selected = null;
+    window.renderCh2L2Inner = () => {
+        const app = document.getElementById('app') || el;
+        const state = window.ch2l2Inputs;
 
-    el.innerHTML = `
-        <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
-            <div class="flex justify-between items-center mb-6">
-                <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
-                <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-black">第 2 章</span>
-            </div>
+        app.innerHTML = `
+            <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
+                    <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-xs font-black">第 2 章 條件與迴圈</span>
+                </div>
 
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6">
-                <h1 class="text-2xl font-black text-slate-800 mb-2 flex items-center gap-2">💻 ${data.title}</h1>
-                <p class="text-slate-600 font-medium mb-6">${data.desc}</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-slate-900 rounded-2xl p-4 shadow-inner">
-                        <pre class="font-mono text-sm text-slate-100 whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-purple-400">if</span> score >= <span class="text-amber-400">60</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"及格"</span>)
-    <span class="text-purple-400">if</span> score >= <span class="text-amber-400">80</span>:
-        <span class="text-green-400">print</span>(<span class="text-orange-300">"優秀"</span>)
-<span class="text-purple-400">else</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"不及格"</span>)</pre>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-6">
+                    <div>
+                        <h1 class="text-2xl font-black text-slate-800 mb-2 flex items-center gap-2">⚖️ 2-2 雙向條件結構 (if-else)</h1>
+                        <p class="text-slate-600 font-medium leading-relaxed">
+                            單向 <code>if</code> 只管條件成立時的事，那不成立時該怎麼辦呢？這時候就需要 <code>else</code>（否則）！<code>if-else</code> 形成一個<b>雙向二分法</b>：當條件成立時執行 if 區塊；<b>不成立時，則絕對會執行 else 區塊</b>。兩者是互斥的，必定會選其中一條路走！
+                        </p>
                     </div>
 
-                    <div class="bg-slate-950 rounded-2xl p-4 flex flex-col justify-between min-h-[300px]">
-                        <div>
-                            <div class="flex items-center border-b border-slate-800 pb-2 mb-3 text-xs font-mono text-slate-500"><span>🖥️ Python Shell Output</span></div>
-                            <p class="text-xs text-amber-400 font-mono mb-4">👉 ${data.quiz}</p>
-                            
-                            <div class="space-y-2.5">
-                                ${data.options.map((opt, idx) => {
-                                    const isCurrent = window.ch2l2Selected === idx;
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-sm">
+                        <div class="space-y-2">
+                            <h3 class="font-bold text-indigo-700 flex items-center gap-1">📌 語法規則</h3>
+                            <pre class="bg-slate-900 text-slate-100 p-3 rounded-xl font-mono text-xs leading-relaxed"><span class="text-purple-400">if</span> 條件式:<n>    ⚡ 條件成立時執行\n<span class="text-purple-400">else</span><span class="text-rose-400">:</span>\n    ⚡ 條件不成立(False)時執行</pre>
+                            <p class="text-slate-500 text-xs">⚠️ <b>重要提醒：</b><code>else</code> 後方<b>不需要、也不能</b>寫任何條件運算式，只要直接加上冒號 <code>:</code> 即可！</p>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="font-bold text-indigo-700 flex items-center gap-1">💡 生活生活範例：電影密碼</h3>
+                            <div class="bg-slate-900 text-slate-100 p-3 rounded-xl font-mono text-xs leading-relaxed">
+                                age = <span class="text-amber-400">15</span>\n<span class="text-purple-400">if</span> age >= <span class="text-amber-400">18</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"可以觀看限制級電影"</span>)\n<span class="text-purple-400">else</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"年齡未滿，禁止觀看"</span>)
+                            </div>
+                            <p class="text-slate-500 text-xs">在此案例中，15 >= 18 為 False，程式會自動分流至 <code>else</code> 區塊，印出禁止觀看。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-8">
+                    <h2 class="text-xl font-black text-slate-800 border-b pb-2 flex items-center gap-2">🎯 任務挑戰：二分法流向比對</h2>
+
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                            <p>關於 Python 中 <code>if-else</code> 結構的敘述，下列何者「正確」？</p>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2.5 text-sm font-mono">
+                            ${[
+                                { key: 'A', text: 'A) else 後面可以像 if 一樣，自由加上特定的判斷條件（如 else x > 5:）' },
+                                { key: 'B', text: 'B) 不管 if 的條件是 True 還是 False，else 區塊的程式碼每次都一定會被執行' },
+                                { key: 'C', text: 'C) if 區塊與 else 區塊是互斥的，有且只有其中一個區塊會被執行' },
+                                { key: 'D', text: 'D) else 區塊的程式碼不需要做任何空格縮排' }
+                            ].map(opt => {
+                                const isSelected = state.q1 === opt.key;
+                                return `
+                                    <button onclick="window.ch2l2Inputs.q1='${opt.key}'; window.renderCh2L2Inner();"
+                                            class="w-full text-left p-3 rounded-xl border transition flex items-center gap-3 ${isSelected ? 'bg-indigo-950 border-indigo-500 text-indigo-400 font-bold' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                                        <span class="w-5 h-5 rounded-full border text-xs flex items-center justify-center ${isSelected ? 'border-indigo-400 bg-indigo-500 text-slate-950 font-bold' : 'border-slate-400'}">${opt.key}</span>
+                                        <span>${opt.text}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                            <p>觀察下方 Python 程式碼，當 <code>password = "1234"</code> 時，最終控制台印出的訊息為何？</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                            <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+                                <pre class="font-mono text-sm text-slate-100 whitespace-pre" style="font-family: 'Courier New', Courier, monospace;">password = <span class="text-orange-300">"1234"</span>\n<span class="text-purple-400">if</span> password == <span class="text-orange-300">"python5566"</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"登入成功"</span>)\n<span class="text-purple-400">else</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"密碼錯誤"</span>)</pre>
+                            </div>
+                            <div class="grid grid-cols-1 gap-2 text-sm font-mono">
+                                ${[
+                                    { key: 'A', text: 'A) 登入成功' },
+                                    { key: 'B', text: 'B) 密碼錯誤' },
+                                    { key: 'C', text: 'C) 同時印出「登入成功」與「密碼錯誤」' },
+                                    { key: 'D) 發生系統報錯，不印出任何字串' }
+                                ].map(opt => {
+                                    const isSelected = state.q2 === opt.key;
                                     return `
-                                        <button onclick="window.ch2l2Selected = ${idx}; renderCh2L2Module(document.getElementById('app'));"
-                                                class="w-full text-left p-3 rounded-xl border text-sm font-mono transition flex flex-col whitespace-pre-line ${
-                                                    isCurrent ? 'bg-emerald-950/80 border-emerald-500 text-emerald-400 font-bold' : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900'
-                                                }">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-5 h-5 rounded-full border flex items-center justify-center text-xs ${isCurrent ? 'border-emerald-400 bg-emerald-500 text-slate-950' : 'border-slate-600'}">${idx + 1}</span>
-                                                <span class="leading-relaxed">${opt.text}</span>
-                                            </div>
+                                        <button onclick="window.ch2l2Inputs.q2='${opt.key}'; window.renderCh2L2Inner();"
+                                                class="w-full text-left p-3 rounded-xl border transition flex items-center gap-3 ${isSelected ? 'bg-indigo-950 border-indigo-500 text-indigo-400 font-bold' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                                            <span class="w-5 h-5 rounded-full border text-xs flex items-center justify-center ${isSelected ? 'border-indigo-400 bg-indigo-500 text-slate-950 font-bold' : 'border-slate-400'}">${opt.key}</span>
+                                            <span>${opt.text}</span>
                                         </button>
                                     `;
                                 }).join('')}
                             </div>
                         </div>
-                        <div class="mt-4 flex justify-end">
-                            <button onclick="checkCh2L2Result()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black rounded-xl transition shadow-md">▶ 驗證執行結果</button>
+                    </div>
+
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-indigo-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3 & 4</span>
+                            <p>填空任務：請補齊下方程式碼，建立一個檢查奇數偶數的系統：</p>
                         </div>
+                        <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+                            <pre class="font-mono text-sm text-slate-100 whitespace-pre" style="font-family: 'Courier New', Courier, monospace;">num = <span class="text-amber-400">7</span>\n<span class="text-purple-400">if</span> num % <span class="text-amber-400">2</span> == <span class="text-amber-400">0</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"偶數"</span>)\n<span class="bg-indigo-950 border border-indigo-700 px-1 rounded text-indigo-400 font-bold">填空 (三)</span><span class="bg-indigo-950 border border-indigo-700 px-1 rounded text-indigo-400 font-bold">填空 (四)</span>\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"奇數"</span>)</pre>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">填空 (三) 「否則」關鍵字：</label>
+                                <input type="text" value="${state.q3}" oninput="window.ch2l2Inputs.q3=this.value.trim()" placeholder="例如: else" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-indigo-500 bg-white text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">填空 (四) 結尾專用符號：</label>
+                                <input type="text" value="${state.q4}" oninput="window.ch2l2Inputs.q4=this.value.trim()" placeholder="例如: :" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-indigo-500 bg-white text-slate-800">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex justify-end">
+                        <button id="ch2l2-submit-btn" onclick="window.checkCh2L2Result()" class="px-8 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-black text-lg rounded-xl transition shadow-md shadow-indigo-100 transform active:scale-95">
+                            ▶ 驗證 2-2 執行結果
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
+    };
+    window.renderCh2L2Inner();
 }
 
-// 2-2 驗證
-function checkCh2L2Result() {
-    if (window.ch2l2Selected === null) {
-        alert("⚠️ 請先選擇一個正確的選項！");
+window.checkCh2L2Result = function() {
+    const state = window.ch2l2Inputs;
+    if (!state.q1 || !state.q2 || !state.q3 || !state.q4) {
+        alert("⚠️ 請完成所有作答欄位！");
         return;
     }
-    if (window.ch2l2Selected === 0) {
+    const isQ1Correct = (state.q1 === 'C');
+    const isQ2Correct = (state.q2 === 'B');
+    const isQ3Correct = (state.q3.toLowerCase() === 'else');
+    const isQ4Correct = (state.q4 === ':');
+
+    if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
+        if (typeof stopTimer === 'function') stopTimer();
         showResult(true);
     } else {
-        alert("❌ 答案不正確。85分時大於60(及格)，且又大於80(優秀)，兩者都會印出。55分時直接走 else 分支(不及格)。");
+        const btn = document.getElementById('ch2l2-submit-btn');
+        if (btn) {
+            btn.classList.add('animate-shake', 'bg-red-600');
+            setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-600'), 400);
+        }
+        alert("❌ 答案有誤。提示：else 後方不加條件式，且別漏掉冒號喔！");
     }
+};
+
+// ==========================================
+// 💡 2-3 if-elif-else 狀態初始化
+// ==========================================
+if (!window.ch2l3Inputs) {
+    window.ch2l3Inputs = { q1: "", q2: "", q3: "", q4: "" };
 }
 
-
-// ==========================================
-// 💡 2-3 多向選擇結構（改為單選題）
-// ==========================================
 function renderCh2L3Module(el) {
-    const data = {
-        title: "2-3 多向選擇結構 (if-elif-else)",
-        desc: "當條件有三個以上時，使用 elif 能讓架構更清晰。請觀察左側程式碼，找出當 score = 75 時，程式的流向與最終輸出結果。",
-        quiz: "挑戰：如果將 score 設定為 75，畫面上最終會輸出哪一個級別？",
-        options: [
-            { text: '輸出: A', isCorrect: false },
-            { text: '輸出: B', isCorrect: true },
-            { text: '輸出: C', isCorrect: false },
-            { text: '同時輸出: B 和 C', isCorrect: false }
-        ]
-    };
+    if (typeof startTimer === 'function') startTimer();
 
-    if (typeof window.ch2l3Selected === 'undefined') window.ch2l3Selected = null;
+    window.renderCh2L3Inner = () => {
+        const app = document.getElementById('app') || el;
+        const state = window.ch2l3Inputs;
 
-    el.innerHTML = `
-        <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
-            <div class="flex justify-between items-center mb-6">
-                <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
-                <span class="bg-emerald-100 text-emerald-600 px-3 py-1 rounded-full text-xs font-black">第 2 章</span>
-            </div>
+        app.innerHTML = `
+            <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
+                <div class="flex justify-between items-center mb-6">
+                    <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
+                    <span class="bg-violet-100 text-violet-600 px-3 py-1 rounded-full text-xs font-black">第 2 章 條件與迴圈</span>
+                </div>
 
-            <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6">
-                <h1 class="text-2xl font-black text-slate-800 mb-2 flex items-center gap-2">💻 ${data.title}</h1>
-                <p class="text-slate-600 font-medium mb-6">${data.desc}</p>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-slate-900 rounded-2xl p-4 shadow-inner">
-                        <pre class="font-mono text-sm text-slate-100 whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-blue-400">score</span> = <span class="text-amber-400">75</span>
-
-<span class="text-purple-400">if</span> score >= <span class="text-amber-400">90</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"A"</span>)
-<span class="text-purple-400">elif</span> score >= <span class="text-amber-400">70</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"B"</span>)
-<span class="text-purple-400">elif</span> score >= <span class="text-amber-400">60</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"C"</span>)
-<span class="text-purple-400">else</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"F"</span>)</pre>
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-6">
+                    <div>
+                        <h1 class="text-2xl font-black text-slate-800 mb-2 flex items-center gap-2">🚦 2-3 多向分支結構 (if-elif-else)</h1>
+                        <p class="text-slate-600 font-medium leading-relaxed">
+                            生活中的狀況常常不止兩種（例如紅綠燈有三種顏色、成績有 A、B、C 級）。當面對<b>三個或以上的選項分流</b>時，Python 提供了 <code>elif</code>（即 else if 的縮寫）。程式會從上到下**依序檢查**，只要遇到第一個成立的條件就會切進去執行，其餘的區塊便直接忽略！
+                        </p>
                     </div>
 
-                    <div class="bg-slate-950 rounded-2xl p-4 flex flex-col justify-between min-h-[300px]">
-                        <div>
-                            <div class="flex items-center border-b border-slate-800 pb-2 mb-3 text-xs font-mono text-slate-500"><span>🖥️ Python Shell Output</span></div>
-                            <p class="text-xs text-amber-400 font-mono mb-4">👉 ${data.quiz}</p>
-                            
-                            <div class="space-y-2.5">
-                                ${data.options.map((opt, idx) => {
-                                    const isCurrent = window.ch2l3Selected === idx;
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-200 text-sm">
+                        <div class="space-y-2">
+                            <h3 class="font-bold text-violet-700 flex items-center gap-1">📌 語法規則</h3>
+                            <pre class="bg-slate-900 text-slate-100 p-3 rounded-xl font-mono text-xs leading-relaxed"><span class="text-purple-400">if</span> 條件A:<n>    ⚡ 條件 A 成立時執行\n<span class="text-purple-400">elif</span> 條件B:<span class="text-rose-400"></span>\n    ⚡ 條件 B 成立時執行 (可有多組 elif)\n<span class="text-purple-400">else</span>:\n    ⚡ 以上皆不成立時執行</pre>
+                            <p class="text-slate-500 text-xs">⚠️ <b>重要特性：</b>「順序」至關重要！如果上方的條件已經卡位成功，下方的 <code>elif</code> 即使符合也不會執行。</p>
+                        </div>
+                        <div class="space-y-2">
+                            <h3 class="font-bold text-violet-700 flex items-center gap-1">💡 生活生活範例：成績評等</h3>
+                            <div class="bg-slate-900 text-slate-100 p-3 rounded-xl font-mono text-xs leading-relaxed">
+                                score = <span class="text-amber-400">85</span>\n<span class="text-purple-400">if</span> score >= <span class="text-amber-400">90</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"優等"</span>)\n<span class="text-purple-400">elif</span> score >= <span class="text-amber-400">80</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"甲等"</span>)\n<span class="text-purple-400">else</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"繼續努力"</span>)
+                            </div>
+                            <p class="text-slate-500 text-xs">因為 85 >= 90 為 False，接著檢查 85 >= 80 為 True，於是印出「甲等」後結束，不會跑到 else。</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-8">
+                    <h2 class="text-xl font-black text-slate-800 border-b pb-2 flex items-center gap-2">🎯 任務挑戰：多向分流深度除錯</h2>
+
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-violet-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span>
+                            <p>關於 <code>if-elif-else</code> 的執行流程，下列敘述何者「錯誤」？</p>
+                        </div>
+                        <div class="grid grid-cols-1 gap-2.5 text-sm font-mono">
+                            ${[
+                                { key: 'A', text: 'A) 程式會由上往下逐一檢查條件是否成立' },
+                                { key: 'B', text: 'B) 一個結構中，只能允許有一組 if 與一組 else，但 elif 可以有無限多個' },
+                                { key: 'C', text: 'C) 只要其中一個 elif 條件成立，執行完該區塊後就會直接跳出，不會再看底下的 elif' },
+                                { key: 'D', text: 'D) 如果 if 與所有 elif 的條件通通成立，系統會把所有區塊內的文字全部印出來' }
+                            ].map(opt => {
+                                const isSelected = state.q1 === opt.key;
+                                return `
+                                    <button onclick="window.ch2l3Inputs.q1='${opt.key}'; window.renderCh2L3Inner();"
+                                            class="w-full text-left p-3 rounded-xl border transition flex items-center gap-3 ${isSelected ? 'bg-violet-950 border-violet-500 text-violet-400 font-bold' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                                        <span class="w-5 h-5 rounded-full border text-xs flex items-center justify-center ${isSelected ? 'border-violet-400 bg-violet-500 text-slate-950 font-bold' : 'border-slate-400'}">${opt.key}</span>
+                                        <span>${opt.text}</span>
+                                    </button>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-violet-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span>
+                            <p>觀察下方經典的「年齡優待票」判斷程式。若今天一位 <b>6 歲</b> 小朋友來購票，最後會印出什麼票價？</p>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
+                            <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+                                <pre class="font-mono text-sm text-slate-100 whitespace-pre" style="font-family: 'Courier New', Courier, monospace;">age = <span class="text-amber-400">6</span>\n<span class="text-purple-400">if</span> age &lt; <span class="text-amber-400">3</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"免費入場"</span>)\n<span class="text-purple-400">elif</span> age &lt; <span class="text-amber-400">12</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"半價優待"</span>)\n<span class="text-purple-400">else</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"全票購票"</span>)</pre>
+                            </div>
+                            <div class="grid grid-cols-1 gap-2 text-sm font-mono">
+                                ${[
+                                    { key: 'A', text: 'A) 免費入場' },
+                                    { key: 'B', text: 'B) 半價優待' },
+                                    { key: 'C', text: 'C) 全票購票' },
+                                    { key: 'D', text: 'D) 同時印出「半價優待」與「全票購票」' }
+                                ].map(opt => {
+                                    const isSelected = state.q2 === opt.key;
                                     return `
-                                        <button onclick="window.ch2l3Selected = ${idx}; renderCh2L3Module(document.getElementById('app'));"
-                                                class="w-full text-left p-3 rounded-xl border text-sm font-mono transition flex flex-col whitespace-pre-line ${
-                                                    isCurrent ? 'bg-emerald-950/80 border-emerald-500 text-emerald-400 font-bold' : 'bg-slate-900/60 border-slate-800 text-slate-300 hover:bg-slate-900'
-                                                }">
-                                            <div class="flex items-center gap-2">
-                                                <span class="w-5 h-5 rounded-full border flex items-center justify-center text-xs ${isCurrent ? 'border-emerald-400 bg-emerald-500 text-slate-950' : 'border-slate-600'}">${idx + 1}</span>
-                                                <span class="leading-relaxed">${opt.text}</span>
-                                            </div>
+                                        <button onclick="window.ch2l3Inputs.q2='${opt.key}'; window.renderCh2L3Inner();"
+                                                class="w-full text-left p-3 rounded-xl border transition flex items-center gap-3 ${isSelected ? 'bg-violet-950 border-violet-500 text-violet-400 font-bold' : 'bg-white border-slate-200 text-slate-700 hover:bg-slate-100'}">
+                                            <span class="w-5 h-5 rounded-full border text-xs flex items-center justify-center ${isSelected ? 'border-violet-400 bg-violet-500 text-slate-950 font-bold' : 'border-slate-400'}">${opt.key}</span>
+                                            <span>${opt.text}</span>
                                         </button>
                                     `;
                                 }).join('')}
                             </div>
                         </div>
-                        <div class="mt-4 flex justify-end">
-                            <button onclick="checkCh2L3Result()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-black rounded-xl transition shadow-md">▶ 驗證執行結果</button>
+                    </div>
+
+                    <div class="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-4">
+                        <div class="flex items-center gap-2 text-slate-800 font-black text-base">
+                            <span class="bg-violet-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3 & 4</span>
+                            <p>填空任務：請補齊下方程式碼中，「中間分支」的關鍵字，並宣告一組安全收尾的「保底區塊」：</p>
                         </div>
+                        <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+                            <pre class="font-mono text-sm text-slate-100 whitespace-pre" style="font-family: 'Courier New', Courier, monospace;">light = <span class="text-orange-300">"yellow"</span>\n<span class="text-purple-400">if</span> light == <span class="text-orange-300">"red"</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"停"</span>)\n<span class="bg-violet-950 border border-violet-700 px-1 rounded text-violet-400 font-bold">填空 (三)</span> light == <span class="text-orange-300">"yellow"</span>:\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"慢"</span>)\n<span class="bg-violet-950 border border-violet-700 px-1 rounded text-violet-400 font-bold">填空 (四)</span>\n    <span class="text-green-400">print</span>(<span class="text-orange-300">"行"</span>)</pre>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">填空 (三) 中間分支專用關鍵字：</label>
+                                <input type="text" value="${state.q3}" oninput="window.ch2l3Inputs.q3=this.value.trim()" placeholder="例如: elif" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-violet-500 bg-white text-slate-800">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 mb-1">填空 (四) 最後保底區塊與冒號：</label>
+                                <input type="text" value="${state.q4}" oninput="window.ch2l3Inputs.q4=this.value.trim()" placeholder="例如: else:" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-violet-500 bg-white text-slate-800">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 border-t border-slate-100 flex justify-end">
+                        <button id="ch2l3-submit-btn" onclick="window.checkCh2L3Result()" class="px-8 py-3 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-700 hover:to-fuchsia-700 text-white font-black text-lg rounded-xl transition shadow-md shadow-violet-100 transform active:scale-95">
+                            ▶ 驗證 2-3 執行結果
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
-    `;
+        `;
+    };
+    window.renderCh2L3Inner();
 }
 
-// 2-3 驗證
-function checkCh2L3Result() {
-    if (window.ch2l3Selected === null) {
-        alert("⚠️ 請先選擇一個正確的選項！");
+window.checkCh2L3Result = function() {
+    const state = window.ch2l3Inputs;
+    if (!state.q1 || !state.q2 || !state.q3 || !state.q4) {
+        alert("⚠️ 請完整填寫所有題目！");
         return;
     }
-    if (window.ch2l3Selected === 1) {
+    const isQ1Correct = (state.q1 === 'D');
+    const isQ2Correct = (state.q2 === 'B');
+    const isQ3Correct = (state.q3.toLowerCase() === 'elif');
+    const isQ4Correct = (state.q4.replace(/\s+/g, '').toLowerCase() === 'else:');
+
+    if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
+        if (typeof stopTimer === 'function') stopTimer();
         showResult(true);
     } else {
-        alert("❌ 答案不正確。在 if-elif-else 結構中，程式只要一符合第一個成立的條件（75 >= 70）印出 B 後，就會直接跳出整個結構，不會往下執行其餘的 elif 或 else 分支！");
+        const btn = document.getElementById('ch2l3-submit-btn');
+        if (btn) {
+            btn.classList.add('animate-shake', 'bg-red-600');
+            setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-600'), 400);
+        }
+        alert("❌ 驗證未通過！提示：注意 Python 的多分支關鍵字是 elif，最後收尾的 else 必須包含冒號。");
     }
-}
+};
+		
 // 初始化 2-4 的輸入狀態與閱讀狀態
 if (!window.ch2l4Inputs) window.ch2l4Inputs = { q1: "", q2: "", q3: "", q4: "" };
 if (!window.ch2l4ReadStatus) window.ch2l4ReadStatus = { sec1: true }; // 保留主控流

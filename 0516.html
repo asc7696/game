@@ -110,7 +110,7 @@
                 studentScores[globalPlayerName][currentView] = { time: actualUsedTime, date: getNowString() };
 				submitScore(currentView,    success ? 100 : 0,    actualUsedTime,    1);////////////////////////////////////////////////////////////////////////////////////////////////
             }
-			isSuccess = False; ///////////////
+			isSuccess = false; ///////////////
             const modal = document.createElement('div');
             modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-[100] px-4";
             modal.innerHTML = `

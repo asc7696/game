@@ -3687,41 +3687,215 @@ function renderCh2L6Module(el) {
 <div id="quiz-1group-s1" class="p-5 rounded-2xl border border-slate-800 bg-slate-950/40 space-y-4">
     <h3 class="text-lg font-black text-amber-400">📝 3-1 實戰填空</h3>
     <div class="bg-slate-950 rounded-xl p-4 font-mono text-lg text-slate-300">
-        x = <input type="text" id="input-l1-q1" value="${state.quizAns.q1 || ''}" 
-             oninput="window.setInternalFillAns31('q1', this.value)" 
-             placeholder="_______" 
-             class="w-48 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" />
+        x = <input type="text" 
+                   id="input-l1-q1" 
+                   value="${(window.ch3l1State && window.ch3l1State.quizAns) ? (window.ch3l1State.quizAns.q1 || '') : ''}" 
+                   oninput="window.setInternalFillAns31('q1', this.value)" 
+                   placeholder="_______" 
+                   class="w-48 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" />
     </div>
 </div>
 `
 
-// ==========================================
-// ⚙️ 3-1 專屬：就地去紅框函式 (100% 防止 Focus 流失)
-// ==========================================
-window.setInternalFillAns31 = (id, val) => {
-	const state = window.ch3l1State || window.ch1State; 
-    const status = window.ch3l1Status || "normal";
-	
-    // 確保物件存在
-    if (!window.ch1State) {
-        window.ch1State = { quizAns: {}, quizStatus: "normal" };
+// ==========================================================================
+// 🎯 第 3 章第 1 單元：基本邏輯結構與填空 (renderCh3L1Module)
+// ==========================================================================
+function renderCh3L1Module(el) {
+    if (typeof startTimer === 'function') startTimer();
+
+    // 1. 初始化 3-1 專屬的全域變數與儲存容器（如果尚未存在）
+    if (!window.ch3l1State) {
+        window.ch3l1State = {
+            quizAns: {
+                q1: "",
+                q2: "",
+                q3: "",
+                q4: ""
+            },
+            quizStatus: "normal" // normal, error, success
+        };
     }
-    if (!window.ch1State.quizAns) window.ch1State.quizAns = {};
 
-    // 1. 僅儲存資料
-    window.ch1State.quizAns[id] = val; 
+    // 2. 內部核心渲染函式：只用在初次與非輸入狀態的整體重新渲染
+    window.renderCh3l1Inner = () => {
+        const app = document.getElementById('app') || el;
+        const state = window.ch3l1State;
+        const status = state.quizStatus;
 
-    // 2. 如果目前是錯誤狀態
-    if (window.ch1State.quizStatus === "error") {
-        let groupId = "s1";
-        if (["q3", "q4"].includes(id)) groupId = "s2"; 
-        const groupEl = document.getElementById(`quiz-1group-${groupId}`);
-        if (groupEl) {
-            groupEl.classList.remove('border-rose-500', 'bg-rose-950/40');
-            groupEl.classList.add('border-slate-800', 'bg-slate-950/40');
+        // 定義每一題的錯誤狀態 class 樣式
+        // 如果是 error 狀態且作答不對，就地加上紅框與搖晃特效
+        const getGroupBorderClass = (groupId, isCorrect) => {
+            if (status === "error" && !isCorrect) {
+                return "border-rose-500 bg-rose-950/30 animate-shake";
+            }
+            return "border-slate-800 bg-slate-950/40";
+        };
+
+        // 檢查個別答案是否正確（供畫面初期渲染或驗證後標示錯誤用）
+        const isQ1Correct = (state.quizAns.q1.toLowerCase().trim() === "input");
+        const isQ2Correct = (state.quizAns.q2.trim() === "12");
+        const isQ3Correct = (state.quizAns.q3.toLowerCase().trim() === "elif");
+        const isQ4Correct = (state.quizAns.q4.trim() === ":");
+
+        app.innerHTML = `
+            <div class="max-w-4xl mx-auto px-4 py-6 space-y-8 animate-fade-in">
+                <div class="bg-slate-900/60 p-6 rounded-2xl border border-slate-800 flex justify-between items-center">
+                    <div>
+                        <span class="px-3 py-1 text-xs font-black tracking-widest uppercase bg-cyan-500/10 text-cyan-400 rounded-full border border-cyan-500/20">CHAPTER 3 • LEVEL 1</span>
+                        <h1 class="text-3xl font-black text-white tracking-tight mt-1">基本邏輯結構實戰</h1>
+                        <p class="text-slate-400 text-sm mt-1">請補完下方 Python 條件分支（if-elif-else）程式碼中缺少的關鍵字與語法符項！</p>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-slate-500 uppercase tracking-wider">目前計時</div>
+                        <div id="game-timer" class="text-2xl font-mono font-bold text-slate-300">00:00</div>
+                    </div>
+                </div>
+
+                <div class="space-y-6">
+                    
+                    <div id="quiz-1group-s1" class="p-5 rounded-2xl border transition-all duration-300 space-y-4 ${getGroupBorderClass('s1', isQ1Correct && isQ2Correct)}">
+                        <h3 class="text-lg font-black text-cyan-400">📝 階段一：年齡輸入與兒童免票判定</h3>
+                        <p class="text-slate-300 text-sm">請在下方挖空處補上「輸入函式」以及「免票上限年齡（6 歲以下免票）」：</p>
+                        
+                        <div class="bg-slate-950 rounded-xl p-4 font-mono text-base md:text-lg text-slate-300 leading-loose">
+                            <div>age_str = <input type="text" id="input-l1-q1" value="${state.quizAns.q1}" 
+                                           oninput="window.setInternalFillAns31('q1', this.value)" 
+                                           placeholder="輸入函式" 
+                                           class="w-40 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" />("請輸入年齡：")</div>
+                            <div>age = int(age_str)</div>
+                            <div class="text-purple-400">if <span class="text-slate-300">age &lt;=</span> <input type="text" id="input-l1-q2" value="${state.quizAns.q2}" 
+                                           oninput="window.setInternalFillAns31('q2', this.value)" 
+                                           placeholder="年齡數字" 
+                                           class="w-28 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" /><span class="text-slate-300">:</span></div>
+                            <div class="pl-6 text-emerald-400">print("免票過關！")</div>
+                        </div>
+                    </div>
+
+                    <div id="quiz-1group-s2" class="p-5 rounded-2xl border transition-all duration-300 space-y-4 ${getGroupBorderClass('s2', isQ3Correct && isQ4Correct)}">
+                        <h3 class="text-lg font-black text-amber-400">📝 階段二：半價與全票多重分支</h3>
+                        <p class="text-slate-300 text-sm">請補上 Python 中的「第二個條件分支關鍵字」以及該行結尾必備的「語法符號」：</p>
+                        
+                        <div class="bg-slate-950 rounded-xl p-4 font-mono text-base md:text-lg text-slate-300 leading-loose">
+                            <div class="text-slate-500"># 接續上方區塊...</div>
+                            <div><input type="text" id="input-l1-q3" value="${state.quizAns.q3}" 
+                                           oninput="window.setInternalFillAns31('q3', this.value)" 
+                                           placeholder="關鍵字" 
+                                           class="w-36 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" /> <span class="text-slate-300">age &lt;= 12</span> <input type="text" id="input-l1-q4" value="${state.quizAns.q4}" 
+                                           oninput="window.setInternalFillAns31('q4', this.value)" 
+                                           placeholder="符號" 
+                                           class="w-24 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" /></div>
+                            <div class="pl-6 text-emerald-400">print("兒童半價票！")</div>
+                            <div class="text-purple-400">else:</div>
+                            <div class="pl-6 text-emerald-400">print("成人全票！")</div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="bg-slate-900/40 p-5 rounded-2xl border border-slate-800 flex justify-between items-center">
+                    <p class="text-xs text-slate-500">💡 提示：輸入完成後直接點擊驗證按鈕。若輸入正確，錯誤紅框會即時消失。</p>
+                    <div class="flex space-x-3">
+                        <button onclick="window.resetCh3l1()" 
+                                class="px-5 py-3 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl transition-all text-sm">
+                            重置欄位 ↺
+                        </button>
+                        <button id="ch3l1-submit-btn" 
+                                onclick="window.checkCh3l1Answers()" 
+                                class="px-8 py-3 bg-gradient-to-r from-cyan-600 to-indigo-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-black rounded-xl shadow-lg transition-all text-base">
+                            驗證程式碼結果 🚀
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    // ==========================================================================
+    // ⚙️ 3-1 專屬：就地去紅框與即時資料儲存 (100% 完美保留 Focus)
+    // ==========================================================================
+    window.setInternalFillAns31 = (id, val) => {
+        // 安全初始化防呆
+        if (!window.ch3l1State) window.ch3l1State = { quizAns: {}, quizStatus: "normal" };
+        if (!window.ch3l1State.quizAns) window.ch3l1State.quizAns = {};
+
+        // 1. 僅同步記憶資料，完全不刷新 DOM，確保打字流暢
+        window.ch3l1State.quizAns[id] = val;
+
+        // 2. 如果目前在 error 狀態，動態解除紅框
+        if (window.ch3l1State.quizStatus === "error") {
+            // 判定目前修改的是哪一個群組
+            let groupId = ["q1", "q2"].includes(id) ? "s1" : "s2";
+            const groupEl = document.getElementById(`quiz-1group-${groupId}`);
+            
+            if (groupEl) {
+                // 就地移除紅框與搖晃特效，還原為深色預設外框
+                groupEl.classList.remove('border-rose-500', 'bg-rose-950/30', 'animate-shake');
+                groupEl.classList.add('border-slate-800', 'bg-slate-950/40');
+            }
         }
-    }
-};
+    };
+
+    // ==========================================================================
+    // 🔄 重置按鈕邏輯
+    // ==========================================================================
+    window.resetCh3l1 = () => {
+        window.ch3l1State = {
+            quizAns: { q1: "", q2: "", q3: "", q4: "" },
+            quizStatus: "normal"
+        };
+        window.renderCh3l1Inner();
+    };
+
+    // ==========================================================================
+    // 🚀 驗證答案與上傳至 GAS 後端
+    // ==========================================================================
+    window.checkCh3l1Answers = async () => {
+        const state = window.ch3l1State;
+
+        // 檢查是否有未填寫的格子
+        if (!state.quizAns.q1 || !state.quizAns.q2 || !state.quizAns.q3 || !state.quizAns.q4) {
+            alert("⚠️ 請將所有挖空欄位填寫完畢後，再進行驗證！");
+            return;
+        }
+
+        // 答案標準化清理
+        const a1 = state.quizAns.q1.toLowerCase().trim();
+        const a2 = state.quizAns.q2.trim();
+        const a3 = state.quizAns.q3.toLowerCase().trim();
+        const a4 = state.quizAns.q4.trim();
+
+        // 邏輯比對
+        const isQ1Correct = (a1 === "input");
+        const isQ2Correct = (a2 === "6");
+        const isQ3Correct = (a3 === "elif");
+        const isQ4Correct = (a4 === ":" || a4 === "："); // 接受中英文冒號防呆
+
+        if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
+            state.quizStatus = "success";
+            window.renderCh3l1Inner();
+
+            // 🛑 停止計時器並計算成績
+            if (typeof stopTimer === 'function') stopTimer();
+            const timeUsed = document.getElementById('game-timer')?.innerText || "00:00";
+
+            alert("🎯 恭喜！3-1 所有填空邏輯完全正確！正在傳送成績至系統...");
+
+            // 🚀 呼叫全域上傳 GAS 函式並發放勳章
+            if (typeof window.submitToGAS === 'function') {
+                await window.submitToGAS("3-1", 100, timeUsed, 1, "🔰 邏輯結構先鋒勳章");
+            } else {
+                console.log("找到過關資料，但 submitToGAS 尚未準備就緒：", { level: "3-1", score: 100, timeUsed });
+            }
+        } else {
+            state.quizStatus = "error";
+            window.renderCh3l1Inner(); // 刷新以套用紅框與搖晃樣式
+            alert("❌ 填寫的代碼中含有語法或邏輯錯誤！紅框標示的區塊仍有問題，請修正後再試一次。");
+        }
+    };
+
+    // 3. 初始觸發渲染
+    window.renderCh3l1Inner();
+}
 		
 // ==========================================
 // 💡 3-2 串列走訪 互動學習模組狀態初始化

@@ -160,10 +160,16 @@ function resetLevelState(view) {
     window.ch1l5ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
     window.idleState = { currentExample: 1, p1Name: "May", p2X: "10", p2Y: "20", p3Roc: "115", p4Cm: "175", p4Kg: "70", isRunning: false, hasRun: false };
 
+	// 💡 確保 1-1 的狀態被完全清空
+    window.cpStep = 0;
+    window.cpAns = {};
+    window.cpStatus = 'normal';
+	
     // 第二章 2-1 到 2-6 狀態清除
-    window.ch2l1Selected = null;
-    window.ch2l2Selected = null;
-    window.ch2l3Selected = null;
+    // 💡 確保 2-1, 2-2, 2-3 的狀態也被完全清空
+    window.ch2l1Inputs = { q1: "", q2: "", q3: "", q4: "" };
+    window.ch2l2Inputs = { q1: "", q2: "", q3: "", q4: "" };
+    window.ch2l3Inputs = { q1: "", q2: "", q3: "", q4: "", q5: "", q6_1: "", q6_2: "", q6_3: "" };
     window.ch2l4State = { activeTab: 'demo', demoIndex: 0, demoStep: 0, quizIndex: 0, selectedAns: null };
     window.ch2l5State = { activeTab: 'demo', demoIndex: 0, demoStep: 0, quizIndex: 0, selectedAns: null };
 	window.ch2l6Inputs = { q1: "", q2: "", q3: "", q4: "" };

@@ -4742,76 +4742,66 @@ function renderCh3L5Module(el) {
     if (!window.ch3l5State) {
         window.ch3l5State = {
             ex1Step: 0,
-            ex2Step: 0,
-            // 互動實驗室的隨機快照暫存
-            ex1RandomValue: null,
-            ex2RandomValue: null,
+            ex2Step: 0, // 範例 2 步進狀態
+            ex2Result: "🎁 尚未抽選", // 範例 2 隨機結果暫存
             // 課後實戰填空題答案
-            quizAns: { q1: "", q2: "", q3: "", q4: "", q5: "", q6: "", q7: "", q8: "", q9: "", q10: "" },
+            quizAns: { q1: "", q2: "", q3: "", q4: "", q5: "" },
             quizStatus: "normal"
         };
     }
+
+    // 🛠️ 📥 標準答案物件直接定義在作用域內（徹底根除 HTML 屬性引號衝突）
+    const targetAnswersCh3L5 = {
+        q1: "import random",
+        q2: "random.randint(1, 10)",
+        q3: "random.choice(gifts)",
+        q4: "random",
+        q5: "randint"
+    };
 
     window.renderCh3L5Inner = () => {
         const app = document.getElementById('app') || el;
         const state = window.ch3l5State;
 
-        // 🛠️ 題目解答定義 (用於最後驗證)
-        const answers = {
-            q1: "random",
-            q2: "choice",
-            q3: "box",
-            q4: "append",
-            q5: "reward",
-            q6: "reward",
-            q7: "random",
-            q8: "chance", // 亦可接受 drop_chance，依題目宣告為準，這裡對應程式碼的定義
-            q9: "choice",
-            q10: "discount"
-        };
-
-        // 隨機資料池（供範例點擊時模擬真正的隨機效果）
-        const gifts = ['馬克杯', '泡麵', '立可帶', '行充'];
-
         app.innerHTML = `
             <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
                 <div class="flex justify-between items-center mb-6">
                     <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
-                    <span class="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-xs font-black">第 3 章 進階模組應用</span>
+                    <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-xs font-black">第 3 章 進階模組應用</span>
                 </div>
 
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-6">
                     <div>
-                        <h1 class="text-3xl font-black text-slate-900 mb-4 flex items-center gap-2">🎲 3-5 隨機的魅力：random 模組</h1>
+                        <h1 class="text-3xl font-black text-slate-900 mb-4 flex items-center gap-2">🎲 3-5 隨機模組：遊戲機率與隨機機制</h1>
                         <p class="text-xl text-slate-700 font-medium leading-relaxed mb-6">
-                            在程式中加入「隨機」要素，能讓遊戲或應用變得更有趣！Python 內建的 <code>random</code> 模組提供了多種產生隨機數或隨機選取的方法。使用前別忘了要先 <code>import random</code> 哦！
+                            在遊戲世界裡，「隨機」是創造樂趣的核心！不管是怪物掉落寶物、抽卡系統、還是暴擊機率，背後都離不開 Python 的 <span class="font-bold text-indigo-600">random</span> 模組。這一關我們將掌握數字與清單的隨機操作。
                         </p>
                     </div>
 
                     <div class="overflow-hidden border border-slate-200 rounded-2xl shadow-sm">
                         <table class="w-full text-left border-collapse bg-white">
                             <thead>
-                                <tr class="bg-purple-600 text-white text-lg font-black">
-                                    <th class="p-4">方法語法</th>
+                                <tr class="bg-indigo-600 text-white text-lg font-black">
+                                    <th class="p-4">語法</th>
                                     <th class="p-4">功能詳細說明</th>
-                                    <th class="p-4">回傳值範例</th>
+                                    <th class="p-4">範例行為</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-slate-200 text-base font-medium text-slate-700">
                                 <tr>
-                                    <td class="p-4 font-mono text-purple-700 font-bold text-lg">random.randint(a, b)</td>
-                                    <td class="p-4">產生一個包含頭尾，在 <span class="font-bold text-slate-900">a 到 b 之間</span> 的隨機<span class="text-indigo-600 font-bold">整數</span>。</td>
-                                    <td class="p-4 font-mono">randint(1, 10) → <span class="text-emerald-600">7</span></td>
+                                    <td class="p-4 font-mono text-indigo-700 font-bold text-lg">import random</td>
+                                    <td class="p-4">引入 Python 內建的隨機模組（使用隨機功能前必須寫這行）。</td>
+                                    <td class="p-4 text-slate-500">解鎖隨機技能庫</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-4 font-mono text-purple-700 font-bold text-lg">random.choice(串列)</td>
-                                    <td class="p-4">從指定的<span class="font-bold text-slate-900">串列/清單</span>中，<span class="text-indigo-600 font-bold">隨機抽選一個</span>元素。</td>
-                                    <td class="p-4 font-mono">choice(['A','B','C']) → <span class="text-emerald-600">'B'</span></td>
+                                    <td class="p-4 font-mono text-indigo-700 font-bold text-lg">random.randint(a, b)</td>
+                                    <td class="p-4">隨機產生一個包含 <span class="font-bold text-emerald-600">a 到 b 之間（包含端點）</span>的整數。</td>
+                                    <td class="p-4 font-mono">randint(1, 3) → 1, 2 或 3</td>
                                 </tr>
                                 <tr>
-                                    <td class="p-4 font-mono text-purple-700 font-bold text-lg">random.random()</td>
-                                    <td class="p-4">產生一個大於等於 0.0 且小於 1.0 的隨機<span class="text-indigo-600 font-bold">浮點數 (小數)</span>。</td>
-                                    <td class="p-4 font-mono">random() → <span class="text-emerald-600">0.4215...</span></td>
+                                    <td class="p-4 font-mono text-indigo-700 font-bold text-lg">random.choice(list)</td>
+                                    <td class="p-4">從指定的清單（List）中，<span class="font-bold text-indigo-600">隨機抽取出一個</span>元素。</td>
+                                    <td class="p-4 font-mono">從禮物清單抽一個</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -4822,27 +4812,28 @@ function renderCh3L5Module(el) {
                     
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
                         <div class="flex justify-between items-center border-b pb-2">
-                            <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">⚡ 範例 1：尋找你的幸運數字 (randint)</h2>
-                            <span class="text-sm font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-md">範圍: 1 ~ 10 之間的整數</span>
+                            <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">⚡ 範例 1：隨機骰子模擬器 (randint)</h2>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-slate-900 rounded-xl p-4 shadow-lg">
-<pre class="text-left m-0 p-0 text-xl text-slate-100 font-mono" style="white-space: pre;"><span class="text-purple-400">import</span> random
-x = random.randint(<span class="text-amber-400">1</span>, <span class="text-amber-400">10</span>)
-<span class="text-green-400">print</span>(<span class="text-orange-300">'我的幸運數字是'</span>, x)</pre>
+<pre class="text-left m-0 p-0 text-lg text-slate-100 font-mono" style="white-space: pre;">
+<span class="text-purple-400">import</span> random
+dice = random.randint(<span class="text-amber-400">1</span>, <span class="text-amber-400">6</span>)
+<span class="text-green-400">print</span>(<span class="text-orange-300">"你擲出了："</span>, dice)
+</pre>
                             </div>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
                                 <div class="space-y-2">
-                                    <div class="text-base font-bold text-slate-600">📊 模擬器狀態監視器：</div>
-                                    <div class="bg-white p-2 rounded border font-mono text-lg">變數 x = <span class="text-amber-600 font-black">${state.ex1Step > 0 ? state.ex1RandomValue : '尚未執行'}</span></div>
-                                    <div class="bg-slate-950 text-emerald-400 font-mono p-3 rounded-lg text-lg min-h-[5.5rem]">
-                                        <div class="text-xs text-slate-500 border-b border-slate-800 pb-1 mb-1">🖥️ 螢幕輸出控制台 (Console)</div>
-                                        ${state.ex1Step > 0 ? `我的幸運數字是 ${state.ex1RandomValue}` : '<span class="text-slate-600">等待按下執行...</span>'}
+                                    <div class="text-sm font-bold text-slate-600">📊 狀態監視器：</div>
+                                    <div class="bg-white p-2 rounded border font-mono text-sm">
+                                        <div>dice = <span class="text-indigo-600 font-black">${state.ex1Step > 0 ? state.ex1Result : '尚未擲骰'}</span></div>
+                                    </div>
+                                    <div class="bg-slate-950 text-emerald-400 font-mono p-3 rounded-lg text-sm min-h-[4.5rem]">
+                                        <div class="text-xs text-slate-500 border-b border-slate-800 pb-1 mb-1">🖥️ Console 輸出</div>
+                                        ${state.ex1Step > 0 ? `你擲出了： ${state.ex1Result}` : '<span class="text-slate-600">等待執行...</span>'}
                                     </div>
                                 </div>
-                                <div class="flex gap-2 mt-4">
-                                    <button onclick="window.runEx135()" class="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition shadow-md">🎲 按下執行（每次都隨機！）</button>
-                                </div>
+                                <button onclick="window.runCh3L5Ex1()" class="mt-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition shadow-md">🎲 擲骰子</button>
                             </div>
                         </div>
                     </div>
@@ -4850,86 +4841,72 @@ x = random.randint(<span class="text-amber-400">1</span>, <span class="text-ambe
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
                         <div class="flex justify-between items-center border-b pb-2">
                             <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">⚡ 範例 2：隨機禮物抽選機 (choice)</h2>
-                            <span class="text-sm font-bold bg-slate-100 text-slate-500 px-3 py-1 rounded-md">串列抽樣</span>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-slate-900 rounded-xl p-4 shadow-lg">
-<pre class="text-left m-0 p-0 text-xl text-slate-100 font-mono" style="white-space: pre;"><span class="text-purple-400">import</span> random
-gift = [<span class="text-orange-300">'馬克杯'</span>, <span class="text-orange-300">'泡麵'</span>, <span class="text-orange-300">'立可帶'</span>, <span class="text-orange-300">'行充'</span>]
-x = random.choice(gift)
-<span class="text-green-400">print</span>(<span class="text-orange-300">'我抽到的禮物是'</span>, x)</pre>
+<pre class="text-left m-0 p-0 text-base text-slate-100 font-mono" style="white-space: pre;">
+<span class="text-purple-400">import</span> random
+gifts = [<span class="text-orange-300">"超級神劍"</span>, <span class="text-orange-300">"回復藥水"</span>, <span class="text-orange-300">"金幣x100"</span>]
+prize = random.choice(gifts)
+<span class="text-green-400">print</span>(<span class="text-orange-300">"恭喜抽中："</span>, prize)
+</pre>
                             </div>
                             <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col justify-between">
                                 <div class="space-y-2">
-                                    <div class="text-base font-bold text-slate-600">📊 模擬器狀態監視器：</div>
-                                    <div class="bg-white p-2 rounded border font-mono text-lg">變數 x = <span class="text-indigo-600 font-black">${state.ex2Step > 0 ? `'${state.ex2RandomValue}'` : '尚未執行'}</span></div>
-                                    <div class="bg-slate-950 text-emerald-400 font-mono p-3 rounded-lg text-lg min-h-[5.5rem]">
-                                        <div class="text-xs text-slate-500 border-b border-slate-800 pb-1 mb-1">🖥️ 螢幕輸出控制台 (Console)</div>
-                                        ${state.ex2Step > 0 ? `我抽到的禮物是 ${state.ex2RandomValue}` : '<span class="text-slate-600">等待按下執行...</span>'}
+                                    <div class="text-sm font-bold text-slate-600">📊 狀態監視器：</div>
+                                    <div class="bg-white p-2 rounded border font-mono text-sm">
+                                        <div>prize = <span class="text-indigo-600 font-black">${state.ex2Result}</span></div>
+                                    </div>
+                                    <div class="bg-slate-950 text-emerald-400 font-mono p-3 rounded-lg text-sm min-h-[4.5rem]">
+                                        <div class="text-xs text-slate-500 border-b border-slate-800 pb-1 mb-1">🖥️ Console 輸出</div>
+                                        ${state.ex2Step > 0 ? `恭喜抽中： ${state.ex2Result}` : '<span class="text-slate-600">等待抽取...</span>'}
                                     </div>
                                 </div>
-                                <div class="flex gap-2 mt-4">
-                                    <button onclick="window.runEx235('${JSON.stringify(gifts)}')" class="flex-1 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition shadow-md">🎁 抽出專屬禮物</button>
-                                </div>
+                                <button onclick="window.runCh3L5Ex2()" class="mt-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition shadow-md">🎁 開始抽選</button>
                             </div>
                         </div>
                     </div>
+
                 </div>
 
-                <div class="bg-slate-900 rounded-3xl p-6 shadow-xl border-4 border-purple-500/30 text-slate-100 space-y-8">
+                <div class="bg-slate-900 rounded-3xl p-6 shadow-xl border-4 border-indigo-500/30 text-slate-100 space-y-8">
                     <div class="border-b border-slate-800 pb-3">
-                        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400 flex items-center gap-2">🎯 3-5 遊戲場景程式填空挑戰</h2>
-                        <p class="text-slate-400 text-sm font-medium mt-1">請根據題目情境，在對應的輸入框中填入正確的程式碼（請注意大小寫與變數名稱一致性）。</p>
+                        <h2 class="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 flex items-center gap-2">🎯 3-5 遊戲應用場景實戰挑戰</h2>
+                        <p class="text-slate-400 text-sm font-medium mt-1">請填入適當的隨機模組指令，建立完美的遊戲副本與抽卡機制。</p>
                     </div>
 
                     <div class="space-y-8">
-                        <div id="quiz-group-s1" class="p-5 rounded-2xl border border-slate-800 bg-slate-950/40 space-y-4">
-                            <h3 class="text-lg font-black text-amber-400 flex items-center gap-2">⚔️ 1. 武器盲盒抽取機制</h3>
-                            <p class="text-slate-300 text-sm">情境：玩家在商城購買了一個武器盲盒(box)，打開後隨機抽取一件裝備(reward)放進背包(bag)。</p>
+                        <div id="quiz-5group-s1" class="p-5 rounded-2xl border border-slate-800 bg-slate-950/40 space-y-4">
+                            <h3 class="text-lg font-black text-amber-400 flex items-center gap-2">⚔️ 1. 副本動態暴擊與傷害生成</h3>
+                            <p class="text-slate-300 text-sm">情境：每次攻擊時，必須先引入隨機模組，並生成 1 到 10 之間的隨機傷害值。</p>
                             <div class="bg-slate-950 rounded-xl p-4 font-mono text-base md:text-lg leading-loose space-y-1 overflow-x-auto text-slate-300">
-                                <div><span class="text-purple-400">import</span> <input type="text" id="input-q1" value="${state.quizAns.q1}" oninput="window.setInternalFillAns35('q1', this.value.trim())" placeholder="_______" class="w-24 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" /></div>
-                                <div>box = ["傳說聖劍", "史詩暗刃", "稀有盾牌", "普通木棍"]</div>
-                                <div>bag = ["紅藥水"]</div>
-                                <div>reward = random.<input type="text" id="input-q2" value="${state.quizAns.q2}" oninput="window.setInternalFillAns35('q2', this.value.trim())" placeholder="_______" class="w-24 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" />(<input type="text" id="input-q3" value="${state.quizAns.q3}" oninput="window.setInternalFillAns35('q3', this.value.trim())" placeholder="_______" class="w-24 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" />) <span class="text-slate-500 text-xs sm:text-sm"># 隨機抽取其中一個</span></div>
-                                <div>bag.<input type="text" id="input-q4" value="${state.quizAns.q4}" oninput="window.setInternalFillAns35('q4', this.value.trim())" placeholder="_______" class="w-24 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" />(<input type="text" id="input-q5" value="${state.quizAns.q5}" oninput="window.setInternalFillAns35('q5', this.value.trim())" placeholder="_______" class="w-24 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" />) <span class="text-slate-500 text-xs sm:text-sm"># 將抽到的裝備放進背包</span></div>
-                                <div><span class="text-green-400">print</span>("恭喜打開盲盒獲得：", <input type="text" id="input-q6" value="${state.quizAns.q6}" oninput="window.setInternalFillAns35('q6', this.value.trim())" placeholder="_______" class="w-28 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" />)</div>
-                                <div><span class="text-green-400">print</span>("目前背包：", bag)</div>
+                                <div><input type="text" id="input-l5-q1" value="${state.quizAns.q1}" oninput="window.setInternalFillAns35('q1', this.value)" placeholder="_______" class="w-48 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" /> <span class="text-slate-500 text-sm"># 步驟一：引入模組</span></div>
+                                <div>damage = <input type="text" id="input-l5-q2" value="${state.quizAns.q2}" oninput="window.setInternalFillAns35('q2', this.value)" placeholder="_______" class="w-64 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" /></div>
+                                <div><span class="text-green-400">print</span>("對怪物造成了：", damage, "點傷害！")</div>
                             </div>
                         </div>
 
-                        <div id="quiz-group-s2" class="p-5 rounded-2xl border border-slate-800 bg-slate-950/40 space-y-4">
-                            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">💧 2. 打怪掉寶率機制</h3>
-                            <p class="text-slate-300 text-sm">情境：玩家挑戰史萊姆，有 40% 的機率掉落「史萊姆黏液」。</p>
+                        <div id="quiz-5group-s2" class="p-5 rounded-2xl border border-slate-800 bg-slate-950/40 space-y-4">
+                            <h3 class="text-lg font-black text-emerald-400 flex items-center gap-2">🔮 2. 公會盲盒活動隨機抽獎</h3>
+                            <p class="text-slate-300 text-sm">情境：從準備好的公會獎勵清單中，隨機抽出一個品項給中獎玩家。</p>
                             <div class="bg-slate-950 rounded-xl p-4 font-mono text-base md:text-lg leading-loose space-y-1 overflow-x-auto text-slate-300">
-                                <div><span class="text-purple-400">import</span> random</div>
-                                <div>bag = ["聖劍", "紅藥水"]</div>
-                                <div>chance = random.<input type="text" id="input-q7" value="${state.quizAns.q7}" oninput="window.setInternalFillAns35('q7', this.value.trim())" placeholder="_______" class="w-32 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" />() <span class="text-slate-500 text-xs sm:text-sm"># 產生一個 0.0 到 1.0 之間的小數</span></div>
-                                <div><span class="text-green-400">print</span>("戰鬥結束！計算掉寶機率...", chance)</div>
-                                <div><span class="text-purple-400">if</span> <input type="text" id="input-q8" value="${state.quizAns.q8}" oninput="window.setInternalFillAns35('q8', this.value.trim())" placeholder="_______" class="w-28 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" /> &lt;= <span class="text-amber-400">0.40</span>: <span class="text-slate-500 text-xs sm:text-sm"># 0.0 ~ 0.4 代表 40%</span></div>
-                                <div class="pl-6">bag.append("史萊姆黏液")</div>
-                                <div class="pl-6"><span class="text-green-400">print</span>("史萊姆掉落了【史萊姆黏液】，已放入背包。")</div>
-                                <div><span class="text-purple-400">else</span>:</div>
-                                <div class="pl-6"><span class="text-green-400">print</span>("什麼都沒掉落。")</div>
-                            </div>
-                        </div>
-
-                        <div id="quiz-group-s3" class="p-5 rounded-2xl border border-slate-800 bg-slate-950/40 space-y-4">
-                            <h3 class="text-lg font-black text-rose-400 flex items-center gap-2">🎡 3. 澎派包餅乾隨機折扣轉盤</h3>
-                            <p class="text-slate-300 text-sm">情境：購買一組100元的澎派包餅乾，可參加隨機轉盤抽折扣（打折數）。</p>
-                            <div class="bg-slate-950 rounded-xl p-4 font-mono text-base md:text-lg leading-loose space-y-1 overflow-x-auto text-slate-300">
-                                <div><span class="text-purple-400">import</span> random</div>
-                                <div>price = <span class="text-amber-400">100</span> <span class="text-slate-500 text-xs sm:text-sm"># 原價100</span></div>
-                                <div>discount = [<span class="text-amber-400">0.9</span>, <span class="text-amber-400">0.8</span>, <span class="text-amber-400">0.7</span>, <span class="text-amber-400">1</span>]</div>
-                                <div>lucky = random.<input type="text" id="input-q9" value="${state.quizAns.q9}" oninput="window.setInternalFillAns35('q9', this.value.trim())" placeholder="_______" class="w-28 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" />( <input type="text" id="input-q10" value="${state.quizAns.q10}" oninput="window.setInternalFillAns35('q10', this.value.trim())" placeholder="_______" class="w-28 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-purple-500" /> )</div>
-                                <div>after_discount_price = price * lucky</div>
-                                <div><span class="text-green-400">print</span>("折扣後最終售價為：", after_discount_price)</div>
+                                <div>import random</div>
+                                <div>gifts = ["傳奇紅曜石", "冒險者帳篷", "普通的木盾", "稀有寵物蛋"]</div>
+                                <div>my_prize = <input type="text" id="input-l5-q3" value="${state.quizAns.q3}" oninput="window.setInternalFillAns35('q3', this.value)" placeholder="_______" class="w-64 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" /></div>
+                                <div><span class="text-green-400">print</span>("抽獎結果公佈：", my_prize)</div>
+                                <hr class="border-slate-800 my-3">
+                                <div class="text-slate-400 text-sm">🧠 觀念大複習：</div>
+                                <div class="text-sm text-slate-300 pl-2">
+                                    上述程式中，我們呼叫了 <input type="text" id="input-l5-q4" value="${state.quizAns.q4}" oninput="window.setInternalFillAns35('q4', this.value.trim())" placeholder="模組名" class="w-20 px-2 py-0.5 text-center bg-slate-900 border border-slate-700 rounded text-pink-400" /> 模組中的 
+                                    <input type="text" id="input-l5-q5" value="${state.quizAns.q5}" oninput="window.setInternalFillAns35('q5', this.value.trim())" placeholder="方法名" class="w-24 px-2 py-0.5 text-center bg-slate-900 border border-slate-700 rounded text-pink-400" /> 方法來生成隨機整數傷害。
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-8 pt-4 border-t border-slate-200 flex justify-end">
-                    <button id="ch3l5-final-btn" onclick="window.submitCh3L5All('${JSON.stringify(answers)}')" class="px-10 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-black text-xl rounded-2xl transition shadow-lg transform active:scale-95">
+                    <button id="ch3l5-final-btn" onclick="window.submitCh3L5All()" class="px-10 py-4 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-black text-xl rounded-2xl transition shadow-lg transform active:scale-95">
                         🏁 驗證挑戰並完成 3-5
                     </button>
                 </div>
@@ -4938,34 +4915,31 @@ x = random.choice(gift)
     };
 
     // ==========================================
-    // ⚙️ 控制核心函式
+    // ⚙️ 控制核心動作函式 (修正執行邏輯)
     // ==========================================
-    window.runEx135 = () => {
-        const state = window.ch3l5State;
-        state.ex1Step = 1;
-        state.ex1RandomValue = Math.floor(Math.random() * 10) + 1; // 模擬 1-10 隨機
+    window.runCh3L5Ex1 = () => {
+        window.ch3l5State.ex1Step = 1;
+        window.ch3l5State.ex1Result = Math.floor(Math.random() * 6) + 1; // 真正隨機 1-6
         window.renderCh3L5Inner();
     };
 
-    window.runEx235 = (giftsJson) => {
-        const state = window.ch3l5State;
-        const gifts = JSON.parse(giftsJson);
-        state.ex2Step = 1;
-        const randomIndex = Math.floor(Math.random() * gifts.length);
-        state.ex2RandomValue = gifts[randomIndex];
+    // 🔧 完美修正：範例 2 Choice 的隨機抽選行為
+    window.runCh3L5Ex2 = () => {
+        const mockGifts = ["超級神劍", "回復藥水", "金幣x100"];
+        const randomIndex = Math.floor(Math.random() * mockGifts.length);
+        window.ch3l5State.ex2Step = 1;
+        window.ch3l5State.ex2Result = mockGifts[randomIndex];
         window.renderCh3L5Inner();
     };
 
-    // 填空題同步暫存（防焦點流失核心修正）
+    // 填空題同步更新狀態
     window.setInternalFillAns35 = (id, val) => {
         window.ch3l5State.quizAns[id] = val;
         
-        // 修正：當使用者在輸入時，直接就地修正群組的錯誤樣式，而非重刷 innerHTML
         if (window.ch3l5State.quizStatus === "error") {
             let groupId = "s1";
-            if (["q7", "q8"].includes(id)) groupId = "s2";
-            if (["q9", "q10"].includes(id)) groupId = "s3";
-            const groupEl = document.getElementById(`quiz-group-${groupId}`);
+            if (["q3", "q4", "q5"].includes(id)) groupId = "s2";
+            const groupEl = document.getElementById(`quiz-5group-${groupId}`);
             if (groupEl) {
                 groupEl.classList.remove('border-rose-500', 'bg-rose-950/40');
                 groupEl.classList.add('border-slate-800', 'bg-slate-950/60');
@@ -4973,61 +4947,60 @@ x = random.choice(gift)
         }
     };
 
-    window.submitCh3L5All = (answersJson) => {
+    // 🔧 完美修正：獨立驗證提交，無傳參，拒絕字串逃逸造成的崩潰
+    window.submitCh3L5All = () => {
         const state = window.ch3l5State;
-        const answers = JSON.parse(answersJson);
-        const qIds = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8", "q9", "q10"];
+        const qIds = ["q1", "q2", "q3", "q4", "q5"];
 
-        // 1. 檢查是否填寫完畢
+        // 1. 檢查是否填完
         const isComplete = qIds.every(id => state.quizAns[id]);
         if (!isComplete) {
-            alert("❌ 挑戰尚未完成！還有空格沒有填寫哦，請完成所有場景填空再提交。");
+            alert("❌ 空格不可以留白哦！請填寫完畢再進行系統驗證。");
             return;
         }
 
-        // 2. 驗證答案正確性 (支援全小寫比對防呆)
-        const isCorrect = qIds.every(id => state.quizAns[id].toLowerCase() === answers[id].toLowerCase());
+        // 2. 正規化比對
+        const normalize = (str) => str.replace(/\s+/g, '').replace(/'/g, '"').toLowerCase();
+        const checkAns = (id) => normalize(state.quizAns[id]) === normalize(targetAnswersCh3L5[id]);
 
-        if (isCorrect) {
+        const isQ1Correct = checkAns("q1") && checkAns("q2");
+        const isQ2Correct = checkAns("q3") && checkAns("q4") && checkAns("q5");
+
+        if (isQ1Correct && isQ2Correct) {
             if (typeof stopTimer === 'function') stopTimer();
             if (typeof showResult === 'function') showResult(true);
-            alert("🎉 太棒了！你完美掌握了 random 模組的隨機應用與列表操作！");
+            alert("🎉 太強了！你成功收服了 random 隨機模組，順利通過 3-5 實戰考核！");
         } else {
             state.quizStatus = "error";
-            window.renderCh3L5Inner(); // 答錯時重刷標示紅框
+            window.renderCh3L5Inner();
 
-            // 針對錯題場景加入動態動畫與樣式提示
-            const s1Ids = ["q1", "q2", "q3", "q4", "q5", "q6"];
-            const s2Ids = ["q7", "q8"];
-            const s3Ids = ["q9", "q10"];
-
-            const checkAndMarkErr = (ids, groupId) => {
-                const hasErr = ids.some(id => state.quizAns[id].toLowerCase() !== answers[id].toLowerCase());
-                const el = document.getElementById(`quiz-group-${groupId}`);
-                if (hasErr && el) {
+            // 錯誤區塊紅框提示
+            const markErr = (isCorrect, groupId) => {
+                const el = document.getElementById(`quiz-5group-${groupId}`);
+                if (!isCorrect && el) {
                     el.classList.remove('border-slate-800', 'bg-slate-950/60');
                     el.classList.add('border-rose-500', 'bg-rose-950/40', 'animate-shake');
                     setTimeout(() => el.classList.remove('animate-shake'), 400);
                 }
             };
 
-            checkAndMarkErr(s1Ids, "s1");
-            checkAndMarkErr(s2Ids, "s2");
-            checkAndMarkErr(s3Ids, "s3");
+            markErr(isQ1Correct, "s1");
+            markErr(isQ2Correct, "s2");
 
-            // 底部按鈕反饋
             const btn = document.getElementById('ch3l5-final-btn');
             if (btn) {
                 btn.classList.add('animate-shake', 'bg-red-600');
                 setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-600'), 400);
             }
-            alert("❌ 檢測到部分答案不正確！已為您將有錯誤的場景區塊標註為紅框，請再次檢查邏輯與拼字拼法（提示：注意 list 的 append 用法以及變數名稱喔！）");
+            alert("❌ 偵測到程式碼邏輯有盲點！已為您將有錯誤的場景區塊標註為紅框。提示：請確認是否完整打出 random. 還有括號範圍喔！");
         }
     };
 
     window.renderCh3L5Inner();
 }
-
+		
+//3-6
+		
 function renderCh3L6Module(el) {
     if (typeof startTimer === 'function') startTimer();
 
@@ -5040,28 +5013,28 @@ function renderCh3L6Module(el) {
             ex2Step: 0,
             ex2Mode: 'success', // 'success', 'fail'
             ex3Step: 0,
-            ex4Step: 0, // 新增 replace 實驗步進
-            // 課後實戰填空題答案 (擴充至 q8)
+            ex4Step: 0, 
+            // 課後實戰填空題答案
             quizAns: { q1: "", q2: "", q3: "", q4: "", q5: "", q6: "", q7: "", q8: "" },
             quizStatus: "normal"
         };
     }
 
+    // 🛠️ 📥 標準答案物件直接定義在作用域內（避免傳參引號衝突）
+    const targetAnswers = {
+        q1: "len(name) < 2 or len(name) > 6", 
+        q2: 'email.find("@")', 
+        q3: "==-1", 
+        q4: 'combo_input.count("A")',
+        q5: "6", 
+        q6: 'chat_message.replace(bad_word, "QQ")',
+        q7: "bad_word",
+        q8: '"QQ"'
+    };
+
     window.renderCh3L6Inner = () => {
         const app = document.getElementById('app') || el;
         const state = window.ch3l6State;
-
-        // 🛠️ 題目解答定義 (用於最後驗證標準答案，不分大小寫與空格)
-        const answers = {
-            q1: "len(name) < 2 or len(name) > 6", 
-            q2: "email.find(\"@\")", 
-            q3: "==-1", 
-            q4: "combo_input.count(\"A\")",
-            q5: "6", // AABAAASBBAAA 中 A 出現了 6 次
-            q6: "chat_message.replace(bad_word, \"QQ\")",
-            q7: "bad_word",
-            q8: "\"QQ\""
-        };
 
         app.innerHTML = `
             <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
@@ -5100,7 +5073,7 @@ function renderCh3L6Module(el) {
                                 </tr>
                                 <tr>
                                     <td class="p-4 font-mono text-indigo-700 font-bold text-lg">s.count(sub)</td>
-                                    <td class="p-4">計算子字串 sub 在整段字串 s 中<span class="text-indigo-600 font-bold">一共出現了幾次</span>。</td>
+                                    <td class="p-4">計算子字串 sub 在整段字串 s 中一共出現了幾次。</td>
                                     <td class="p-4 font-mono text-emerald-600 font-bold">回傳出現次數 (整數)</td>
                                 </tr>
                                 <tr>
@@ -5114,7 +5087,6 @@ function renderCh3L6Module(el) {
                 </div>
 
                 <div class="space-y-8 mb-12">
-                    
                     <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
                         <div class="flex justify-between items-center border-b pb-2">
                             <h2 class="text-2xl font-black text-slate-800 flex items-center gap-2">⚡ 範例 1：字串長度探測器 (len)</h2>
@@ -5150,7 +5122,6 @@ length = <span class="text-cyan-400">len</span>(password)
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-slate-900 rounded-xl p-4 shadow-lg">
 <pre class="text-left m-0 p-0 text-base text-slate-100 font-mono" style="white-space: pre;">
-<span class="text-slate-500"># A:輕拳, B:重腳, S:技能</span>
 combo_input = <span class="text-orange-300">"AABAAASBBAAA"</span>
 attack_count = combo_input.count(<span class="text-orange-300">"A"</span>)
 <span class="text-green-400">print</span>(<span class="text-orange-300">"輕拳連擊次數："</span>, attack_count)
@@ -5160,11 +5131,11 @@ attack_count = combo_input.count(<span class="text-orange-300">"A"</span>)
                                 <div class="space-y-2">
                                     <div class="text-sm font-bold text-slate-600">📊 狀態監視器：</div>
                                     <div class="bg-white p-2 rounded border font-mono text-sm">
-                                        <div>attack_count = <span class="text-indigo-600 font-black">${state.ex3Step > 0 ? '8' : '尚未統計'}</span></div>
+                                        <div>attack_count = <span class="text-indigo-600 font-black">${state.ex3Step > 0 ? '6' : '尚未統計'}</span></div>
                                     </div>
                                     <div class="bg-slate-950 text-emerald-400 font-mono p-3 rounded-lg text-sm min-h-[4.5rem]">
                                         <div class="text-xs text-slate-500 border-b border-slate-800 pb-1 mb-1">🖥️ Console 輸出</div>
-                                        ${state.ex3Step > 0 ? `輕拳連擊次數： 8 \n(已達 5 次！發動大招！)` : '<span class="text-slate-600">等待執行...</span>'}
+                                        ${state.ex3Step > 0 ? `輕拳連擊次數： 6 \n(已達 5 次！發動大招！)` : '<span class="text-slate-600">等待執行...</span>'}
                                     </div>
                                 </div>
                                 <button onclick="window.runCh3L6Ex3()" class="mt-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition shadow-md">⚔️ 模擬連擊分析</button>
@@ -5199,7 +5170,6 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
                             </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="bg-slate-900 rounded-3xl p-6 shadow-xl border-4 border-indigo-500/30 text-slate-100 space-y-8">
@@ -5234,7 +5204,7 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
                             <h3 class="text-lg font-black text-rose-400 flex items-center gap-2">⚔️ 3. 戰鬥大招門檻計算 (Combo)</h3>
                             <p class="text-slate-300 text-sm">情境：系統紀錄玩家 5 秒內的指令字串，計算按出了幾次輕攻擊「A」，達到 5 次以上即成功判定觸發大招。</p>
                             <div class="bg-slate-950 rounded-xl p-4 font-mono text-base md:text-lg leading-loose space-y-1 overflow-x-auto text-slate-300">
-                                <div>combo_input = "AABAAASBBAAA" <span class="text-slate-500 text-sm"># A:輕拳, B:重腳, S:技能</span></div>
+                                <div>combo_input = "AABAAASBBAAA"</div>
                                 <div>a_count = <input type="text" id="input-l6-q4" value="${state.quizAns.q4}" oninput="window.setInternalFillAns36('q4', this.value.trim())" placeholder="_______" class="w-64 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" /></div>
                                 <div><span class="text-green-400">print</span>("經系統解析，輕拳總共按了：", a_count, "次")</div>
                                 <div><span class="text-purple-400">if</span> a_count &gt;= 5:</div>
@@ -5257,12 +5227,11 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
                                 <div class="text-slate-400 text-sm">🧠 語法複習：replace( <input type="text" id="input-l6-q7" value="${state.quizAns.q7}" oninput="window.setInternalFillAns36('q7', this.value.trim())" placeholder="被替換的變數" class="w-28 px-2 py-0.5 text-center bg-slate-900 border border-slate-700 rounded text-xs text-pink-400 focus:outline-none" /> , <input type="text" id="input-l6-q8" value="${state.quizAns.q8}" oninput="window.setInternalFillAns36('q8', this.value.trim())" placeholder="新字串(含引號)" class="w-28 px-2 py-0.5 text-center bg-slate-900 border border-slate-700 rounded text-xs text-pink-400 focus:outline-none" /> )</div>
                             </div>
                         </div>
-
                     </div>
                 </div>
 
                 <div class="mt-8 pt-4 border-t border-slate-200 flex justify-end">
-                    <button id="ch3l6-final-btn" onclick="window.submitCh3L6All('${JSON.stringify(answers)}')" class="px-10 py-4 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-black text-xl rounded-2xl transition shadow-lg transform active:scale-95">
+                    <button id="ch3l6-final-btn" onclick="window.submitCh3L6All()" class="px-10 py-4 bg-gradient-to-r from-indigo-600 to-cyan-600 hover:from-indigo-700 hover:to-cyan-700 text-white font-black text-xl rounded-2xl transition shadow-lg transform active:scale-95">
                         🏁 驗證挑戰並完成 3-6
                     </button>
                 </div>
@@ -5277,7 +5246,7 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
     window.runCh3L6Ex3 = () => { window.ch3l6State.ex3Step = 1; window.renderCh3L6Inner(); };
     window.runCh3L6Ex4 = () => { window.ch3l6State.ex4Step = 1; window.renderCh3L6Inner(); };
 
-    // 填空題就地去紅框（核心修正：防止重刷導致 input 的 Focus 流失）
+    // 填空題就地去紅框（防止輸入焦點流失）
     window.setInternalFillAns36 = (id, val) => {
         window.ch3l6State.quizAns[id] = val;
         
@@ -5294,9 +5263,8 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
         }
     };
 
-    window.submitCh3L6All = (answersJson) => {
+    window.submitCh3L6All = () => {
         const state = window.ch3l6State;
-        const answers = JSON.parse(answersJson);
         const qIds = ["q1", "q2", "q3", "q4", "q5", "q6", "q7", "q8"];
 
         // 1. 檢查是否填完
@@ -5306,9 +5274,9 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
             return;
         }
 
-        // 2. 嚴謹的正規化比對（消除多餘空格、統一引號）
+        // 2. 嚴謹的正規化比對（消除多餘空格、將單引號全部取代為雙引號進行統一）
         const normalize = (str) => str.replace(/\s+/g, '').replace(/'/g, '"').toLowerCase();
-        const checkAns = (id) => normalize(state.quizAns[id]) === normalize(answers[id]);
+        const checkAns = (id) => normalize(state.quizAns[id]) === normalize(targetAnswers[id]);
 
         const isQ1Correct = checkAns("q1");
         const isQ2Correct = checkAns("q2") && checkAns("q3");
@@ -5343,13 +5311,12 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
                 btn.classList.add('animate-shake', 'bg-red-600');
                 setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-600'), 400);
             }
-            alert("❌ 部分機制的程式碼邏輯有盲點！已為您將有錯誤的場景區塊標註為紅框。提示：請數清楚連擊次數，並確認 replace 的新舊字串順序喔！");
+            alert("❌ 部分機制的程式碼邏輯有盲點！已為您將有錯誤的場景區塊標註為紅框。提示：請數清楚連擊次數，並確認 replace 的新舊字串順序與引號喔！");
         }
     };
 
     window.renderCh3L6Inner();
 }
-
 
 // 初始化綜合練習關卡狀態
 if (!window.comprehensiveState) {
@@ -5481,6 +5448,7 @@ last_num = id_card[-1]     <span class="text-slate-400"># 最後 1 個數字</sp
     `;
   };
 
+	
   // 前端仿 Python 條件執行比對引擎
   window.runComprehensiveSim = () => {
     const state = window.comprehensiveState;

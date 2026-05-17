@@ -84,23 +84,24 @@
         function stopTimer() { clearInterval(timerInterval); }
 
         // 💡 切換畫面主控台
+// 💡 切換畫面主控台
 function changeView(view) {
     currentView = view;
-    // 如果是回到選單或成績單，清除計時器
+    // 如果是回到大廳、成績單、或教師端，關閉計時器
     if (view === 'menu' || view === 'report' || view === 'teacher') {
         if (timerInterval) clearInterval(timerInterval);
     } else {
-        // 🚀 如果進入的是遊戲關卡，先強制初始化該關卡的變數、重新啟動計時
+        // 🚀 進入關卡，觸發安全重置機制
         resetLevelState(view);
     }
     render();
 }
 
-// 🚀 自動根據關卡編號重置所有暫存與變數，並重啟計時器
+// 🚀 安全初始化關卡狀態，既清除作答紀錄，又防範畫面崩潰 (renderCPInner 錯誤)
 function resetLevelState(view) {
-    if (timerInterval) clearInterval(timerInterval); // 停止舊計時器
+    if (timerInterval) clearInterval(timerInterval); // 清除前一個關卡的計時器
     
-    // 重置時間 (依據您原有的設計，有些關卡是倒數 600 秒，有些是正計時 0 秒開始)
+    // 1. 重新設定該關卡專屬的時間模式
     if (view === 'ch1_l1' || view === 'ch1_l2') {
         isCountingDown = true;
         initialDuration = 600;
@@ -111,31 +112,32 @@ function resetLevelState(view) {
         timeSeconds = 0;
     }
     
-    // 💡 萬能重置：針對您程式碼中所有關卡所使用的內部狀態變數，全部初始化清空
-    if (typeof currentQuestionIndex !== 'undefined') currentQuestionIndex = 0;
-    if (typeof selectedOptions !== 'undefined') selectedOptions = {};
-    if (typeof currentStep !== 'undefined') currentStep = 1;
-    if (typeof score !== 'undefined') score = 0;
-    if (typeof gameOver !== 'undefined') gameOver = false;
-    if (typeof gameActive !== 'undefined') gameActive = true;
-    if (typeof dragData !== 'undefined') dragData = {};
-    
-    // 針對個別複雜關卡內部有獨立暫存陣列的，特別清除
+    // 2. 清除所有關卡的共用答題指針與作答暫存
+    currentQuestionIndex = 0;
+    selectedOptions = {}; 
+    currentStep = 1;
+    score = 0;
+    gameOver = false;
+    gameActive = true;
+    dragData = {};
+
+    // 3. 針對 1-4 字串等有獨立陣列的關卡做安全清空，確保 renderCPInner 抓得到空值而不崩潰
     if (view === 'ch1_l4') {
-        // 1-4 字串專用的暫存
-        if (typeof userAnswers !== 'undefined') userAnswers = ["", "", "", ""];
+        userAnswers = ["", "", "", ""];
     }
     
-    // 啟動新計時
+    // 4. 重啟計時器
     startTimer();
 }
- // 💡 顯示結果彈出視窗
+
+// 💡 顯示結果彈出視窗
+// 💡 挑戰完畢結果對話框
 function showResult(success, mbtiResult = '') {
     const savedClass = localStorage.getItem("className") || "";
     const app = document.getElementById('app');
     const actualUsedTime = isCountingDown ? (initialDuration - timeSeconds) : timeSeconds;
     
-    // 🏆 計算獎牌等級
+    // 🏆 動態劃分金、銀、銅牌與通關等級
     let award = "挑戰失敗";
     if (success) {
         if (actualUsedTime >= 0 && actualUsedTime <= 120) award = "金牌";
@@ -147,7 +149,8 @@ function showResult(success, mbtiResult = '') {
     
     if (success && globalPlayerName !== 'Teacher') {
         if (!studentScores[globalPlayerName]) studentScores[globalPlayerName] = {};
-        // 將包含獎牌的完整包寫入本機
+        
+        // 💾 同步將 award 與時間寫入本機
         studentScores[globalPlayerName][currentView] = { 
             time: actualUsedTime, 
             date: getNowString(),
@@ -155,21 +158,23 @@ function showResult(success, mbtiResult = '') {
         };
         localStorage.setItem("studentScores", JSON.stringify(studentScores));
         
-        // 🚀 調用上傳 GAS
+        // 🚀 發送至後端
         submitScore(currentView, success ? 100 : 0, actualUsedTime, 1, award);
     }
     
     const modal = document.createElement('div');
     modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-[100] px-4";
     modal.innerHTML = `
-        <div class="flex flex-col items-center justify-center min-h-screen p-6 animate-fade-in">
+        <div class="flex flex-col items-center justify-center min-h-screen p-6 animate-fade-in w-full">
             <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-slate-100 max-w-md w-full text-center">
                 <div class="text-6xl mb-4">${success ? '🎉' : '❌'}</div>
                 <h2 class="text-3xl font-black mb-2 text-slate-800">${success ? '挑戰成功！' : '挑戰失敗'}</h2>
+                <p class="text-slate-500 mb-6 font-semibold">${LEVEL_NAMES[currentView] || ''}</p>
+                
                 <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 mb-6 font-bold text-slate-600">
-                    <div>👤 玩家：${savedClass}班 ${globalPlayerName}</div>
-                    <div>⏱️ 使用時間：${formatTime(actualUsedTime)}</div>
-                    ${success ? `<div class="text-indigo-600">🏆 榮獲獎勵：${award}</div>` : ''}
+                    <div>👤 學生：${savedClass ? savedClass + '班 ' : ''}${globalPlayerName}</div>
+                    <div>⏱️ 耗時：${formatTime(actualUsedTime)}</div>
+                    ${success ? `<div class="text-indigo-600 font-black text-lg">🏆 獲得獎項：${award}</div>` : ''}
                 </div>
                 <div class="flex gap-4">
                     <button onclick="changeView('menu')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">返回大廳</button>
@@ -178,14 +183,14 @@ function showResult(success, mbtiResult = '') {
         </div>
     `;
     app.appendChild(modal);
-}
-		
+}		
         window.drag = (ev, type, id) => { ev.dataTransfer.setData("type", type); ev.dataTransfer.setData("id", id); };
         window.allowDrop = (ev) => ev.preventDefault();
 
 // ================= 渲染引擎 =================
 function render() {
     const app = document.getElementById('app');
+    if (!app) return;
     
     if (!currentView) {
         const savedClass = localStorage.getItem("className");
@@ -199,9 +204,10 @@ function render() {
         }
     }
 
+    // 路由分流
     if (currentView === 'login') renderLogin(app);
     else if (currentView === 'menu') renderMenu(app);
-    else if (currentView === 'report') renderReportCard(app); // 正常導向成績單
+    else if (currentView === 'report') renderReportCard(app); // 修正連結：正常導向個人成績單
     else if (currentView === 'teacher') renderTeacherDashboard(app);
     
     // 第一章
@@ -241,20 +247,18 @@ let globalPlayerName = "";
 
 function renderMenu(el) {
     const savedClass = localStorage.getItem("className") || "";
-    
-    // 💡 取得當前玩家的通關紀錄
     const myScores = studentScores[globalPlayerName] || {};
 
-    // 🏆 Helper: 用來在按鈕內動態生成獎牌標籤
+    // 🏆 動態產生主選單按鈕內部的獎牌標籤 (亮色系設計)
     const getAwardTag = (levelKey) => {
         if (myScores[levelKey] && myScores[levelKey].award) {
             const award = myScores[levelKey].award;
-            let colorClass = "bg-slate-100 text-slate-600";
-            if (award === "金牌") colorClass = "bg-amber-100 text-amber-700 border border-amber-300 animate-pulse";
-            if (award === "銀牌") colorClass = "bg-slate-200 text-slate-700 border border-slate-400";
-            if (award === "銅牌") colorClass = "bg-orange-100 text-orange-700 border border-orange-300";
-            if (award === "挑戰成功") colorClass = "bg-emerald-100 text-emerald-700 border border-emerald-300";
-            return `<span class="ml-2 px-2 py-0.5 text-xs font-black rounded-full ${colorClass}">🏆 ${award}</span>`;
+            let colorClass = "bg-slate-100 text-slate-600 border-slate-200";
+            if (award === "金牌") colorClass = "bg-amber-100 text-amber-700 border-amber-300 font-black shadow-sm";
+            if (award === "銀牌") colorClass = "bg-slate-200 text-slate-700 border-slate-400 font-black";
+            if (award === "銅牌") colorClass = "bg-orange-100 text-orange-700 border-orange-300 font-black";
+            if (award === "挑戰成功") colorClass = "bg-emerald-100 text-emerald-700 border-emerald-300 font-black";
+            return `<span class="ml-2 px-2 py-0.5 text-xs rounded-full border ${colorClass}">🏆 ${award}</span>`;
         }
         return "";
     };
@@ -498,8 +502,8 @@ function renderReportCard(el) {
         <div class="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
             <div class="flex justify-between items-center mb-6">
                 <button onclick="changeView('menu')" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl transition">← 返回大廳</button>
-                <h1 class="text-2xl font-black text-slate-800">📊 學習學習成績單</h1>
-                <div class="text-sm font-bold text-slate-500">學生：${globalPlayerName}</div>
+                <h1 class="text-2xl font-black text-slate-800">📊 個人學習成績單</h1>
+                <div class="text-sm font-bold text-slate-500">學生姓名：${globalPlayerName}</div>
             </div>
             
             <div class="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
@@ -2926,10 +2930,11 @@ function renderCh2L3Module(el) {
 let isSubmittingScore = false;
 
 // 💡 送出成績到 Google Apps Script
+// 💡 將成績、耗時與獎牌即時同步上傳至 Google Apps Script
 async function submitScore(level, score, timeUsed, attempts, award = "") {
   const savedClass = localStorage.getItem("className") || "";
   
-  // 🚀 修正解析：相容 "01號 姓名" 或 "1號姓名" 或 "姓名" 等多種狀況
+  // 🚀 修正解析器：完美相容 "05號 姓名"、"1號張三"、或直接無座號的純姓名狀況
   let seatNumber = "";
   let studentName = globalPlayerName;
   
@@ -2947,11 +2952,11 @@ async function submitScore(level, score, timeUsed, attempts, award = "") {
     score: score,
     timeUsed: timeUsed,
     attempts: attempts,
-    award: award, // 🏆 攜帶獎牌資料
+    award: award, // 🏆 成功包含獎牌欄位
     userAgent: navigator.userAgent
   };
 
-  console.log("送出資料至 GAS:", payload);
+  console.log("正在打包並送出資料至 GAS 後端...", payload);
 
   try {
     const response = await fetch(
@@ -2959,35 +2964,31 @@ async function submitScore(level, score, timeUsed, attempts, award = "") {
       {
         method: "POST",
         mode: "cors",
-        headers: {
-          "Content-Type": "text/plain"
-        },
+        headers: { "Content-Type": "text/plain" },
         body: JSON.stringify(payload)
       }
     ).catch(err => {
-      console.warn("Fetch 被瀏覽器套件或網域攔截...", err);
+      console.warn("Fetch 傳輸被瀏覽器安全套件攔截...", err);
       return null;
     });
 
     if (!response) {
-      alert("連線失敗，請檢查網路或確認 GAS 伺服器狀態。");
+      alert("網路連線失敗，請確認是否被防火牆或 AdBlock 阻擋。");
       return;
     }
 
-    if (!response.ok) {
-      throw new Error(`HTTP 錯誤！狀態碼: ${response.status}`);
-    }
-
+    if (!response.ok) throw new Error(`HTTP 錯誤！狀態碼: ${response.status}`);
+    
     const result = await response.json();
-    console.log("伺服器回傳結果:", result);
+    console.log("GAS 伺服器回傳結果:", result);
     
     if (result.status === "success") {
-      alert(`成績與獎牌 [${award}] 上傳成功！`);
+      alert(`🎉 成績與獎牌 [${award}] 已成功上傳雲端資料庫！`);
     } else {
-      alert("資料庫儲存失敗，請確認 GAS 後端程式碼。");
+      alert("雲端資料庫儲存失敗，請聯繫老師檢查 GAS 後端代碼設定。");
     }
   } catch (error) {
-    console.error("上傳發生例外狀況:", error);
+    console.error("成績上傳發生例外異常:", error);
   }
 }
 	

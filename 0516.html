@@ -110,15 +110,15 @@
                 studentScores[globalPlayerName][currentView] = { time: actualUsedTime, date: getNowString() };
 				submitScore(currentView,    success ? 100 : 0,    actualUsedTime,    1);////////////////////////////////////////////////////////////////////////////////////////////////
             }
-			isSuccess = false; ///////////////
+			
             const modal = document.createElement('div');
             modal.className = "fixed inset-0 bg-black/50 flex items-center justify-center z-[100] px-4";
             modal.innerHTML = `
                 <div class="flex flex-col items-center justify-center min-h-screen bg-slate-50 p-6 animate-fade-in">
         <div class="bg-white p-8 rounded-3xl shadow-xl border-2 border-slate-100 max-w-md w-full text-center">
-            <div class="text-6xl mb-4">${isSuccess ? '🎉' : '❌'}</div>
-            <h2 class="text-3xl font-black mb-2 text-slate-800">${isSuccess ? '挑戰成功！' : '挑戰失敗'}</h2>
-            <p class="text-slate-500 mb-6 font-medium">${currentLevelData.name}</p>
+            <div class="text-6xl mb-4">${Success ? '🎉' : '❌'}</div>
+            <h2 class="text-3xl font-black mb-2 text-slate-800">${Success ? '挑戰成功！' : '挑戰失敗'}</h2>
+            
             
             <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 mb-6 font-bold text-slate-600">
                 <div>👤 玩家：${savedClass}班 ${globalPlayerName}</div>

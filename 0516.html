@@ -122,14 +122,12 @@
             
             <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 mb-6 font-bold text-slate-600">
                 <div>👤 玩家：${savedClass}班 ${globalPlayerName}</div>
-                //<div>🎯 得分：<span class="text-2xl font-black ${scoreStr} </span> </div>
                 <div>⏱️ 使用時間：${formatTime(actualUsedTime)}</div>
                
             </div>
             
             <div class="flex gap-4">
                 <button onclick="changeView('menu')" class="flex-1 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-bold transition">返回大廳</button>
-                <button onclick="selectChapter(currentChapterId)" class="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md transition">再試一次</button>
             </div>
         </div>
     </div>            `;
@@ -1995,7 +1993,7 @@ function renderCh2L1Module(el) {
                     </div>
                     ${window.ch2l1ReadStatus.sec2 ? `<button class="w-full mt-4 py-3 bg-emerald-600 text-white font-bold text-xl rounded-xl shadow">✅ 已完成兩大範例數列比較</button>` : `<button onclick="window.toggleSec21Read('sec2', this)" class="w-full mt-4 py-3 bg-indigo-500 hover:bg-indigo-600 text-white font-bold text-xl rounded-xl transition active:scale-95">🕹️ 我已照指引輸入多組數字、完成結果比較，點擊確認</button>`}
                 </div>
-
+s
                 <div class="bg-white p-6 rounded-3xl shadow-xl border-4 border-indigo-200 space-y-8">
                     <h2 class="font-black text-3xl text-indigo-700 border-b-2 border-indigo-100 pb-3 flex items-center gap-2">📝 學習挑戰：實戰條件結構設計</h2>
                     

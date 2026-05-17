@@ -135,29 +135,44 @@ function resetLevelState(view) {
         timeSeconds = 0;
     }
     
-    // 💡 2. 萬能清空全域基礎狀態
+    // 💡 2. 萬能清空全域基礎遊玩狀態
     currentQuestionIndex = 0; 
     currentStep = 1;
     score = 0;
     gameOver = false;
     gameActive = true;
     
-    // 💡 3. 強制重置可能殘留答案的物件與陣列
+    // 💡 3. 強制重置通用選擇與拖拽暫存物件
     selectedOptions = {}; 
     dragData = {};
     
-    // 💡 4. 針對程式內特定關卡使用的私有答案陣列，做深度洗滌清空
-    if (typeof userAnswers !== 'undefined') {
-        userAnswers = ["", "", "", ""]; // 針對 1-4 字串等填空關卡的重設
-    }
+    // 💡 4. ⚡【深度修復】針對 1-4 關卡的輸入與閱讀狀態徹底重置
+    window.ch1l4Inputs = { q1: "", q2: "", q3: "", q4: "" };
+    window.ch1l4ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
+
+    // 💡 5. ⚡【深度修復】針對 1-5 關卡的文字填空、閱讀狀態與 IDLE 模擬器徹底還原
+    window.ch1l5Inputs = { q1: "", q2: "", q3: "", q4: "", q5_roc: "", q6_bmi: "" };
+    window.ch1l5ReadStatus = { sec1: false, sec2: false, sec3: false, sec4: false };
+    window.idleState = {
+        currentExample: 1, // 預設回到範例 1
+        p1Name: "May",     // 恢復原作者預設文字
+        p2X: "10",
+        p2Y: "20",
+        p3Roc: "115",
+        p4Cm: "175",
+        p4Kg: "70",
+        isRunning: false,  // 停止編譯中狀態
+        hasRun: false      // 恢復成尚未執行（清除 Shell Output 殘留紀錄）
+    };
+
+    // 💡 6. 針對其餘章節特定變數（例如第三章串列）做安全清空
     if (typeof listData !== 'undefined') {
-        listData = []; // 針對第三章串列相關關卡的初始化
+        listData = []; 
     }
     
-    // 💡 5. 重啟全新計時器
+    // 💡 7. 重啟全新計時器
     startTimer();
 }
-
 		// 💡 挑戰完畢結果對話框
 function showResult(success, mbtiResult = '') {
     const savedClass = localStorage.getItem("className") || "";

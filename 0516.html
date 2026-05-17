@@ -1212,7 +1212,7 @@ function renderArithmeticLogic(el) {
                             <div class="flex flex-wrap items-center gap-4">
                                 <input type="text" id="q13-2" value="${window.ch1l3Inputs.q2}" 
                                     oninput="window.ch1l3Inputs.q2=this.value" 
-                                    placeholder="填 True 或 False"
+                                    placeholder="?"
                                     class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
                                 <span id="q13-2-feedback" class="text-2xl"></span>
                             </div>
@@ -1234,7 +1234,7 @@ function renderArithmeticLogic(el) {
                             <div class="flex flex-wrap items-center gap-4">
                                 <input type="text" id="q13-4" value="${window.ch1l3Inputs.q4}" 
                                     oninput="window.ch1l3Inputs.q4=this.value" 
-                                    placeholder="填 True 或 False"
+                                    placeholder="?"
                                     class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
                                 <span id="q13-4-feedback" class="text-2xl"></span>
                             </div>
@@ -1529,7 +1529,7 @@ function renderStringOperations(el) {
                             <div class="flex flex-wrap items-center gap-4">
                                 <input type="text" id="q14-3" value="${window.ch1l4Inputs.q3}" 
                                     oninput="window.ch1l4Inputs.q3=this.value" 
-                                    placeholder="填 True 或 False"
+                                    placeholder="?"
                                     class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
                                 <span id="q14-3-feedback" class="text-2xl"></span>
                             </div>
@@ -1540,7 +1540,7 @@ function renderStringOperations(el) {
                             <div class="flex flex-wrap items-center gap-4">
                                 <input type="text" id="q14-4" value="${window.ch1l4Inputs.q4}" 
                                     oninput="window.ch1l4Inputs.q4=this.value" 
-                                    placeholder="填 True 或 False"
+                                    placeholder="?"
                                     class="w-52 p-4 border-2 border-slate-300 rounded-xl focus:border-indigo-500 outline-none font-bold text-2xl shadow-sm">
                                 <span id="q14-4-feedback" class="text-2xl"></span>
                             </div>
@@ -2325,7 +2325,7 @@ function renderCh2L4Module(el) {
     </div>
     <div class="flex items-center gap-2 pt-1">
         <span class="font-bold text-slate-700 font-mono text-sm">if 後方應填入：</span>
-        <input type="text" value="${window.ch2l4Inputs.q3}" oninput="window.ch2l4Inputs.q3=this.value.trim()" placeholder="例如：x % 2 == 0" class="w-72 p-2.5 border-2 border-slate-300 rounded-xl focus:border-cyan-500 outline-none font-mono text-base shadow-sm bg-white text-slate-800">
+        <input type="text" value="${window.ch2l4Inputs.q3}" oninput="window.ch2l4Inputs.q3=this.value.trim()" placeholder="??" class="w-72 p-2.5 border-2 border-slate-300 rounded-xl focus:border-cyan-500 outline-none font-mono text-base shadow-sm bg-white text-slate-800">
         <span class="font-bold text-slate-700 font-mono text-lg">:</span>
     </div>
 </div>
@@ -2488,7 +2488,7 @@ function renderCh2L6Module(el) {
     // 內部渲染閉包，確保點擊選擇或輸入時能完美重繪保留狀態
     window.renderCh2L6Inner = () => {
         const app = document.getElementById('app') || el;
-        const state = window.ch2l6Inputs;
+        const state = window.ch2l6Inputs; // 確保使用 ch2l6 狀態
 
         app.innerHTML = `
             <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in">
@@ -2569,11 +2569,11 @@ function renderCh2L6Module(el) {
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 mb-1">填空 (一) 迴圈開頭關鍵字：</label>
-                                <input type="text" value="${state.q3}" oninput="window.ch2l5Inputs.q3=this.value.trim()" placeholder="例如: while" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-emerald-500 bg-white text-slate-800">
+                                <input type="text" value="${state.q3}" oninput="window.ch2l6Inputs.q3=this.value.trim();" placeholder="??" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-emerald-500 bg-white text-slate-800">
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-slate-500 mb-1">填空 (二) 讓數字每次少 1 的寫法：</label>
-                                <input type="text" value="${state.q4}" oninput="window.ch2l5Inputs.q4=this.value.trim()" placeholder="例如: count -= 1" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-emerald-500 bg-white text-slate-800">
+                                <input type="text" value="${state.q4}" oninput="window.ch2l6Inputs.q4=this.value.trim();" placeholder=???" class="w-full px-4 py-2.5 border border-slate-300 rounded-xl font-mono text-sm focus:outline-none focus:border-emerald-500 bg-white text-slate-800">
                             </div>
                         </div>
                     </div>
@@ -2593,49 +2593,49 @@ function renderCh2L6Module(el) {
 }
 
 // ==========================================
-// 💡 2-6 邏輯評分與驗證引擎
+// 💡 【新增】2-6 專屬邏輯評分與驗證引擎
 // ==========================================
-function checkCh2L6Result() {
-    const state = window.ch2l5Inputs;
+window.checkCh2L6Result = function() {
+    const state = window.ch2l6Inputs;
 
-    // 檢查是否有未填寫的題目
+    // 1. 檢查是否有未填寫的題目
     if (!state.q1 || !state.q2 || !state.q3 || !state.q4) {
         alert("⚠️ 還有題目還沒作答完成喔，請檢查所有選擇與填空！");
         return;
     }
 
-    // 統一去除空格與將填空(一)小寫化以提升容錯率
+    // 2. 標準化填空題輸入（去空格與小寫化）
     const ansQ3 = state.q3.toLowerCase();
     const ansQ4 = state.q4.replace(/\s+/g, ''); // 移除所有空白
 
-    // 正確答案定義
+    // 3. 邏輯對錯判定
     const isQ1Correct = (state.q1 === 'C');
     const isQ2Correct = (state.q2 === 'B');
     const isQ3Correct = (ansQ3 === 'while');
     const isQ4Correct = (ansQ4 === 'count-=1' || ansQ4 === 'count=count-1');
 
+    // 4. 回傳處理
     if (isQ1Correct && isQ2Correct && isQ3Correct && isQ4Correct) {
         if (typeof stopTimer === 'function') stopTimer();
-        // 成功，完美串接系統 GAS 雲端 Excel 資料庫
+        // 成功！完美串接 GAS 試算表上傳機制
         showResult(true);
     } else {
-        // 答錯時，觸發按鈕 animate-shake 紅色警告特效
+        // 答錯，觸發按鈕動畫搖晃特效與變紅
         const btn = document.getElementById('ch2l6-submit-btn');
         if (btn) {
-            btn.classList.add('animate-shake', 'bg-red-600');
-            setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-600'), 400);
+            btn.classList.add('animate-shake', 'from-red-600', 'to-rose-600');
+            setTimeout(() => btn.classList.remove('animate-shake', 'from-red-600', 'to-rose-600'), 400);
         }
         
-        // 細緻的反饋提示幫助學生學習
         let errorMsg = "❌ 答案有些不對喔！提示：\n";
-        if (!isQ1Correct) errorMsg += "- 選擇題 1：請重新確認 while 與 for 迴圈適用的情境區別。\n";
-        if (!isQ2Correct) errorMsg += "- 選擇題 2：追蹤變數 n：1 -> 3 -> 5，想一下 5 還有沒有符合小於 5 的條件？\n";
-        if (!isQ3Correct) errorMsg += "- 填空題(一)：請輸入正確的 Python 關鍵字。\n";
-        if (!isQ4Correct) errorMsg += "- 填空題(二)：倒數時計數變數每一次應該要遞減。";
+        if (!isQ1Correct) errorMsg += "- 選擇題 1：請重新確認 while 的次數規定特性。\n";
+        if (!isQ2Correct) errorMsg += "- 選擇題 2：追蹤數字 n 變化，當 n 變成 5 時是否還滿足 n < 5 條件？\n";
+        if (!isQ3Correct) errorMsg += "- 填空題(一)：應填入進入迴圈結構的關鍵字。\n";
+        if (!isQ4Correct) errorMsg += "- 填空題(二)：要達到「倒數」效果，變數該如何更新遞減？";
         
         alert(errorMsg);
     }
-}
+};
 		
 // ==========================================
 // 💡 3-1 串列 List 基礎 (改為高質感單選題)
@@ -3086,7 +3086,7 @@ function renderComprehensiveModule(el) {
 id_card = <span class="text-indigo-400">input</span>(<span class="text-emerald-400">"請輸入完整的身分證字號："</span>)
 last_2_digits = id_card[-2:]  <span class="text-slate-400"># 使用切片取得末兩碼</span>
 
-<span class="text-pink-400 font-bold">if</span> <input type="text" id="act1-in" value="${state.act1_cond}" oninput="window.comprehensiveState.act1_cond=this.value" placeholder="填入判斷式，如 last_2_digits in ['99', '67', '88']" class="w-96 px-2 py-0.5 text-slate-900 rounded font-mono text-sm outline-none bg-yellow-100 border-2 border-amber-400 font-bold">:
+<span class="text-pink-400 font-bold">if</span> <input type="text" id="act1-in" value="${state.act1_cond}" oninput="window.comprehensiveState.act1_cond=this.value" placeholder="填入判斷式" class="w-96 px-2 py-0.5 text-slate-900 rounded font-mono text-sm outline-none bg-yellow-100 border-2 border-amber-400 font-bold">:
     <span class="text-amber-400">print</span>(<span class="text-emerald-400">"恭喜！憑證免費入園！"</span>)
 <span class="text-pink-400 font-bold">else</span>:
     <span class="text-amber-400">print</span>(<span class="text-rose-400">"不符合免費資格，需正常購票。"</span>)

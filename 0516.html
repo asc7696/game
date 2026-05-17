@@ -757,8 +757,7 @@ function renderPythonModule(el) {
 
         app.innerHTML = `
             <div class="p-6 max-w-5xl mx-auto space-y-8 text-slate-800">
-                <button onclick="changeView('menu')" class="flex items-center text-xl text-slate-500 hover:text-slate-800 font-bold transition-colors">${Icons.ArrowLeft} 返回選單</button>
-                
+             <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">← 返回選單</button>   
                 <h1 class="text-4xl font-black text-amber-600 pb-2 border-b-4 border-amber-500">關卡 1-2：Python 變數與資料型態</h1>
 
                 <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-slate-100">
@@ -1055,8 +1054,8 @@ function renderArithmeticLogic(el) {
 
         el.innerHTML = `
             <div class="p-6 max-w-6xl mx-auto space-y-8">
-                <button onclick="changeView('menu')" class="mb-2 flex items-center text-xl text-slate-500 hover:text-slate-800 transition-colors font-bold">${Icons.ArrowLeft} 返回大廳</button>
-                
+             <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">← 返回選單</button>
+			 
                 <div class="flex justify-between items-center pb-4 border-b-2 border-slate-200">
                     <h1 class="text-4xl font-black text-slate-800">關卡 1-3：數值、關係與邏輯運算</h1>
                     <div class="text-2xl font-mono bg-slate-800 text-white px-8 py-3 rounded-full shadow-md">限時：<span id="h13-time">${formatTime(timeSeconds)}</span></div>
@@ -1354,8 +1353,7 @@ function renderStringOperations(el) {
 
         el.innerHTML = `
             <div class="p-6 max-w-6xl mx-auto space-y-8">
-                <button onclick="changeView('menu')" class="mb-2 flex items-center text-xl text-slate-500 hover:text-slate-800 transition-colors font-bold">${Icons.ArrowLeft} 返回大廳</button>
-                
+                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">← 返回選單</button>                
                 <div class="flex justify-between items-center pb-4 border-b-2 border-slate-200">
                     <h1 class="text-4xl font-black text-slate-800">關卡 1-4：字串基本運算與常用方法</h1>
                     <div class="text-2xl font-mono bg-slate-800 text-white px-8 py-3 rounded-full shadow-md">限時：<span id="h14-time">${formatTime(timeSeconds)}</span></div>
@@ -1773,8 +1771,7 @@ function renderInputOutputModule(el) {
 
         app.innerHTML = `
             <div class="p-6 max-w-6xl mx-auto space-y-8 text-slate-800">
-                <button onclick="changeView('menu')" class="mb-2 flex items-center text-xl text-slate-500 hover:text-slate-800 transition-colors font-bold">${Icons.ArrowLeft} 返回大廳</button>
-                
+                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">← 返回選單</button>
                 <div class="flex justify-between items-center pb-4 border-b-2 border-slate-200">
                     <h1 class="text-4xl font-black text-slate-800">關卡 1-5：輸入與輸出函式</h1>
                     <div class="text-2xl font-mono bg-slate-800 text-white px-8 py-3 rounded-full shadow-md">限時：<span id="h15-time">${formatTime(timeSeconds)}</span></div>

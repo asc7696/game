@@ -122,9 +122,9 @@
             
             <div class="bg-slate-50 rounded-2xl p-4 text-left space-y-2 mb-6 font-bold text-slate-600">
                 <div>👤 玩家：${savedClass}班 ${globalPlayerName}</div>
-                <div>🎯 得分：<span class="text-2xl font-black ${currentScore >= 60 ? 'text-emerald-600' : 'text-rose-600'}">${currentScore}</span> / 100</div>
+                <div>🎯 得分：<span class="text-2xl font-black ${scoreStr} </span> </div>
                 <div>⏱️ 剩餘時間：${formatTime(timeLeft)}</div>
-                <div>🔄 嘗試次數：${currentAttempts} 次</div>
+               
             </div>
             
             <div class="flex gap-4">

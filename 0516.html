@@ -2049,24 +2049,23 @@ function renderCh2L1Module(el) {
                         <div class="space-y-3">
                             <h3 class="text-2xl font-black text-cyan-700 flex items-center gap-1">📌 語法規則</h3>
                             <div class="bg-slate-900 text-slate-100 p-5 rounded-xl font-mono text-xl leading-relaxed shadow-lg overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;">
-<span class="text-purple-400">if</span> 條件式<span class="text-rose-400">:</span>
+<pre class="text-left m-0 p-0" style="white-space: pre;"><span class="text-purple-400">if</span> 條件式<span class="text-rose-400">:</span>
     ⚡ 條件成立時執行的程式碼
-    ⚡ (前方必須精確縮排 4 格)
+    ⚡ (前方必須精確縮排 4 格)</pre>
                             </div>
                             <p class="text-slate-600 text-sm font-bold">⚠️ 重要提醒：Python 規定條件式結尾必須加上冒號 :，且內層程式碼必須精確縮排 4 個空格！</p>
                         </div>
                         <div class="space-y-3">
-                            <h3 class="text-2xl font-black text-cyan-700 flex items-center gap-1">💡 生活生活範例：下雨出門</h3>
+                            <h3 class="text-2xl font-black text-cyan-700 flex items-center gap-1">💡 生活範例：下雨出門</h3>
                             <div class="bg-slate-900 text-slate-100 p-5 rounded-xl font-mono text-xl leading-relaxed shadow-lg overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;">
-is_raining = <span class="text-purple-400">True</span>
+<pre class="text-left m-0 p-0" style="white-space: pre;">is_raining = <span class="text-purple-400">True</span>
 <span class="text-purple-400">if</span> is_raining:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"記得帶傘出門！"</span>)
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"記得帶傘出門！"</span>)</pre>
                             </div>
                             <p class="text-slate-600 text-sm font-bold">當 is_raining 為 True，終端機就會印出提醒；若為 False 則無任何輸出。</p>
                         </div>
                     </div>
-                </div>
-
+					
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-8">
                     <h2 class="text-2xl font-black text-slate-800 border-b pb-2 flex items-center gap-2">🎯 任務挑戰：語法與邏輯驗證</h2>
 
@@ -2216,27 +2215,26 @@ function renderCh2L2Module(el) {
                         <div class="space-y-3">
                             <h3 class="text-2xl font-black text-indigo-700 flex items-center gap-1">📌 語法規則</h3>
                             <div class="bg-slate-900 text-slate-100 p-5 rounded-xl font-mono text-xl leading-relaxed shadow-lg overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;">
-<span class="text-purple-400">if</span> 條件式:
+<pre class="text-left m-0 p-0" style="white-space: pre;"><span class="text-purple-400">if</span> 條件式:
     ⚡ 條件成立時執行
 <span class="text-purple-400">else</span><span class="text-rose-400">:</span>
-    ⚡ 條件不成立時執行
+    ⚡ 條件不成立時執行</pre>
                             </div>
                             <p class="text-slate-600 text-sm font-bold">⚠️ 重要提醒：else 後方不需要、也不能寫任何條件運算式，只要直接加上冒號 : 即可！</p>
                         </div>
                         <div class="space-y-3">
-                            <h3 class="text-2xl font-black text-indigo-700 flex items-center gap-1">💡 生活生活範例：電影密碼</h3>
+                            <h3 class="text-2xl font-black text-indigo-700 flex items-center gap-1">💡 生活範例：電影密碼</h3>
                             <div class="bg-slate-900 text-slate-100 p-5 rounded-xl font-mono text-xl leading-relaxed shadow-lg overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;">
-age = <span class="text-amber-400">15</span>
+<pre class="text-left m-0 p-0" style="white-space: pre;">age = <span class="text-amber-400">15</span>
 <span class="text-purple-400">if</span> age >= <span class="text-amber-400">18</span>:
     <span class="text-green-400">print</span>(<span class="text-orange-300">"可以觀看限制級電影"</span>)
 <span class="text-purple-400">else</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"年齡未滿，禁止觀看"</span>)
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"年齡未滿，禁止觀看"</span>)</pre>
                             </div>
                             <p class="text-slate-600 text-sm font-bold">在此案例中，15 >= 18 為 False，程式會自動分流至 else 區塊，印出禁止觀看。</p>
                         </div>
                     </div>
-                </div>
-
+					
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-8">
                     <h2 class="text-2xl font-black text-slate-800 border-b pb-2 flex items-center gap-2">🎯 任務挑戰：二分法流向比對</h2>
 
@@ -2389,31 +2387,31 @@ function renderCh2L3Module(el) {
                         <div class="space-y-3">
                             <h3 class="text-2xl font-black text-violet-700 flex items-center gap-1">📌 語法規則</h3>
                             <div class="bg-slate-900 text-slate-100 p-5 rounded-xl font-mono text-xl leading-relaxed shadow-lg overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;">
-<span class="text-purple-400">if</span> 條件A:
+<pre class="text-left m-0 p-0" style="white-space: pre;"><span class="text-purple-400">if</span> 條件A:
     ⚡ 條件 A 成立時執行
 <span class="text-purple-400">elif</span> 條件B:
     ⚡ 條件 B 成立時執行
 <span class="text-purple-400">else</span>:
-    ⚡ 以上皆不成立時保底執行
+    ⚡ 以上皆不成立時保底執行</pre>
                             </div>
                             <p class="text-slate-600 text-sm font-bold">⚠️ 重要特性：「順序」至關重要！如果上方的條件已經卡位成功，下方的 elif 即使符合也絕對不會執行。</p>
                         </div>
                         <div class="space-y-3">
-                            <h3 class="text-2xl font-black text-violet-700 flex items-center gap-1">💡 生活生活範例：成績評等</h3>
+                            <h3 class="text-2xl font-black text-violet-700 flex items-center gap-1">💡 生活範例：成績評等</h3>
                             <div class="bg-slate-900 text-slate-100 p-5 rounded-xl font-mono text-xl leading-relaxed shadow-lg overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;">
-score = <span class="text-amber-400">85</span>
+<pre class="text-left m-0 p-0" style="white-space: pre;">score = <span class="text-amber-400">85</span>
 <span class="text-purple-400">if</span> score >= <span class="text-amber-400">90</span>:
     <span class="text-green-400">print</span>(<span class="text-orange-300">"優等"</span>)
 <span class="text-purple-400">elif</span> score >= <span class="text-amber-400">80</span>:
     <span class="text-green-400">print</span>(<span class="text-orange-300">"甲等"</span>)
 <span class="text-purple-400">else</span>:
-    <span class="text-green-400">print</span>(<span class="text-orange-300">"繼續努力"</span>)
+    <span class="text-green-400">print</span>(<span class="text-orange-300">"繼續努力"</span>)</pre>
                             </div>
                             <p class="text-slate-600 text-sm font-bold">因為 85 >= 90 為 False，接著檢查 85 >= 80 為 True，於是印出「甲等」後結束，分流非常明確！</p>
                         </div>
                     </div>
-                </div>
 
+					
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-6 space-y-8">
                     <h2 class="text-2xl font-black text-slate-800 border-b pb-2 flex items-center gap-2">🎯 任務挑戰：多向分流深度除錯</h2>
 

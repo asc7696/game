@@ -3812,7 +3812,7 @@ function renderCh3L2Module(el) {
 
                         <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
                             <label class="block text-slate-200 text-xs font-bold">✏️ 檢核問題：在這個範例中，內部的 <code>print(s)</code> 指令總共會被執行幾次？</label>
-                            <input type="text" value="${state.q1}" oninput="window.ch3l2State.q1=this.value.trim();" placeholder="請輸入阿拉伯數字" class="w-40 px-3 py-1 bg-slate-950 text-cyan-400 rounded-lg font-mono text-xs font-bold border border-slate-700 focus:outline-none">
+                            <input type="text" value="${state.q1}" oninput="window.ch3l2State.q1=this.value.trim(); window.renderCh3l2Inner();" placeholder="請輸入阿拉伯數字" class="w-40 px-3 py-1 bg-slate-950 text-cyan-400 rounded-lg font-mono text-xs font-bold border border-slate-700 focus:outline-none">
                         </div>
                     </div>
 
@@ -3854,7 +3854,7 @@ function renderCh3L2Module(el) {
 
                         <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
                             <label class="block text-slate-200 text-xs font-bold">✏️ 檢核問題：若將迴圈改寫成跳格函數 <code>for i in range(0, len(x), 2): print(x[i])</code>，印出的數據結果為何？（請以中括號半形格式輸入，例如: [1,2,3]）</label>
-                            <input type="text" value="${state.q2}" oninput="window.ch3l2State.q2=this.value.trim().replace(/\\s+/g,'');" placeholder="例如: [1,3,5,7]" class="w-52 px-3 py-1 bg-slate-950 text-cyan-400 rounded-lg font-mono text-xs font-bold border border-slate-700 focus:outline-none">
+                            <input type="text" value="${state.q2}" oninput="window.ch3l2State.q2=this.value.trim().replace(/\\s+/g,''); window.renderCh3l2Inner();" placeholder="例如: [1,3,5,7]" class="w-52 px-3 py-1 bg-slate-950 text-cyan-400 rounded-lg font-mono text-xs font-bold border border-slate-700 focus:outline-none">
                         </div>
                     </div>
 
@@ -3876,7 +3876,7 @@ function renderCh3L2Module(el) {
                             <div class="bg-slate-950 rounded-lg p-3 flex flex-col justify-between min-h-[120px]">
                                 <div class="font-mono text-2xs text-teal-400 space-y-0.5">
                                     <div class="text-slate-500 border-b border-slate-900 pb-1 mb-1">🖥️ 終端機模擬</div>
-                                    ${state.step3 === 3 ? '<div class="text-white font-bold text-sm">231</div>' : '<div class="text-slate-600 text-3xs">（注意：print在迴圈外，最後一步才會印出）</div>'}
+                                    ${state.step3 === 3 ? '<div class="text-white font-bold text-xs">231</div>' : '<div class="text-slate-600 text-3xs">（注意：print在迴圈外，最後一步才會印出）</div>'}
                                 </div>
                                 <div class="flex gap-2 mt-3">
                                     <button onclick="window.moveCh3l2Step(3, 3)" ${state.step3 >= 3 ? 'disabled' : ''} class="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white text-2xs font-bold rounded transition disabled:opacity-30">下一步 (${state.step3}/3)</button>
@@ -3915,7 +3915,7 @@ function renderCh3L2Module(el) {
                             <div class="bg-slate-950 rounded-lg p-3 flex flex-col justify-between min-h-[120px]">
                                 <div class="font-mono text-2xs text-purple-400 space-y-0.5">
                                     <div class="text-slate-500 border-b border-slate-900 pb-1 mb-1">🖥️ 終端機模擬</div>
-                                    ${state.step4 === 3 ? '<div class="text-white font-bold text-sm">231</div>' : '<div class="text-slate-600 text-3xs">（注意：最後才在終端機印出累加結果）</div>'}
+                                    ${state.step4 === 3 ? '<div class="text-white font-bold text-xs">231</div>' : '<div class="text-slate-600 text-3xs">（注意：最後才在終端機印出累加結果）</div>'}
                                 </div>
                                 <div class="flex gap-2 mt-3">
                                     <button onclick="window.moveCh3l2Step(4, 3)" ${state.step4 >= 3 ? 'disabled' : ''} class="px-3 py-1 bg-purple-600 hover:bg-purple-700 text-white text-2xs font-bold rounded transition disabled:opacity-30">下一步 (${state.step4}/3)</button>
@@ -3943,7 +3943,7 @@ function renderCh3L2Module(el) {
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div class="bg-slate-900 rounded-2xl p-4 shadow-inner">
                             <div class="text-xs font-mono text-slate-500 border-b border-slate-800 pb-2 mb-3">📄 list_loop.py</div>
-                            <pre class="font-mono text-sm text-slate-100 whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-blue-400">scores</span> = [<span class="text-amber-400">100</span>, <span class="text-amber-400">80</span>, <span class="text-amber-400">90</span>]\n\n<span class="text-purple-400">for</span> s <span class="text-purple-400">in</span> scores:\n    <span class="text-green-400">print</span>(s)</pre>
+                            <pre class="font-mono text-sm text-slate-100 whitespace-pre bg-slate-950 p-4 rounded-xl overflow-x-auto select-none" style="font-family: 'Courier New', Courier, monospace;"><span class="text-blue-400">scores</span> = [<span class="text-amber-400">100</span>, <span class="text-amber-400">80</span>, <span class="text-amber-400">90</span>]\n\n<span class="text-purple-400">for</span> s <span class="text-purple-400">in</span> scores:\n    <span class="text-green-400">print</span>(s)</pre>
                         </div>
 
                         <div class="bg-slate-950 rounded-2xl p-4 flex flex-col justify-between min-h-[250px]">
@@ -4023,10 +4023,10 @@ function renderCh3L2Module(el) {
             window.renderCh3l2Inner();
 
             let errorReport = "❌ 答錯囉！請查看以下線索重新調整答案：\n";
-            if (!isQ1Correct) errorReport += "• 檢核 2：串列有 3 個元素，迴圈就會老實重複執行 3 次。\n";
-            if (!isQ2Correct) errorReport += "• 檢核 3：range(0, len(x), 2) 代表索引為 0, 2, 4, 6，印出對應元素就是 [1, 3, 5, 7]。\n";
-            if (!isQ3Correct) errorReport += "• 檢核 4：sum = sum + s 是在做分數累加，這是總和功能。\n";
-            if (!isQ4Correct) errorReport += "• 檢核 5：這題同樣是用索引逐一加總到 sum 內，一樣是總和。\n";
+            if (!isQ1Correct) errorReport += "• 檢核 1：串列有 3 個元素，迴圈就會老實重複執行 3 次。\n";
+            if (!isQ2Correct) errorReport += "• 檢核 2：range(0, len(x), 2) 代表索引為 0, 2, 4, 6，印出對應元素就是 [1, 3, 5, 7]。\n";
+            if (!isQ3Correct) errorReport += "• 檢核 3：sum = sum + s 是在做分數累加，這是總和功能。\n";
+            if (!isQ4Correct) errorReport += "• 檢核 4：這題同樣是用索引逐一加總到 sum 內，一樣是總和。\n";
             if (!isSelectedCorrect) errorReport += "• 單選題：Python 的 print() 在印出資料後預設會自動換行喔！";
             
             alert(errorReport);
@@ -4065,16 +4065,20 @@ function renderCh3L3Module(el) {
         const status = window.ch3l3Status;
 
         // --- 🎮 RPG 背包動態模擬渲染引擎 ---
-        // 根據學生目前的答題對錯，動態推算背包內容顯示給學生看
+        // 根據學生目前的答題，動態推算背包內容顯示給學生看 (優化：加入填空題基本推算)
         let currentBag = ["新手劍", "木盾", "短刀"];
-        if (state.q1 === 1) currentBag.push("鐵盔");
-        if (state.q2 === 0) currentBag.unshift("聖劍");
+        if (state.q2 === 0) currentBag.unshift("聖劍"); // 聖劍在最前
+        if (state.q1 === 1) currentBag.push("鐵盔");   // 鐵盔在最後
         
-        // 精準模擬中期的標準背包狀態 (Q5 的依據)
-        let midBag = ["聖劍", "新手劍", "木盾", "紅藥水", "短刀", "鐵盔", "藍藥水"];
-        
-        // 精準模擬最終背包狀態 (Q8 的依據)
-        let finalBag = ["聖劍", "新手劍", "紅藥水", "短刀", "鐵盔"];
+        // 檢查填空是否有寫到關鍵字，有的話放進預覽提升互動感
+        const cleanInput3 = state.q3.replace(/\s+/g, '');
+        if (cleanInput3.includes("紅藥水") && (cleanInput3.includes(".insert(3") || cleanInput3.includes(",3"))) {
+            // 精準插入第四個位置 (索引 3)
+            currentBag.splice(3, 0, "紅藥水");
+        }
+        if (state.q4.replace(/\s+/g, '').includes("藍藥水")) {
+            currentBag.push("藍藥水");
+        }
 
         app.innerHTML = `
             <div class="max-w-4xl mx-auto px-4 py-6 animate-fade-in space-y-8">
@@ -4086,7 +4090,7 @@ function renderCh3L3Module(el) {
 
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 space-y-4">
                     <div>
-                        <h1 class="text-3xl font-black text-slate-900 mb-2 flex items-center gap-2">🎒 3-3 串列的常用操作操作</h1>
+                        <h1 class="text-3xl font-black text-slate-900 mb-2 flex items-center gap-2">🎒 3-3 串列的常用操作</h1>
                         <p class="text-slate-600 font-medium text-base">
                             串列建立好之後，我們隨時可以對它進行動態調整。Python 內建了四個最常用的神奇方法，可以用來新增、插入或刪除資料：
                         </p>
@@ -4140,7 +4144,7 @@ function renderCh3L3Module(el) {
                                 <p class="text-slate-400 text-xs mt-1">初始設定背包變數：<code>bag = ["新手劍", "木盾", "短刀"]</code>。請撰寫或選擇精確的代碼來整理背包！</p>
                             </div>
                             <div class="bg-slate-950 px-4 py-2 rounded-xl border border-slate-800 text-right">
-                                <span class="text-2xs font-mono text-amber-500 font-bold block">🎒 當前即時背包狀態預覽</span>
+                                <span class="text-2xs font-mono text-amber-500 font-bold block">🎒 任務①~④即時背包預覽</span>
                                 <span class="text-xs font-mono text-slate-300 font-bold">[ ${currentBag.map(item => `'${item}'`).join(', ')} ]</span>
                             </div>
                         </div>
@@ -4183,13 +4187,19 @@ function renderCh3L3Module(el) {
                         <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
                             <span class="text-amber-400 font-bold">任務 ③ 【代碼填空】</span>
                             <p class="font-medium text-slate-200">你獲得了一瓶 <code>"紅藥水"</code>，想要強制放進<b>背包的第四個位置 (索引值為 3)</b>，請寫出程式碼：</p>
-                            <input type="text" value="${state.q3}" oninput="window.ch3l3State.q3=this.value.trim();" placeholder="bag.______" class="w-full sm:w-80 p-2 bg-slate-900 border border-slate-700 text-cyan-400 font-mono rounded-lg focus:outline-none focus:border-amber-500">
+                            <div class="flex items-center gap-2 font-mono text-cyan-400 bg-slate-900 p-2 rounded-lg border border-slate-700 w-full sm:w-80">
+                                <span>bag.</span>
+                                <input type="text" value="${state.q3.replace(/^bag\./, '')}" oninput="window.ch3l3State.q3='bag.'+this.value.trim(); window.renderCh3l3Inner();" placeholder="insert(3, '紅藥水')" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
+                            </div>
                         </div>
 
                         <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
                             <span class="text-amber-400 font-bold">任務 ④ 【代碼填空】</span>
                             <p class="font-medium text-slate-200">你又獲得了一瓶 <code>"藍藥水"</code>，想要直接放進<b>背包最後面</b>，請寫出程式碼：</p>
-                            <input type="text" value="${state.q4}" oninput="window.ch3l3State.q4=this.value.trim();" placeholder="bag.______" class="w-full sm:w-80 p-2 bg-slate-900 border border-slate-700 text-cyan-400 font-mono rounded-lg focus:outline-none focus:border-amber-500">
+                            <div class="flex items-center gap-2 font-mono text-cyan-400 bg-slate-900 p-2 rounded-lg border border-slate-700 w-full sm:w-80">
+                                <span>bag.</span>
+                                <input type="text" value="${state.q4.replace(/^bag\./, '')}" oninput="window.ch3l3State.q4='bag.'+this.value.trim(); window.renderCh3l3Inner();" placeholder="append('藍藥水')" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
+                            </div>
                         </div>
 
                         <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
@@ -4202,12 +4212,12 @@ function renderCh3L3Module(el) {
                                     { text: `bag = ["聖劍", "新手劍", "木盾", "短刀", "紅藥水", "鐵盔", "藍藥水"]`, id: 2 }
                                 ].map(opt => {
                                     const isSel = state.q5 === opt.id;
-                                    return `<button onclick="window.ch3l3State.q5=${opt.id}; window.renderCh3l2Inner ? null : window.renderCh3l3Inner();" class="w-full text-left p-2 rounded-lg font-mono text-2xs border transition ${isSel ? 'bg-amber-950 border-amber-500 text-amber-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'}">${opt.text}</button>`;
+                                    return `<button onclick="window.ch3l3State.q5=${opt.id}; window.renderCh3l3Inner();" class="w-full text-left p-2 rounded-lg font-mono text-2xs border transition ${isSel ? 'bg-amber-950 border-amber-500 text-amber-400 font-black' : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'}">${opt.text}</button>`;
                                 }).join('')}
                             </div>
                         </div>
 
-                        <div class="bg-slate-950 p-3 rounded-lg border border-dashed border-slate-800 text-2xs text-slate-400 leading-relaxed">
+                        <div class="flex items-center gap-2 bg-slate-950 p-3 rounded-lg border border-dashed border-slate-800 text-2xs text-slate-400 leading-relaxed">
                             💡 <b>冒險小憩提示：</b> 後續的任務 ⑥ 與 ⑦，將會基於這個標準狀態繼續往下執行喔！<br>
                             <code>bag = ["聖劍", "新手劍", "木盾", "紅藥水", "短刀", "鐵盔", "藍藥水"]</code>
                         </div>
@@ -4215,13 +4225,19 @@ function renderCh3L3Module(el) {
                         <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
                             <span class="text-amber-400 font-bold">任務 ⑥ 【代碼填空】</span>
                             <p class="font-medium text-slate-200">你口渴了，決定拿出背包<b>最後面的「藍藥水」</b>喝掉它。請寫出對應程式碼（提示：利用 <code>pop</code> 移除指定索引）：</p>
-                            <input type="text" value="${state.q6}" oninput="window.ch3l3State.q6=this.value.trim();" placeholder="bag.______" class="w-full sm:w-80 p-2 bg-slate-900 border border-slate-700 text-cyan-400 font-mono rounded-lg focus:outline-none focus:border-amber-500">
+                            <div class="flex items-center gap-2 font-mono text-cyan-400 bg-slate-900 p-2 rounded-lg border border-slate-700 w-full sm:w-80">
+                                <span>bag.</span>
+                                <input type="text" value="${state.q6.replace(/^bag\./, '')}" oninput="window.ch3l3State.q6='bag.'+this.value.trim();" placeholder="pop()" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
+                            </div>
                         </div>
 
                         <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
                             <span class="text-amber-400 font-bold">任務 ⑦ 【代碼填空】</span>
                             <p class="font-medium text-slate-200">背包太滿了，你決定扔掉重死人的舊防具<b>「木盾」</b>。請寫出對應程式碼（提示：直接指定名稱移除）：</p>
-                            <input type="text" value="${state.q7}" oninput="window.ch3l3State.q7=this.value.trim();" placeholder="請填寫完整代碼" class="w-full sm:w-80 p-2 bg-slate-900 border border-slate-700 text-cyan-400 font-mono rounded-lg focus:outline-none focus:border-amber-500">
+                            <div class="flex items-center gap-2 font-mono text-cyan-400 bg-slate-900 p-2 rounded-lg border border-slate-700 w-full sm:w-80">
+                                <span>bag.</span>
+                                <input type="text" value="${state.q7.replace(/^bag\./, '')}" oninput="window.ch3l3State.q7='bag.'+this.value.trim();" placeholder="remove('木盾')" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
+                            </div>
                         </div>
 
                         <div class="p-4 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
@@ -4230,7 +4246,7 @@ function renderCh3L3Module(el) {
                             <div class="space-y-2 pt-1">
                                 ${[
                                     { text: `bag = ["聖劍", "新手劍", "紅藥水", "短刀", "鐵盔"]`, id: 0 },
-                                    { text: `bag = ["聖劍", "新手劍", "木盾", "紅藥水", "短刀", "鐵盔"]`, id: 1 },
+                                    { text: `bag = ["聖劍", "新手劍", "木盾", "紅藥水", "裝備", "鐵盔"]`, id: 1 },
                                     { text: `bag = ["新手劍", "紅藥水", "短刀", "鐵盔", "藍藥水"]`, id: 2 }
                                 ].map(opt => {
                                     const isSel = state.q8 === opt.id;
@@ -4258,13 +4274,13 @@ function renderCh3L3Module(el) {
     window.checkCh3L3BagEngine = function() {
         const state = window.ch3l3State;
 
-        // 1. 未作答防呆
-        if (state.q1 === null || state.q2 === null || !state.q3 || !state.q4 || state.q5 === null || !state.q6 || !state.q7 || state.q8 === null) {
+        // 1. 未作答防呆 (確保檢查時，字串不是只有自動帶入的 "bag.")
+        if (state.q1 === null || state.q2 === null || state.q3 === "bag." || state.q4 === "bag." || state.q5 === null || state.q6 === "bag." || state.q7 === "bag." || state.q8 === null) {
             alert("⚠️ 勇者，你還有背包任務沒有完成喔！請仔細檢查所有欄位。");
             return;
         }
 
-        // 2. 清除所有空格以利嚴格比對
+        // 2. 嚴格清理：去除所有空格、統一將雙引號轉為單引號
         const cleanStr = (s) => s.replace(/\s+/g, '').replace(/"/g, "'");
 
         const ans3 = cleanStr(state.q3);
@@ -4276,32 +4292,31 @@ function renderCh3L3Module(el) {
         const isQ1Ok = (state.q1 === 1);
         const isQ2Ok = (state.q2 === 0);
         
-        // 考慮可能帶有分號或沒帶分號的情況
-        const isQ3Ok = (ans3 === "bag.insert(3,'紅藥水')" || ans3 === "bag.insert(3,\"紅藥水\")");
-        const isQ4Ok = (ans4 === "bag.append('藍藥水')" || ans4 === "bag.append(\"藍藥水\")");
-        
+        // 統一用單引號進行精準匹配
+        const isQ3Ok = (ans3 === "bag.insert(3,'紅藥水')");
+        const isQ4Ok = (ans4 === "bag.append('藍藥水')");
         const isQ5Ok = (state.q5 === 1);
         
-        // 拿走最後一項可以寫 pop(-1) 或 pop()，皆算對
+        // 考慮 pop 的多元寫法
         const isQ6Ok = (ans6 === "bag.pop(-1)" || ans6 === "bag.pop()" || ans6 === "bag.pop(6)");
-        const isQ7Ok = (ans7 === "bag.remove('木盾')" || ans7 === "bag.remove(\"木盾\")");
-        
+        const isQ7Ok = (ans7 === "bag.remove('木盾')");
         const isQ8Ok = (state.q8 === 0);
 
         if (isQ1Ok && isQ2Ok && isQ3Ok && isQ4Ok && isQ5Ok && isQ6Ok && isQ7Ok && isQ8Ok) {
             if (typeof stopTimer === 'function') stopTimer();
             window.ch3l3Status = "normal";
-            showResult(true); // 通關！向主控台傳遞金鑰
+            if (typeof showResult === 'function') showResult(true); 
+            alert("🎉 太棒了！你完美掌握了 Python 串列的新增與刪除操作，成功整理了冒險背包！");
         } else {
             window.ch3l3Status = "error";
             let errReport = "❌ 背包整理的邏輯有些漏洞喔！請查看線索：\n";
             if (!isQ1Ok) errReport += "• 任務①：新增到最後面，使用 .append() 是最佳首選！\n";
             if (!isQ2Ok) errReport += "• 任務②：強行插隊到最前面，請使用 .insert(0, ...)。\n";
-            if (!isQ3Ok) errReport += "• 任務③：第四個位置對應的索引值是 3 喔！語法為 bag.insert(3, '紅藥水')。\n";
-            if (!isQ4Ok) errReport += "• 任務④：加到尾端請用 bag.append('藍藥水')。\n";
+            if (!isQ3Ok) errReport += "• 任務③：第四個位置對應的索引值是 3 喔！語法為 insert(3, '紅藥水')。\n";
+            if (!isQ4Ok) errReport += "• 任務④：加到尾端請用 append('藍藥水')。\n";
             if (!isQ5Ok) errReport += "• 任務⑤：請依序數數看，聖劍在 0、紅藥水在 3、藍藥水在最後。\n";
-            if (!isQ6Ok) errReport += "• 任務⑥：移除最後一項可直接調用不帶參數的 bag.pop() 或是 bag.pop(-1)。\n";
-            if (!isQ7Ok) errReport += "• 任務⑦：直接指定名稱移除木盾，應使用 bag.remove('木盾')。\n";
+            if (!isQ6Ok) errReport += "• 任務⑥：移除最後一項可直接調用不帶參數的 pop() 或是 pop(-1)。\n";
+            if (!isQ7Ok) errReport += "• 任務⑦：直接指定名稱移除木盾，應使用 remove('木盾')。\n";
             if (!isQ8Ok) errReport += "• 任務⑧：沒了最後面的藍藥水與中間的木盾，請重新檢查剩餘裝備順序！";
             
             alert(errReport);
@@ -4339,11 +4354,32 @@ if (!window.ch3l4State) {
 }
 
 // ==========================================
-// 💡 3-4 核心渲染與互動控制主功能
+// 💡 3-4 核心渲染與互動控制主功能（健全修正版）
 // ==========================================
 function renderCh3L4Module(el) {
     if (typeof startTimer === 'function') startTimer();
 
+    // 🛡️ 防呆機制 1：全域狀態與資料結構初始化
+    if (!window.ch3l4State) {
+        window.ch3l4State = {
+            activePrint: 0,
+            q1: null,
+            q2: null,
+            c1_if: "",
+            c1_else: "",
+            c1_print: "",
+            c2_list1: "",
+            c2_list2: "",
+            c2_list3: "",
+            c2_list4: "",
+            c2_if: ""
+        };
+    }
+    if (window.ch3l4Status === undefined) {
+        window.ch3l4Status = "normal";
+    }
+
+    // 統一命名核心內部渲染（全小寫 l 防止大小寫錯對）
     window.renderCh3l4Inner = () => {
         const app = document.getElementById('app') || el;
         const state = window.ch3l4State;
@@ -4421,7 +4457,7 @@ function renderCh3L4Module(el) {
 
                     <div class="space-y-3">
                         <div class="bg-slate-900 p-4 rounded-xl">
-                            <pre class="text-slate-200 font-mono text-xs leading-relaxed">bag = ["短刀", "紅藥水", "龍之鱗片", "鐵盔"]\n\n<span class="text-purple-400">if</span> <span class="text-amber-400">"龍之鱗片"</span> <span class="text-purple-400">in</span> bag:\n    <span class="text-green-400">print</span>(<span class="text-cyan-300">"守衛：你持有龍之鱗片，大門已為你開啟！"</span>)\n<span class="text-purple-400">else</span>:\n    <span class="text-green-400">print</span>(<span class="text-cyan-300">"守衛：此處極度危險，沒有龍之鱗片不准進入！"</span>)</pre>
+                            <pre class="text-slate-200 font-mono text-xs leading-relaxed">bag = ["短刀", "紅藥水", "龍之鱗片", "鐵盔"]\n\n<span class="text-purple-400">if</span> <span class="text-amber-400">"龍之鱗片"</span> <span class="text-purple-400">in</span> bag:\n    <span class="text-green-400">print</span>(<span class="text-cyan-300">"守衛：你持有龍之鱗片，大門已為你開啟！"</span>)\n<span class="text-purple-400">else</span>:\n    <span class="text-green-400">print</span>(<span class="text-cyan-300">"守衛：此處極度危險，沒有龍之鱗片不准進入！"</span>)</pre>
                         </div>
                         <div class="space-y-2">
                             <label class="block text-slate-700 text-sm font-bold">🙋 思考填空：請問這段程式執行後，守衛最終會對你說什麼話？</label>
@@ -4439,7 +4475,7 @@ function renderCh3L4Module(el) {
 
                     <div class="space-y-3 pt-4 border-t border-slate-100">
                         <div class="bg-slate-900 p-4 rounded-xl">
-                            <pre class="text-slate-200 font-mono text-xs leading-relaxed">player = <span class="text-cyan-300">'阿公三四'</span>\nblack = [<span class="text-cyan-300">"外掛張三"</span>, <span class="text-cyan-300">"洗錢李四"</span>, <span class="text-cyan-300">"破壞王五"</span>]  <span class="text-slate-500"># 黑名單</span>\n\n<span class="text-purple-400">if</span> _____________________:\n    <span class="text-green-400">print</span>(<span class="text-cyan-300">"系統：歡迎玩家申請加入公會！"</span>)\n<span class="text-purple-400">else</span>:\n    <span class="text-green-400">print</span>(<span class="text-cyan-300">"系統：玩家在黑名單中，拒絕加入！"</span>)</pre>
+                            <pre class="text-slate-200 font-mono text-xs leading-relaxed">player = <span class="text-cyan-300">'阿公三四'</span>\nblack = [<span class="text-cyan-300">"外掛張三"</span>, <span class="text-cyan-300">"洗錢李四"</span>, <span class="text-cyan-300">"破壞王五"</span>]  <span class="text-slate-500"># 黑名單</span>\n\n<span class="text-purple-400">if</span> _____________________:\n    <span class="text-green-400">print</span>(<span class="text-cyan-300">"系統：歡迎玩家申請加入公會！"</span>)\n<span class="text-purple-400">else</span>:\n    <span class="text-green-400">print</span>(<span class="text-cyan-300">"系統：玩家在黑名單中，拒絕加入！"</span>)</pre>
                         </div>
                         <div class="space-y-2">
                             <label class="block text-slate-700 text-sm font-bold">🙋 選擇題：為了讓完全不在黑名單裡的「阿公三四」能成功看到<b>歡迎加入</b>的訊息，底線應該填入什麼？</label>
@@ -4451,7 +4487,8 @@ function renderCh3L4Module(el) {
                                     'black not in player'
                                 ].map((code, idx) => {
                                     const isSel = state.q2 === idx;
-                                    return `<button onclick="window.ch3l4State.q2=${idx}; window.renderCh3l4Inner();" class="text-left p-2.5 rounded-xl border transition ${isSel ? 'bg-indigo-950 border-indigo-500 text-indigo-400 font-bold' : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'}">${idx+1}. ${code}</button>`;
+                                    /* ✨ 修正：將選中按鈕改為高亮明亮的白藍底，增強可視性與一致性 */
+                                    return `<button onclick="window.ch3l4State.q2=${idx}; window.renderCh3l4Inner();" class="text-left p-3 rounded-xl border transition ${isSel ? 'bg-indigo-50 border-indigo-500 text-indigo-700 font-bold shadow-sm' : 'bg-slate-900 text-slate-300 border-slate-800 hover:bg-slate-800'}\">${idx+1}. ${code}</button>`;
                                 }).join('')}
                             </div>
                         </div>
@@ -4472,15 +4509,15 @@ function renderCh3L4Module(el) {
                             <div>bag = ["短刀", "紅藥水", "龍之鱗片", "鐵盔"]</div>
                             <div class="flex flex-wrap items-center gap-1.5">
                                 <span>if</span>
-                                <input type="text" value="${state.c1_if}" oninput="window.ch3l4State.c1_if=this.value;" placeholder='"王者披風" in bag:' class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-44 font-mono text-2xs focus:outline-none">
+                                <input type="text" value="${state.c1_if}" oninput="window.saveFill34('c1_if', this.value)" placeholder='"王者披風" in bag:' class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-44 font-mono text-2xs focus:outline-none focus:border-indigo-500">
                             </div>
                             <div class="pl-4 text-emerald-400">print("你已經裝備了【王者披風】，無法重複裝備")</div>
                             <div class="flex flex-wrap items-center gap-1.5">
-                                <input type="text" value="${state.c1_else}" oninput="window.ch3l4State.c1_else=this.value;" placeholder="else:" class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-16 font-mono text-2xs focus:outline-none">
+                                <input type="text" value="${state.c1_else}" oninput="window.saveFill34('c1_else', this.value)" placeholder="else:" class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-16 font-mono text-2xs focus:outline-none focus:border-indigo-500">
                             </div>
                             <div class="pl-4 flex flex-wrap items-center gap-1.5">
                                 <span>print(</span>
-                                <input type="text" value="${state.c1_print}" oninput="window.ch3l4State.c1_print=this.value;" placeholder='"成功裝備王者披風！"' class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-40 font-mono text-2xs focus:outline-none">
+                                <input type="text" value="${state.c1_print}" oninput="window.saveFill34('c1_print', this.value)" placeholder='"成功裝備王者披風！"' class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-40 font-mono text-2xs focus:outline-none focus:border-indigo-500">
                                 <span>)</span>
                             </div>
                         </div>
@@ -4497,15 +4534,15 @@ function renderCh3L4Module(el) {
                             <div>name = input('輸入你的姓名')</div>
                             <div class="flex flex-wrap items-center gap-1">
                                 <span>lucky = ["淑", </span>
-                                <input type="text" value="${state.c2_list1}" oninput="window.ch3l4State.c2_list1=this.value;" placeholder='"志"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none"><span>,</span>
-                                <input type="text" value="${state.c2_list2}" oninput="window.ch3l4State.c2_list2=this.value;" placeholder='"豪"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none"><span>,</span>
-                                <input type="text" value="${state.c2_list3}" oninput="window.ch3l4State.c2_list3=this.value;" placeholder='"雅"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none"><span>,</span>
-                                <input type="text" value="${state.c2_list4}" oninput="window.ch3l4State.c2_list4=this.value;" placeholder='"婷"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none">
+                                <input type="text" value="${state.c2_list1}" oninput="window.saveFill34('c2_list1', this.value)" placeholder='"志"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
+                                <input type="text" value="${state.c2_list2}" oninput="window.saveFill34('c2_list2', this.value)" placeholder='"豪"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
+                                <input type="text" value="${state.c2_list3}" oninput="window.saveFill34('c2_list3', this.value)" placeholder='"雅"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
+                                <input type="text" value="${state.c2_list4}" oninput="window.saveFill34('c2_list4', this.value)" placeholder='"婷"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500">
                                 <span>]</span>
                             </div>
                             <div class="flex flex-wrap items-center gap-1.5">
                                 <span class="text-purple-400">if</span>
-                                <input type="text" value="${state.c2_if}" oninput="window.ch3l4State.c2_if=this.value;" placeholder="例如：依題目情境做單字成員判定" class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-72 font-mono text-2xs focus:outline-none">
+                                <input type="text" value="${state.c2_if}" oninput="window.saveFill34('c2_if', this.value)" placeholder="例如：依題目情語境做單字成員判定" class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-72 font-mono text-2xs focus:outline-none focus:border-indigo-500">
                             </div>
                             <div class="pl-4 text-emerald-400">print("離島花東機+酒專案現折 $500！")</div>
                         </div>
@@ -4521,6 +4558,13 @@ function renderCh3L4Module(el) {
         `;
     };
 
+    // ⚡ 防流失專用輸入儲存函式：只存資料不重繪頁面，確保打字順暢不卡
+    window.saveFill34 = (field, value) => {
+        if (window.ch3l4State) {
+            window.ch3l4State[field] = value;
+        }
+    };
+
     // ==========================================
     // 🧠 3-4 終極綜合防呆與語意校驗大引擎
     // ==========================================
@@ -4533,34 +4577,42 @@ function renderCh3L4Module(el) {
             return;
         }
 
-        // 2. 文字清洗工具
-        const clean = (s) => s.replace(/\s+/g, '').replace(/"/g, "'");
+        // 2. 文字清洗工具（✨ 修正：移除小括號，將所有雙引號統一轉單引號）
+        const clean = (s) => s.replace(/\s+/g, '').replace(/"/g, "'").replace(/\(/g, '').replace(/\)/g, '');
+        // 專門針對單一字的清洗工具（無論有沒有帶引號，都過濾成乾淨的單字本身）
+        const cleanChar = (s) => s.replace(/['"\s]+/g, '');
 
         // 3. 校對各題答案
-        const isQ1Correct = (state.q1 === 0); // 包含龍之鱗片，看 if 區塊
-        const isQ2Correct = (state.q2 === 1); // 玩家不在黑名單中，用 player not in black
+        const isQ1Correct = (state.q1 === 0); 
+        const isQ2Correct = (state.q2 === 1); 
 
         // 挑戰 1 精準比對
         const c1IfAns = clean(state.c1_if);
-        const isC1IfOk = (c1IfAns === "'王者披風'inbag:" || c1IfAns === "bag.count('王者披風')>0:"); // 支持標準與進階寫法
+        const isC1IfOk = (c1IfAns === "'王者披風'inbag:" || c1IfAns === "bag.count('王者披風')>0:"); 
         const isC1ElseOk = (clean(state.c1_else) === "else:");
         const isC1PrintOk = (state.c1_print.trim().length > 0);
 
-        // 挑戰 2 精準比對
-        const isL1 = (clean(state.c2_list1) === "'志'");
-        const isL2 = (clean(state.c2_list2) === "'豪'");
-        const isL3 = (clean(state.c2_list3) === "'雅'");
-        const isL4 = (clean(state.c2_list4) === "'婷'");
+        // 挑戰 2 精準比對（✨ 修正：使用 cleanChar，即使學生沒輸入引號也算對）
+        const isL1 = (cleanChar(state.c2_list1) === "志");
+        const isL2 = (cleanChar(state.c2_list2) === "豪");
+        const isL3 = (cleanChar(state.c2_list3) === "雅");
+        const isL4 = (cleanChar(state.c2_list4) === "婷");
         
-        // 考慮常見的兩種判定寫法：1. 任何一個字是否在裡面 (多字元核對通常實務上會用迴圈或 in 判定，最切合當前主題之簡化版為判定特定代表字或關鍵邏輯)
-        // 由於題目為 name=input()，在此若學生寫出與 in / lucky 有關之合理成員判定即給予通關
+        // 挑戰 2 的 if 嚴謹判定（✨ 修正：避免錯誤語法矇混過關，限定最合理的幾種成員檢查寫法）
         const c2IfAns = clean(state.c2_if);
-        const isC2IfOk = (c2IfAns.includes('in') && (c2IfAns.includes('lucky') || c2IfAns.includes('name')));
+        const validC2Answers = [
+            "nameinlucky:", "luckyinname:", 
+            "any(xinluckyforxinname):", "any(xinyforxinnameforyinlucky):"
+        ];
+        // 移除最後可能存在的冒號做彈性比對
+        const c2IfAnsNoColon = c2IfAns.endsWith(':') ? c2IfAns.slice(0, -1) : c2IfAns;
+        const isC2IfOk = validC2Answers.some(ans => c2IfAns === ans || c2IfAnsNoColon === ans.slice(0, -1));
 
         if (isQ1Correct && isQ2Correct && isC1IfOk && isC1ElseOk && isC1PrintOk && isL1 && isL2 && isL3 && isL4 && isC2IfOk) {
             if (typeof stopTimer === 'function') stopTimer();
             window.ch3l4Status = "normal";
-            showResult(true); // 觸發主系統通關金鑰
+            if (typeof showResult === 'function') showResult(true); 
+            alert("🎉 恭喜通過！完全掌握了 in 和 not in 串列成員檢查的精髓！");
         } else {
             window.ch3l4Status = "error";
             let report = "❌ 偵測到部分代碼編譯或邏輯有誤！請參考下方除錯指引：\n";
@@ -4568,13 +4620,14 @@ function renderCh3L4Module(el) {
             if (!isQ2Correct) report += "• 體驗 2：要看到歡迎訊息，必須滿足「玩家不在黑名單內」，因此要用 not in。\n";
             if (!isC1IfOk) report += "• 挑戰 1 (if)：請寫出包含冒號的完整成員條件，例如 '王者披風' in bag:\n";
             if (!isC1ElseOk) report += "• 挑戰 1 (else)：否則的分支，請確認拼字與冒號 else:\n";
-            if (!isL1 || !isL2 || !isL3 || !isL4) report += "• 挑戰 2 (lucky)：請檢查 4 個字串欄位是否都有加上半形引號包裹。\n";
-            if (!isC2IfOk) report += "• 挑戰 2 (if)：請運用本章所學，寫出與 in / lucky 清單相關的成員資格判定句！";
+            if (!isL1 || !isL2 || !isL3 || !isL4) report += "• 挑戰 2 (lucky)：請確認填入的幸運字依序為 '志'、'豪'、'雅'、'婷'。\n";
+            if (!isC2IfOk) report += "• 挑戰 2 (if)：請運用本章所學檢查成員資格，例如輸入 name in lucky: (檢查名字字串是否在幸運清單中)。";
             
             alert(report);
         }
     };
 
+    // 💡 執行初次渲染
     window.renderCh3l4Inner();
 }
 		
@@ -4857,7 +4910,7 @@ function renderCh3L6Module(el) {
         window.ch3l6State = {
             ex1Step: 0,
             ex2Step: 0,
-            ex2Mode: 'success', // 'success', 'fail'
+            ex2Mode: 'success', 
             ex3Step: 0,
             ex4Step: 0, 
             // 課後實戰填空題答案
@@ -4866,13 +4919,13 @@ function renderCh3L6Module(el) {
         };
     }
 
-    // 🛠️ 📥 標準答案物件直接定義在作用域內（避免傳參引號衝突）
+    // 🛠️ 📥 標準答案物件（已同步更新：q5 的大招連擊次數標準答案為 "8"）
     const targetAnswers = {
         q1: "len(name) < 2 or len(name) > 6", 
         q2: 'email.find("@")', 
         q3: "==-1", 
         q4: 'combo_input.count("A")',
-        q5: "6", 
+        q5: "8", // ⚡ 精准同步：連擊次數更新為 8
         q6: 'chat_message.replace(bad_word, "QQ")',
         q7: "bad_word",
         q8: '"QQ"'
@@ -4968,7 +5021,8 @@ length = <span class="text-cyan-400">len</span>(password)
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="bg-slate-900 rounded-xl p-4 shadow-lg">
 <pre class="text-left m-0 p-0 text-base text-slate-100 font-mono" style="white-space: pre;">
-combo_input = <span class="text-orange-300">"AABAAASBBAAA"</span>
+<span class="text-slate-500"># ⚡ 已精準修正：字串調整為含 8 個 A</span>
+combo_input = <span class="text-orange-300">"AABAAASBBAAAAA"</span>
 attack_count = combo_input.count(<span class="text-orange-300">"A"</span>)
 <span class="text-green-400">print</span>(<span class="text-orange-300">"輕拳連擊次數："</span>, attack_count)
 </pre>
@@ -4977,11 +5031,11 @@ attack_count = combo_input.count(<span class="text-orange-300">"A"</span>)
                                 <div class="space-y-2">
                                     <div class="text-sm font-bold text-slate-600">📊 狀態監視器：</div>
                                     <div class="bg-white p-2 rounded border font-mono text-sm">
-                                        <div>attack_count = <span class="text-indigo-600 font-black">${state.ex3Step > 0 ? '6' : '尚未統計'}</span></div>
+                                        <div>attack_count = <span class="text-indigo-600 font-black">${state.ex3Step > 0 ? '8' : '尚未統計'}</span></div>
                                     </div>
                                     <div class="bg-slate-950 text-emerald-400 font-mono p-3 rounded-lg text-sm min-h-[4.5rem]">
                                         <div class="text-xs text-slate-500 border-b border-slate-800 pb-1 mb-1">🖥️ Console 輸出</div>
-                                        ${state.ex3Step > 0 ? `輕拳連擊次數： 6 \n(已達 5 次！發動大招！)` : '<span class="text-slate-600">等待執行...</span>'}
+                                        ${state.ex3Step > 0 ? `輕拳連擊次數： 8 \n(已達 5 次！發動大招！)` : '<span class="text-slate-600">等待執行...</span>'}
                                     </div>
                                 </div>
                                 <button onclick="window.runCh3L6Ex3()" class="mt-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition shadow-md">⚔️ 模擬連擊分析</button>
@@ -5050,7 +5104,7 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
                             <h3 class="text-lg font-black text-rose-400 flex items-center gap-2">⚔️ 3. 戰鬥大招門檻計算 (Combo)</h3>
                             <p class="text-slate-300 text-sm">情境：系統紀錄玩家 5 秒內的指令字串，計算按出了幾次輕攻擊「A」，達到 5 次以上即成功判定觸發大招。</p>
                             <div class="bg-slate-950 rounded-xl p-4 font-mono text-base md:text-lg leading-loose space-y-1 overflow-x-auto text-slate-300">
-                                <div>combo_input = "AABAAASBBAAA"</div>
+                                <div>combo_input = "AABAAASBBAAAAA" <span class="text-slate-500 text-sm"># ⚡ 精准同步修正為 8 個 A</span></div>
                                 <div>a_count = <input type="text" id="input-l6-q4" value="${state.quizAns.q4}" oninput="window.setInternalFillAns36('q4', this.value.trim())" placeholder="_______" class="w-64 px-2 py-0.5 mx-1 text-center font-bold bg-slate-900 border border-slate-700 rounded text-cyan-400 focus:outline-none focus:border-indigo-500" /></div>
                                 <div><span class="text-green-400">print</span>("經系統解析，輕拳總共按了：", a_count, "次")</div>
                                 <div><span class="text-purple-400">if</span> a_count &gt;= 5:</div>
@@ -5120,7 +5174,7 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
             return;
         }
 
-        // 2. 嚴謹的正規化比對（消除多餘空格、將單引號全部取代為雙引號進行統一）
+        // 2. 嚴謹的正規化比對
         const normalize = (str) => str.replace(/\s+/g, '').replace(/'/g, '"').toLowerCase();
         const checkAns = (id) => normalize(state.quizAns[id]) === normalize(targetAnswers[id]);
 
@@ -5157,13 +5211,14 @@ clean_msg = msg.replace(<span class="text-orange-300">"大笨蛋"</span>, <span 
                 btn.classList.add('animate-shake', 'bg-red-600');
                 setTimeout(() => btn.classList.remove('animate-shake', 'bg-red-600'), 400);
             }
-            alert("❌ 部分機制的程式碼邏輯有盲點！已為您將有錯誤的場景區塊標註為紅框。提示：請數清楚連擊次數，並確認 replace 的新舊字串順序與引號喔！");
+            alert("❌ 部分機制的程式碼邏輯有盲點！已為您將有錯誤的場景區塊標註為紅框。提示：請數清楚連擊次數（目前修正為 8 次），並確認 replace 的新舊字串順序與引號喔！");
         }
     };
 
     window.renderCh3L6Inner();
 }
 
+		
 // 初始化綜合練習關卡狀態
 if (!window.comprehensiveState) {
   window.comprehensiveState = {

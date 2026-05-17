@@ -101,24 +101,30 @@ const Icons = {
 
         // 💡 切換畫面主控台
 // 💡 切換畫面主控台
+// 💡 切換畫面主控台
 function changeView(view) {
     currentView = view;
-    // 如果是回到大廳、成績單、或教師端，關閉計時器
+    
+    // 1. 如果是回大廳、成績單、教師後台，清除並停止計時器
     if (view === 'menu' || view === 'report' || view === 'teacher') {
         if (timerInterval) clearInterval(timerInterval);
     } else {
-        // 🚀 進入關卡，觸發安全重置機制
+        // 2. 🚀 進入任何遊戲關卡，執行萬能狀態重置機制
         resetLevelState(view);
     }
+    
+    // 3. 強制清空 app 容器，徹底沖刷舊 DOM 殘留
+    const app = document.getElementById('app');
+    if (app) app.innerHTML = '';
+    
+    // 4. 重新執行渲染
     render();
 }
-
-// 🚀 安全初始化關卡狀態，既清除作答紀錄，又防範畫面崩潰 (renderCPInner 錯誤)
-// 🚀 安全初始化關卡狀態，既能清除舊作答，又能防範 renderCPInner 找不到變數而崩潰
+// 🚀 萬能重置機制：確保重複進入任何關卡時，作答紀錄 100% 清空且重新計時
 function resetLevelState(view) {
-    if (timerInterval) clearInterval(timerInterval); // 停止上一個關卡的計時器
+    if (timerInterval) clearInterval(timerInterval); // 終止舊計時器
     
-    // 1. 重新設定該關卡專屬的時間計時模式
+    // 💡 1. 判定正計時或倒計時
     if (view === 'ch1_l1' || view === 'ch1_l2') {
         isCountingDown = true;
         initialDuration = 600;
@@ -129,27 +135,30 @@ function resetLevelState(view) {
         timeSeconds = 0;
     }
     
-    // 2. 重置基礎遊玩狀態，不破壞核心資料結構
+    // 💡 2. 萬能清空全域基礎狀態
     currentQuestionIndex = 0; 
     currentStep = 1;
     score = 0;
     gameOver = false;
     gameActive = true;
     
-    // 清空選擇紀錄與拖拽資料
-    if (typeof selectedOptions !== 'undefined') selectedOptions = {};
-    if (typeof dragData !== 'undefined') dragData = {};
-
-    // 3. 針對 1-4 字串等有獨立陣列的關卡做安全初始值清空
-    if (view === 'ch1_l4') {
-        userAnswers = ["", "", "", ""];
+    // 💡 3. 強制重置可能殘留答案的物件與陣列
+    selectedOptions = {}; 
+    dragData = {};
+    
+    // 💡 4. 針對程式內特定關卡使用的私有答案陣列，做深度洗滌清空
+    if (typeof userAnswers !== 'undefined') {
+        userAnswers = ["", "", "", ""]; // 針對 1-4 字串等填空關卡的重設
+    }
+    if (typeof listData !== 'undefined') {
+        listData = []; // 針對第三章串列相關關卡的初始化
     }
     
-    // 4. 重新啟動全新計時
+    // 💡 5. 重啟全新計時器
     startTimer();
 }
-// 💡 顯示結果彈出視窗
-// 💡 挑戰完畢結果對話框
+
+		// 💡 挑戰完畢結果對話框
 function showResult(success, mbtiResult = '') {
     const savedClass = localStorage.getItem("className") || "";
     const app = document.getElementById('app');
@@ -205,7 +214,7 @@ function showResult(success, mbtiResult = '') {
         window.drag = (ev, type, id) => { ev.dataTransfer.setData("type", type); ev.dataTransfer.setData("id", id); };
         window.allowDrop = (ev) => ev.preventDefault();
 
-// ================= 渲染引擎 =================
+// ================= 萬能渲染引擎 =================
 function render() {
     const app = document.getElementById('app');
     if (!app) return;
@@ -222,10 +231,10 @@ function render() {
         }
     }
 
-    // 路由分流
+    // 視圖路由路由分流
     if (currentView === 'login') renderLogin(app);
     else if (currentView === 'menu') renderMenu(app);
-    else if (currentView === 'report') renderReportCard(app); // 修正連結：正常導向個人成績單
+    else if (currentView === 'report') renderReportCard(app); // 📊 串接個人成績單面板
     else if (currentView === 'teacher') renderTeacherDashboard(app);
     
     // 第一章
@@ -259,6 +268,7 @@ function render() {
     else if (currentView === 'all_l5') renderTrieModule(app);
     else if (currentView === 'all_l6') renderBSTModule(app);
 }
+
 		
 // 全域變數
 let globalPlayerName = ""; 

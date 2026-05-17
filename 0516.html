@@ -41,6 +41,22 @@
         let initialDuration = 0;
         let currentAnimation = null;
 
+		// ================= 全域圖標定義 (補回遺失的 Icons 變數) =================
+const Icons = {
+    concept: '💡',
+    code: '💻',
+    quiz: '📝',
+    check: '✅',
+    cross: '❌',
+    star: '⭐',
+    lock: '🔒',
+    unlock: '🔓',
+    timer: '⏱️',
+    trophy: '🏆',
+    success: '🎉',
+    warning: '⚠️'
+};
+
         let unlockedLevels = {
 		    ch1_l1: true, ch1_l2: true, ch1_l3: true, ch1_l4: true, ch1_l5: true,
             ch2_l1: true, ch2_l2: true, ch2_l3: true, ch2_l4: true, ch2_l5: true,
@@ -98,10 +114,11 @@ function changeView(view) {
 }
 
 // 🚀 安全初始化關卡狀態，既清除作答紀錄，又防範畫面崩潰 (renderCPInner 錯誤)
+// 🚀 安全初始化關卡狀態，既能清除舊作答，又能防範 renderCPInner 找不到變數而崩潰
 function resetLevelState(view) {
-    if (timerInterval) clearInterval(timerInterval); // 清除前一個關卡的計時器
+    if (timerInterval) clearInterval(timerInterval); // 停止上一個關卡的計時器
     
-    // 1. 重新設定該關卡專屬的時間模式
+    // 1. 重新設定該關卡專屬的時間計時模式
     if (view === 'ch1_l1' || view === 'ch1_l2') {
         isCountingDown = true;
         initialDuration = 600;
@@ -112,24 +129,25 @@ function resetLevelState(view) {
         timeSeconds = 0;
     }
     
-    // 2. 清除所有關卡的共用答題指針與作答暫存
-    currentQuestionIndex = 0;
-    selectedOptions = {}; 
+    // 2. 重置基礎遊玩狀態，不破壞核心資料結構
+    currentQuestionIndex = 0; 
     currentStep = 1;
     score = 0;
     gameOver = false;
     gameActive = true;
-    dragData = {};
+    
+    // 清空選擇紀錄與拖拽資料
+    if (typeof selectedOptions !== 'undefined') selectedOptions = {};
+    if (typeof dragData !== 'undefined') dragData = {};
 
-    // 3. 針對 1-4 字串等有獨立陣列的關卡做安全清空，確保 renderCPInner 抓得到空值而不崩潰
+    // 3. 針對 1-4 字串等有獨立陣列的關卡做安全初始值清空
     if (view === 'ch1_l4') {
         userAnswers = ["", "", "", ""];
     }
     
-    // 4. 重啟計時器
+    // 4. 重新啟動全新計時
     startTimer();
 }
-
 // 💡 顯示結果彈出視窗
 // 💡 挑戰完畢結果對話框
 function showResult(success, mbtiResult = '') {

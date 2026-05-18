@@ -688,7 +688,7 @@ function renderReportCard(el) {
 
 //第一章.....
 // 第一章.....
-// 1-1 修正「返回選單」undefined 臭蟲版
+// 1-1 修正「返回大廳」undefined 臭蟲版
 function renderConceptModule(el) {
     if (typeof startTimer === 'function') startTimer('up');
     
@@ -719,14 +719,14 @@ function renderConceptModule(el) {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
-                    返回選單
+                    返回大廳
                 </button>
                 
                 <h1 class="text-3xl font-black mb-6 text-indigo-700">1-1 程式設計的概念</h1>
                 
                 <div class="bg-white p-6 rounded-3xl shadow-lg mb-8 border-l-8 border-indigo-500">
                     <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-xl font-bold text-indigo-600">一、程式翻譯流程</h3>請按下一步或上一步
+                        <h3 class="text-xl font-bold text-indigo-600">一、程式翻譯流程</h3>請按[下一步]或[上一步]觀看程式翻譯的流程
                         <div class="flex gap-2">
                             <button onclick="window.moveCP(-1)" class="px-3 py-1 bg-slate-100 rounded-lg font-bold">上一步</button>
                             <button onclick="window.moveCP(1)" class="px-3 py-1 bg-indigo-500 text-white rounded-lg font-bold">下一步</button>
@@ -813,7 +813,7 @@ function renderPythonModule(el) {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
-                    返回選單
+                    返回大廳
                 </button>
                 <h1 class="text-4xl font-black text-amber-600 pb-2 border-b-4 border-amber-500">關卡 1-2：Python 變數與資料型態</h1>
 
@@ -1115,7 +1115,7 @@ function renderArithmeticLogic(el) {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
-                    返回選單
+                    返回大廳
                 </button>
  			 
                 <div class="flex justify-between items-center pb-4 border-b-2 border-slate-200">
@@ -1419,7 +1419,7 @@ function renderStringOperations(el) {
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
                     </svg>
-                    返回選單
+                    返回大廳
                 </button>
                 <div class="flex justify-between items-center pb-4 border-b-2 border-slate-200">
                     <h1 class="text-4xl font-black text-slate-800">關卡 1-4：字串基本運算與常用方法</h1>
@@ -1838,7 +1838,7 @@ function renderInputOutputModule(el) {
 
         app.innerHTML = `
             <div class="p-6 max-w-6xl mx-auto space-y-8 text-slate-800">
-                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">← 返回選單</button>
+                <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">← 返回大廳</button>
                 <div class="flex justify-between items-center pb-4 border-b-2 border-slate-200">
                     <h1 class="text-4xl font-black text-slate-800">關卡 1-5：輸入與輸出函式</h1>
                     <div class="text-2xl font-mono bg-slate-800 text-white px-8 py-3 rounded-full shadow-md">限時：<span id="h15-time">${formatTime(timeSeconds)}</span></div>
@@ -2654,6 +2654,8 @@ window.checkCh2L3Result = function() {
 // ==========================================
 // 💡 2-4 巢狀條件結構狀態初始化
 // ==========================================
+// 💡 2-4 巢狀條件結構狀態初始化
+// ==========================================
 if (!window.ch2l4Inputs) {
     window.ch2l4Inputs = {
         // 自主檢核部分的 abc 比大小填空
@@ -2715,19 +2717,20 @@ function renderCh2L4Module(el) {
                 <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 mb-8 space-y-4">
                     <div class="border-b pb-2">
                         <h2 class="text-2xl font-black text-slate-800">✍️ 實戰邏輯推演：三數 (a, b, c) 比大小</h2>
-                        <p class="text-slate-500 text-sm font-bold mt-1">請利用巢狀結構完成極限邏輯填空，判定出最大的元素序列順序（完成本區可協助釐清巢狀思維）：</p>
+                        <p class="text-slate-500 text-sm font-bold mt-1">請利用巢狀結構完成極限邏輯填空，判定出正確的元素序列大小關係（本區為自主練習，答案不計入總分，但有助於釐清巢狀思維）：</p>
                     </div>
                     <div class="bg-slate-900 rounded-2xl p-6 shadow-lg">
                         <pre class="text-left m-0 p-0 text-lg text-slate-100 font-mono leading-loose" style="white-space: pre;"><span class="text-purple-400">if</span> a >= b:
     <span class="text-purple-400">if</span> b >= c:
-        <span class="text-green-400">print</span>("<input type="text" id="abc-input-q1" value="${inputs.abc_q1}" oninput="window.setAbcInput('abc_q1', this.value)" placeholder="答案字串" class="w-36 p-1 rounded bg-slate-800 text-center text-cyan-300 border border-slate-700 text-sm focus:outline-none">")  <span class="text-slate-500"># 提示軌跡：a >= b >= c</span>
+        <span class="text-green-400">print</span>("<input type="text" id="abc-input-q1" value="${inputs.abc_q1}" oninput="window.setAbcInput('abc_q1', this.value)" placeholder="a>=b>=c" class="w-36 p-1 rounded bg-slate-800 text-center text-cyan-300 border border-slate-700 text-sm focus:outline-none">")
     <span class="text-purple-400">else</span>:
-        <span class="text-green-400">print</span>("<input type="text" id="abc-input-q2" value="${inputs.abc_q2}" oninput="window.setAbcInput('abc_q2', this.value)" placeholder="答案字串" class="w-36 p-1 rounded bg-slate-800 text-center text-cyan-300 border border-slate-700 text-sm focus:outline-none">")  <span class="text-slate-500"># 提示軌跡：a 居冠，但 c > b</span>
+        <span class="text-purple-400">if</span> a >= c:
+            <span class="text-green-400">print</span>("<input type="text" id="abc-input-q2" value="${inputs.abc_q2}" oninput="window.setAbcInput('abc_q2', this.value)" placeholder="a>=c>b" class="w-36 p-1 rounded bg-slate-800 text-center text-cyan-300 border border-slate-700 text-sm focus:outline-none">")
 <span class="text-purple-400">else</span>:
     <span class="text-purple-400">if</span> <input type="text" id="abc-input-q3" value="${inputs.abc_q3}" oninput="window.setAbcInput('abc_q3', this.value)" placeholder="條件式" class="w-32 p-1 rounded bg-slate-800 text-center text-amber-300 border border-slate-700 text-sm focus:outline-none">:
         <span class="text-green-400">print</span>(<span class="text-orange-300">"b > a >= c"</span>)   <span class="text-slate-500"># 此路徑已知 b > a</span>
     <span class="text-purple-400">else</span>:
-        <span class="text-green-400">print</span>("<input type="text" id="abc-input-q4" value="${inputs.abc_q4}" oninput="window.setAbcInput('abc_q4', this.value)" placeholder="答案字串" class="w-36 p-1 rounded bg-slate-800 text-center text-cyan-300 border border-slate-700 text-sm focus:outline-none">")  <span class="text-slate-500"># 提示軌跡：b > a 且 c > b</span></pre>
+        <span class="text-green-400">print</span>("<input type="text" id="abc-input-q4" value="${inputs.abc_q4}" oninput="window.setAbcInput('abc_q4', this.value)" placeholder="c>b>a" class="w-36 p-1 rounded bg-slate-800 text-center text-cyan-300 border border-slate-700 text-sm focus:outline-none">")</pre>
                     </div>
                 </div>
 
@@ -2738,7 +2741,7 @@ function renderCh2L4Module(el) {
                     </div>
 
                     <div class="space-y-6">
-                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q1 !== 'B' ? 'border-rose-500' : 'border-slate-800'} space-y-3">
+                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q1 !== 'B' ? 'border-rose-500 bg-rose-950/10' : 'border-slate-800'} space-y-3">
                             <label class="text-xl font-bold text-slate-200">1. 關於「巢狀條件結構（Nested if）」，下列敘述何者正確？</label>
                             <div class="grid grid-cols-1 gap-2 text-base">
                                 ${['A) 外層的 if 條件不管成立與否，內層的 if 都一定會執行', 'B) 只有當外層的 if 條件成立（True）時，才會進一步判斷內層的 if 條件', 'C) Python 不允許在 if 裡面再寫 if', 'D) 巢狀 if 的縮排不重要，對齊最左邊即可'].map(ans => {
@@ -2749,14 +2752,16 @@ function renderCh2L4Module(el) {
                             </div>
                         </div>
 
-                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q2 !== 'A' ? 'border-rose-500' : 'border-slate-800'} space-y-4">
+                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q2 !== 'A' ? 'border-rose-500 bg-rose-950/10' : 'border-slate-800'} space-y-4">
                             <div class="flex flex-col gap-1">
-                                <label class="text-xl font-bold text-slate-200">2. 隨堂圖解思考題：若輸入 score = 85，且 absent = False，下列巢狀結構最終會印出什麼？</label>
-                                <div class="bg-slate-900/80 p-4 my-2 rounded-xl border border-slate-800 font-mono text-base text-slate-300 leading-relaxed">
+                                <label class="text-xl font-bold text-slate-200">2. 隨堂圖解：若輸入 score = 85，且 absent = False，下列巢狀判斷最終會印出什麼？</label>
+                                <div class="bg-slate-900/80 p-4 my-2 rounded-xl border border-slate-800/80 font-mono text-base text-slate-300 leading-relaxed">
                                     <div>score = <span class="text-amber-400">85</span></div>
                                     <div>absent = <span class="text-purple-400">False</span></div>
-                                    <div class="text-purple-400 mt-1">if <span class="text-slate-300">score >= 60:</span></div>
-                                    <div class="pl-6 text-purple-400">if not <span class="text-slate-300">absent:</span></div>
+                                    <div class="text-slate-500 mt-2"># 外層檢查</div>
+                                    <div class="text-purple-400">if <span class="text-slate-200">score >= 60:</span></div>
+                                    <div class="pl-6 text-slate-500"># 內層檢查</div>
+                                    <div class="pl-6 text-purple-400">if not <span class="text-slate-200">absent:</span></div>
                                     <div class="pl-12 text-emerald-400">print(<span class="text-amber-300">"表現優良"</span>)</div>
                                     <div class="pl-6 text-purple-400">else:</div>
                                     <div class="pl-12 text-emerald-400">print(<span class="text-amber-300">"及格但常缺席"</span>)</div>
@@ -2773,7 +2778,7 @@ function renderCh2L4Module(el) {
                             </div>
                         </div>
 
-                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q3 !== 'x % 2 == 0' ? 'border-rose-500' : 'border-slate-800'} space-y-3">
+                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q3 !== 'x % 2 == 0' ? 'border-rose-500 bg-rose-950/10' : 'border-slate-800'} space-y-3">
                             <div class="flex items-center gap-2 text-slate-200 font-black text-lg">
                                 <span class="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">3</span>
                                 <label>填空題：若要讓變數 "x" 在大於 10 且同時為「偶數」時才印出 "Success"，請補全下方程式碼：</label>
@@ -2790,7 +2795,7 @@ function renderCh2L4Module(el) {
                             </div>
                         </div>
 
-                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q4 !== '允許入場' ? 'border-rose-500' : 'border-slate-800'} space-y-3">
+                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q4 !== '允許入場' ? 'border-rose-500 bg-rose-950/10' : 'border-slate-800'} space-y-3">
                             <div class="flex items-center gap-2 text-slate-200 font-black text-lg">
                                 <span class="bg-cyan-600 text-white w-6 h-6 rounded-full flex items-center justify-center text-xs">4</span>
                                 <label>填空題：觀察以下巢狀結構，若 "age = 15" 且 "has_ticket = True"，則最後輸出結果為：</label>
@@ -2810,7 +2815,7 @@ function renderCh2L4Module(el) {
                             </div>
                         </div>
 
-                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q5 !== 'D' ? 'border-rose-500' : 'border-slate-800'} space-y-3">
+                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q5 !== 'D' ? 'border-rose-500 bg-rose-950/10' : 'border-slate-800'} space-y-3">
                             <label class="text-xl font-bold text-slate-200">5. 下列關於 Python 邏輯運算子的規則，何者「錯誤」？</label>
                             <div class="grid grid-cols-1 gap-2 text-base">
                                 ${['A) A and B 需要 A 與 B 同時為 True，結果才為 True', 'B) A or B 只要其中一個為 True，結果即為 True', 'C) not True 的結果會變成 False', 'D) and 的優先權比 or 還要低'].map(ans => {
@@ -2821,7 +2826,7 @@ function renderCh2L4Module(el) {
                             </div>
                         </div>
 
-                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q6 !== 'True' ? 'border-rose-500' : 'border-slate-800'} space-y-3">
+                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q6 !== 'True' ? 'border-rose-500 bg-rose-950/10' : 'border-slate-800'} space-y-3">
                             <label class="text-xl font-bold text-slate-200">6. 請問布林邏輯運算式 (5 > 3) or (10 == 20) and not(3 != 3) 的最終結果為何？</label>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-base">
                                 ${['A) True', 'B) False'].map(ans => {
@@ -2832,7 +2837,7 @@ function renderCh2L4Module(el) {
                             </div>
                         </div>
 
-                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q7 !== 'and' ? 'border-rose-500' : 'border-slate-800'} space-y-3">
+                        <div class="p-5 bg-slate-950/60 rounded-2xl border ${status === 'error' && inputs.q7 !== 'and' ? 'border-rose-500 bg-rose-950/10' : 'border-slate-800'} space-y-3">
                             <label class="text-xl font-bold text-slate-200">7. 填空題：若要判定一個人的年齡 "age" 是否「在 18 歲到 65 歲之間（包含 18 與 65）」，請補全程式碼中的邏輯運算子：</label>
                             <div class="bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-base">
                                 <span>if age >= 18 </span>
@@ -2854,12 +2859,11 @@ function renderCh2L4Module(el) {
     };
 
     // ==========================================
-    // ⚙️ 比大小專屬：就地緩存資料（100% 避免 Focus 流失）
+    // ⚙️ 比大小填空：就地更新快取（防止 Focus 閃退失焦）
     // ==========================================
     window.setAbcInput = (id, val) => {
         if (!window.ch2l4Inputs) window.ch2l4Inputs = {};
-        window.ch2l4Inputs[id] = val.trim();
-        // 僅做背景記憶儲存，不執行全網頁重新渲染，從根源根絕打字卡頓現象
+        window.ch2l4Inputs[id] = val; // 保持就地緩存，不重新驅動 Inner 刷洗畫面
     };
 
     // ==========================================
@@ -2894,15 +2898,15 @@ function renderCh2L4Module(el) {
             if (typeof stopTimer === 'function') stopTimer();
             window.ch2l4Status = "normal";
             
-            // 呼叫原本系統的過關展示
+            // 呼叫系統過關展示
             if (typeof showResult === 'function') {
                 showResult(true);
             } else {
-                alert("🎯 恭喜通過 2-4 巢狀結構所有挑戰！");
+                alert("🎯 恭喜通過 2-4 巢狀條件結構所有挑戰！");
             }
         } else {
             window.ch2l4Status = "error";
-            window.renderCh2L4Inner();
+            window.renderCh2L4Inner(); // 刷洗畫面顯現紅色警示外框
 
             const btn = document.getElementById('ch2l4-final-btn');
             if (btn) {
@@ -2915,6 +2919,8 @@ function renderCh2L4Module(el) {
 
     window.renderCh2L4Inner();
 }
+
+//2-5
 
 function renderCh2L5Module(el) {
     if (typeof startTimer === 'function') startTimer();
@@ -5497,7 +5503,7 @@ last_num = id_card[-1]     <span class="text-slate-400"># 最後 1 個數字</sp
 
     app.innerHTML = `
       <div class="p-6 max-w-5xl mx-auto">
-        <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">← 返回選單</button>
+        <button onclick="changeView('menu')" class="mb-4 flex items-center text-slate-500 hover:text-slate-800 transition-colors">← 返回大廳</button>
         
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           

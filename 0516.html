@@ -4259,7 +4259,7 @@ function renderCh3L3Module(el) {
     window.renderCh3l3Inner = () => {
         const app = document.getElementById('app') || el;
         const state = window.ch3l3State;
-        const status = window.ch3l3Status;
+        const status = window.ch3l3Status || "normal";
 		// 1. 確保全域 inputs 物件存在，若為 null 則立刻初始化（包含 q1, q2 等所有會被讀取的欄位）
   if (!window.ch3l3Inputs) {
     window.ch3l3Inputs = { q1: "", q2: "", q3: "", q4: "", q5: "", q6: "", q7: "" };
@@ -4271,7 +4271,7 @@ function renderCh3L3Module(el) {
 
   // 後續的解構賦值才不會因為 inputs 為 null 而崩潰
   const inputs = window.ch3l3Inputs;
-  const status = window.ch3l3Status || "normal";
+
 
         // --- 🎮 RPG 背包動態模擬渲染引擎 ---
         // 根據學生目前的答題，動態推算背包內容顯示給學生看 (優化：加入填空題基本推算)

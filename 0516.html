@@ -2922,21 +2922,32 @@ function renderCh2L4Module(el) {
 
 //2-5
 
+// ==========================================
+// 🔄 2-5 計數迴圈 (for) 與 range() 函數模組
+// ==========================================
+
 function renderCh2L5Module(el) {
     if (typeof startTimer === 'function') startTimer();
 
     // ==========================================
-    // 🛡️ 全域狀態防呆初始化 (防止未定義時報錯)
+    // 🛡️ 全域狀態防呆初始化 (徹底解決 undefined 錯誤)
     // ==========================================
     if (!window.ch2l5State) {
-        window.ch2l5State = {
-            ex1Step: 0,
-            ex2Step: 0,
-            ex3Step: 0,
-            checked: { ex1: false, ex2: false, ex3: false },
-            quizAns: { q1: "", q2: "", q3: "", q4: "" },
-            quizStatus: "normal"
-        };
+        window.ch2l5State = {};
+    }
+    // 逐層確保核心屬性一定存在，防止外部污染或遺漏
+    if (window.ch2l5State.ex1Step === undefined) window.ch2l5State.ex1Step = 0;
+    if (window.ch2l5State.ex2Step === undefined) window.ch2l5State.ex2Step = 0;
+    if (window.ch2l5State.ex3Step === undefined) window.ch2l5State.ex3Step = 0;
+    
+    if (!window.ch2l5State.checked) {
+        window.ch2l5State.checked = { ex1: false, ex2: false, ex3: false };
+    }
+    if (!window.ch2l5State.quizAns) {
+        window.ch2l5State.quizAns = { q1: "", q2: "", q3: "", q4: "" };
+    }
+    if (!window.ch2l5State.quizStatus) {
+        window.ch2l5State.quizStatus = "normal";
     }
 
     window.renderCh2L5Inner = () => {
@@ -3052,8 +3063,8 @@ function renderCh2L5Module(el) {
                         </div>
                         <div class="pt-2 flex justify-between items-center">
                             <p class="text-slate-500 text-sm font-bold">💡 提示：按完 3 步看完所有變化，即可進行自我檢核。</p>
-                            <button onclick="window.checkUnderstand25(1)" ${state.ex1Step < 3 ? 'disabled' : ''} class="px-6 py-2 ${state.checked.ex1 ? 'bg-blue-100 text-blue-600' : 'bg-blue-600 text-white hover:bg-blue-700'} disabled:opacity-40 font-black rounded-xl transition shadow">
-                                ${state.checked.ex1 ? '✓ 我已理解此運算歷程' : '🔍 自我檢核確認'}
+                            <button onclick="window.checkUnderstand25(1)" ${state.ex1Step < 3 ? 'disabled' : ''} class="px-6 py-2 ${state.checked?.ex1 ? 'bg-blue-100 text-blue-600' : 'bg-blue-600 text-white hover:bg-blue-700'} disabled:opacity-40 font-black rounded-xl transition shadow">
+                                ${state.checked?.ex1 ? '✓ 我已理解此運算歷程' : '🔍 自我檢核確認'}
                             </button>
                         </div>
                     </div>
@@ -3085,8 +3096,8 @@ function renderCh2L5Module(el) {
                         </div>
                         <div class="pt-2 flex justify-between items-center">
                             <p class="text-slate-500 text-sm font-bold">💡 提示：注意 range(1, 4) 只會跑到 3，不會跑到 4 喔！</p>
-                            <button onclick="window.checkUnderstand25(2)" ${state.ex2Step < 3 ? 'disabled' : ''} class="px-6 py-2 ${state.checked.ex2 ? 'bg-blue-100 text-blue-600' : 'bg-blue-600 text-white hover:bg-blue-700'} disabled:opacity-40 font-black rounded-xl transition shadow">
-                                ${state.checked.ex2 ? '✓ 我已理解此重複歷程' : '🔍 自我檢核確認'}
+                            <button onclick="window.checkUnderstand25(2)" ${state.ex2Step < 3 ? 'disabled' : ''} class="px-6 py-2 ${state.checked?.ex2 ? 'bg-blue-100 text-blue-600' : 'bg-blue-600 text-white hover:bg-blue-700'} disabled:opacity-40 font-black rounded-xl transition shadow">
+                                ${state.checked?.ex2 ? '✓ 我已理解此重複歷程' : '🔍 自我檢核確認'}
                             </button>
                         </div>
                     </div>
@@ -3123,8 +3134,8 @@ function renderCh2L5Module(el) {
                         </div>
                         <div class="pt-2 flex justify-between items-center">
                             <p class="text-slate-500 text-sm font-bold">💡 提示：看懂每次 sum 是如何把當前的 i 吞進去加起來的嗎？</p>
-                            <button onclick="window.checkUnderstand25(3)" ${state.ex3Step < 3 ? 'disabled' : ''} class="px-6 py-2 ${state.checked.ex3 ? 'bg-blue-100 text-blue-600' : 'bg-blue-600 text-white hover:bg-blue-700'} disabled:opacity-40 font-black rounded-xl transition shadow">
-                                ${state.checked.ex3 ? '✓ 我已理解此累加變數軌跡' : '🔍 自我檢核確認'}
+                            <button onclick="window.checkUnderstand25(3)" ${state.ex3Step < 3 ? 'disabled' : ''} class="px-6 py-2 ${state.checked?.ex3 ? 'bg-blue-100 text-blue-600' : 'bg-blue-600 text-white hover:bg-blue-700'} disabled:opacity-40 font-black rounded-xl transition shadow">
+                                ${state.checked?.ex3 ? '✓ 我已理解此累加變數軌跡' : '🔍 自我檢核確認'}
                             </button>
                         </div>
                     </div>
@@ -3138,13 +3149,13 @@ function renderCh2L5Module(el) {
 
                     <div class="space-y-6">
                         ${quizItems.select.map((q) => {
-                            const isErr = state.quizStatus === 'error' && state.quizAns[q.id] !== q.ans;
+                            const isErr = state.quizStatus === 'error' && state.quizAns?.[q.id] !== q.ans;
                             return `
                                 <div id="quiz-box-${q.id}" class="p-4 rounded-xl border transition-all ${isErr ? 'border-rose-500 bg-rose-950/40' : 'border-slate-800 bg-slate-950/60'}">
                                     <label class="block text-lg font-bold mb-3 text-slate-200">${q.text}</label>
                                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
                                         ${q.options.map(opt => `
-                                            <button onclick="window.setSelectQuizAns25('${q.id}', '${opt}')" class="p-3 text-left rounded-lg text-base font-bold transition border ${state.quizAns[q.id] === opt ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-700 hover:bg-slate-800 text-slate-300'}">
+                                            <button onclick="window.setSelectQuizAns25('${q.id}', '${opt}')" class="p-3 text-left rounded-lg text-base font-bold transition border ${state.quizAns?.[q.id] === opt ? 'bg-indigo-600 border-indigo-400 text-white' : 'bg-slate-900 border-slate-700 hover:bg-slate-800 text-slate-300'}">
                                                 ${opt}
                                             </button>
                                         `).join('')}
@@ -3154,12 +3165,12 @@ function renderCh2L5Module(el) {
                         }).join('')}
 
                         ${quizItems.fill.map((q) => {
-                            const isErr = state.quizStatus === 'error' && state.quizAns[q.id] !== q.ans;
+                            const isErr = state.quizStatus === 'error' && state.quizAns?.[q.id] !== q.ans;
                             return `
                                 <div id="quiz-box-${q.id}" class="p-4 rounded-xl border transition-all ${isErr ? 'border-rose-500 bg-rose-950/40' : 'border-slate-800 bg-slate-950/60'} flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                                     <label class="text-lg font-bold text-slate-200 flex-1">${q.text}</label>
                                     <input type="text" 
-                                           value="${state.quizAns[q.id] || ''}" 
+                                           value="${state.quizAns?.[q.id] || ''}" 
                                            oninput="window.setInternalFillAns25('${q.id}', this.value.trim())" 
                                            placeholder="請輸入答案數字" 
                                            class="p-3 w-full sm:w-48 rounded-xl bg-slate-900 border border-slate-700 text-center font-black text-xl text-cyan-400 focus:outline-none focus:border-indigo-500" />
@@ -3190,25 +3201,28 @@ function renderCh2L5Module(el) {
     window.resetEx25 = (exNum) => {
         const state = window.ch2l5State;
         state[`ex${exNum}Step`] = 0;
-        state.checked[`ex${exNum}`] = false;
+        if (state.checked) state.checked[`ex${exNum}`] = false;
         window.renderCh2L5Inner();
     };
 
     window.checkUnderstand25 = (exNum) => {
         const state = window.ch2l5State;
+        if (!state.checked) state.checked = { ex1: false, ex2: false, ex3: false };
         state.checked[`ex${exNum}`] = true;
         window.renderCh2L5Inner();
     };
 
     // 選擇題點擊：立即刷新 UI
     window.setSelectQuizAns25 = (id, val) => {
+        if (!window.ch2l5State.quizAns) window.ch2l5State.quizAns = {};
         window.ch2l5State.quizAns[id] = val;
         window.ch2l5State.quizStatus = "normal"; 
         window.renderCh2L5Inner();
     };
 
-    // 填空題輸入（關鍵修正）：只記錄狀態，不刷新 DOM，避免 input 失去焦點
+    // 填空題輸入：只記錄狀態，不刷新 DOM，避免 input 失去焦點
     window.setInternalFillAns25 = (id, val) => {
+        if (!window.ch2l5State.quizAns) window.ch2l5State.quizAns = {};
         window.ch2l5State.quizAns[id] = val;
         
         // 如果原本是錯誤狀態，當使用者開始改答案時，悄悄把該題的外框紅字移除
@@ -3225,14 +3239,14 @@ function renderCh2L5Module(el) {
         const state = window.ch2l5State;
         
         // 1. 先確認是否點完前方的互動歷程
-        if (!state.checked.ex1 || !state.checked.ex2 || !state.checked.ex3) {
+        if (!state.checked?.ex1 || !state.checked?.ex2 || !state.checked?.ex3) {
             alert("❌ 提交失敗！請先點擊跑完上方所有範例的「下一步」歷程，並點擊藍色【自我檢核確認】按鈕。");
             return;
         }
 
         // 2. 檢查四題挑戰測試題是否填寫完畢
         const qIds = ["q1", "q2", "q3", "q4"];
-        const isComplete = qIds.every(id => state.quizAns[id]);
+        const isComplete = qIds.every(id => state.quizAns?.[id]);
         if (!isComplete) {
             alert("❌ 挑戰尚未完成！下方 4 題測試題皆為必填，請作答完畢再提交。");
             return;
@@ -3240,7 +3254,7 @@ function renderCh2L5Module(el) {
 
         // 3. 驗證答案正確性
         const answers = { q1: "2, 5, 8", q2: "4", q3: "9", q4: "3" };
-        const isCorrect = qIds.every(id => state.quizAns[id] === answers[id]);
+        const isCorrect = qIds.every(id => state.quizAns?.[id] === answers[id]);
 
         if (isCorrect) {
             if (typeof stopTimer === 'function') stopTimer();

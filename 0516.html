@@ -2763,16 +2763,16 @@ function renderCh2L4(el) {
           </div>
         </div>
 
-        <div class="p-5 bg-slate-50 rounded-2xl border ${status === 'error' && (!window.validateCh2L4Fills()) ? 'border-rose-500' : 'border-slate-200'} space-y-4">
-          <div class="flex items-center gap-2 text-slate-800 font-black text-xl">
-            <span class="bg-cyan-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm">4 & 5</span>
-            <p>實戰邏輯推演：三數 (a, b, c) 比大小程式填空</p>
-          </div>
-          <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
-            <pre class="font-mono text-base md:text-lg text-slate-100 select-none p-2 leading-loose" style="font-family: 'Courier New', Courier, monospace;">
+       <div class="p-5 bg-slate-50 rounded-2xl border ${status === 'error' && (!window.validateCh2L4Fills()) ? 'border-rose-500' : 'border-slate-200'} space-y-4">
+  <div class="flex items-center gap-2 text-slate-800 font-black text-xl">
+    <span class="bg-cyan-600 text-white w-7 h-7 rounded-full flex items-center justify-center text-sm">4 & 5</span>
+    <p>實戰邏輯推演：三數 (a, b, c) 比大小程式填空</p>
+  </div>
+  <div class="bg-slate-900 rounded-xl p-4 shadow-inner">
+    <pre class="font-mono text-base md:text-lg text-slate-100 select-none p-2 leading-loose" style="font-family: 'Courier New', Courier, monospace;">
 <span class="text-purple-400">if</span> a >= b:
     <span class="text-purple-400">if</span> b >= c:
-        <span class="text-green-400">print</span>("<input type="text" value="${inputs.q4}" oninput="window.ch2l4Inputs.q4=this.value; window.ch2l4Status='normal';" placeholder="填空 (四)" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-0.5 rounded font-mono text-base w-44 text-center outline-none font-bold")  
+        <span class="text-green-400">print</span>("<input type="text" value="${inputs.q4}" oninput="window.ch2l4Inputs.q4=this.value; window.ch2l4Status='normal';" placeholder="填空 (四)" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-0.5 rounded font-mono text-base w-44 text-center outline-none font-bold">")  
     <span class="text-purple-400">else</span>:
         <span class="text-purple-400">if</span> <input type="text" value="${inputs.q5}" oninput="window.ch2l4Inputs.q5=this.value; window.ch2l4Status='normal';" placeholder="填空 (五)" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-0.5 rounded font-mono text-base w-44 text-center outline-none font-bold">:
             <span class="text-green-400">print</span>("a >= c > b")
@@ -2787,9 +2787,9 @@ function renderCh2L4(el) {
             <span class="text-green-400 font-black">print</span>("b > c > a")
     <span class="text-purple-400">else</span>:
         <span class="text-slate-400"># 走到這代表 b > a 且 c > b，代表 c 最大，b 次之，a 最小</span>
-        <span class="text-green-400">print</span> <input type="text" value="${inputs.q7} " oninput="window.ch2l4Inputs.q7=this.value; window.ch2l4Status='normal';" placeholder="填空 (七)" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-0.5 rounded font-mono text-base w-44 text-center outline-none font-bold">")</pre>
-          </div>
-        </div>
+        <span class="text-green-400">print</span>("<input type="text" value="${inputs.q7}" oninput="window.ch2l4Inputs.q7=this.value; window.ch2l4Status='normal';" placeholder="填空 (七)" class="bg-slate-950 text-yellow-400 border border-slate-600 px-2 py-0.5 rounded font-mono text-base w-44 text-center outline-none font-bold">")</pre>
+  </div>
+</div>
 
         <div class="pt-4 flex justify-end">
           <button id="ch2l4-submit-btn" onclick="window.submitCh2L4All()" class="px-8 py-3.5 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl font-black text-lg transition-all active:scale-95 shadow-md">驗證本關卡答案</button>

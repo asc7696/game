@@ -841,7 +841,7 @@ function renderPythonModule(el) {
 
                 <div class="bg-white p-6 rounded-3xl shadow-md border-2 border-slate-100 space-y-6">
                     <h2 class="text-2xl font-black text-emerald-700">🎮 二、資料型態：以遊戲角色屬性為例</h2>
-                    <p class="text-lg font-bold text-slate-600">快來看看程式在記憶體中是如何幫我們管理「惡靈古堡」玩家資料與狀態變化的：</p>
+                    <p class="text-lg font-bold text-slate-600">快來看看程式是如何幫我們管理記憶體的！以「惡靈古堡」看各遊戲變數資料的改變</p>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div class="border-2 border-blue-200 rounded-3xl p-4 bg-slate-50 shadow-inner">
@@ -902,7 +902,7 @@ function renderPythonModule(el) {
                     </div>
 
                     <p class="text-lg text-amber-900 font-bold bg-white px-4 py-2.5 rounded-xl border border-amber-100">
-                        💡 <span class="text-red-600">請按上方「上一步/下一步」按鈕</span>，觀察記憶體格子內「金劍與木盾」的移動變化：
+                        💡 <span class="text-red-600">請按上方「上一步/下一步」按鈕</span>，觀察三個記憶體(盒子)a,b,temp的資料變化(金劍、木盾)
                     </p>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
@@ -954,7 +954,7 @@ function renderPythonModule(el) {
                                 <div>(2) <code class="font-mono">=</code> 是指定運算子（把右邊放進左邊），<code class="font-mono">==</code> 是關係運算子（檢查兩邊是否相等）。</div>
                                 <div>(3) 兩者完全一模一樣，可以互相通用。</div>
                             </div>
-                            <input type="text" placeholder="填入選項數字 (1~3)" value="${window.pyAns.q_eq}"
+                            <input type="text" placeholder="填入選項數字 (1~3)" }"
                                 oninput="window.pyAns.q_eq=this.value.trim(); window.pyStatus='normal';"
                                 class="mt-2 w-52 p-2 border-b-2 border-emerald-500 font-bold outline-none text-center bg-transparent">
                         </div>
@@ -966,7 +966,7 @@ function renderPythonModule(el) {
                                 <div>(2) <code class="font-mono">HP = 10</code> 正確，左邊必須是「變數箱子名稱」，右邊是「要放入的數值」。</div>
                                 <div>(3) 兩種寫法皆合法，都沒有語法錯誤。</div>
                             </div>
-                            <input type="text" placeholder="填入選項數字 (1~3)" value="${window.pyAns.q_side}"
+                            <input type="text" placeholder="填入選項數字 (1~3)" "
                                 oninput="window.pyAns.q_side=this.value.trim(); window.pyStatus='normal';"
                                 class="mt-2 w-52 p-2 border-b-2 border-emerald-500 font-bold outline-none text-center bg-transparent">
                         </div>
@@ -982,12 +982,12 @@ b = temp
                             </pre>
                             <div class="flex flex-wrap items-center gap-4 text-base font-bold">
                                 <div>變數 a 最終為：
-                                    <input type="text" placeholder="填值" value="${window.pyAns.fill_a}"
+                                    <input type="text" placeholder="填值" 
                                         oninput="window.pyAns.fill_a=this.value.trim(); window.pyStatus='normal';"
                                         class="w-20 border-b-2 border-emerald-500 text-center outline-none bg-transparent">
                                 </div>
                                 <div>變數 b 最終為：
-                                    <input type="text" placeholder="填值" value="${window.pyAns.fill_b}"
+                                    <input type="text" placeholder="填值" 
                                         oninput="window.pyAns.fill_b=this.value.trim(); window.pyStatus='normal';"
                                         class="w-20 border-b-2 border-emerald-500 text-center outline-none bg-transparent">
                                 </div>

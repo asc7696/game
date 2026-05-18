@@ -4050,7 +4050,7 @@ function renderCh3L2Module(el) {
 
                         <div class="bg-slate-900 p-3.5 rounded-xl border border-slate-800 space-y-2">
                             <label class="block text-slate-200 text-xs font-bold">✏️ 檢核問題：若將迴圈改寫成跳格函數 <code>for i in range(0, len(x), 2): print(x[i])</code>，印出的數據結果為何？（請以中括號半形格式輸入，例如: [1,2,3]）</label>
-                            <input type="text" value="${state.q2}" oninput="window.ch3l2State.q2=this.value.trim().replace(/\\s+/g,''); window.renderCh3l2Inner();" placeholder="例如: [1,3,5,7]" class="w-52 px-3 py-1 bg-slate-950 text-cyan-400 rounded-lg font-mono text-xs font-bold border border-slate-700 focus:outline-none">
+                            <input type="text" value="${state.q2}" oninput="window.ch3l2State.q2=this.value.trim().replace(/\\s+/g,''); window.renderCh3l2Inner();" placeholder="例如: [1,3,5]" class="w-52 px-3 py-1 bg-slate-950 text-cyan-400 rounded-lg font-mono text-xs font-bold border border-slate-700 focus:outline-none">
                         </div>
                     </div>
 
@@ -4397,7 +4397,7 @@ function renderCh3L3Module(el) {
                             <p class="font-medium text-slate-200">你獲得了一瓶 <code>"紅藥水"</code>，想要強制放進<b>背包的第四個位置 (索引值為 3)</b>，請寫出程式碼：</p>
                             <div class="flex items-center gap-2 font-mono text-cyan-400 bg-slate-900 p-2 rounded-lg border border-slate-700 w-full sm:w-80">
                                 <span>bag.</span>
-                                <input type="text" value="${state.q3.replace(/^bag\./, '')}" oninput="window.ch3l3State.q3='bag.'+this.value.trim(); window.renderCh3l3Inner();" placeholder="insert(3, '紅藥水')" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
+                                <input type="text" value="${state.q3.replace(/^bag\./, '')}" oninput="window.ch3l3State.q3='bag.'+this.value.trim(); window.renderCh3l3Inner();" placeholder="" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
                             </div>
                         </div>
 
@@ -4406,7 +4406,7 @@ function renderCh3L3Module(el) {
                             <p class="font-medium text-slate-200">你又獲得了一瓶 <code>"藍藥水"</code>，想要直接放進<b>背包最後面</b>，請寫出程式碼：</p>
                             <div class="flex items-center gap-2 font-mono text-cyan-400 bg-slate-900 p-2 rounded-lg border border-slate-700 w-full sm:w-80">
                                 <span>bag.</span>
-                                <input type="text" value="${state.q4.replace(/^bag\./, '')}" oninput="window.ch3l3State.q4='bag.'+this.value.trim(); window.renderCh3l3Inner();" placeholder="append('藍藥水')" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
+                                <input type="text" value="${state.q4.replace(/^bag\./, '')}" oninput="window.ch3l3State.q4='bag.'+this.value.trim(); window.renderCh3l3Inner();" placeholder="" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
                             </div>
                         </div>
 
@@ -4435,7 +4435,7 @@ function renderCh3L3Module(el) {
                             <p class="font-medium text-slate-200">你口渴了，決定拿出背包<b>最後面的「藍藥水」</b>喝掉它。請寫出對應程式碼（提示：利用 <code>pop</code> 移除指定索引）：</p>
                             <div class="flex items-center gap-2 font-mono text-cyan-400 bg-slate-900 p-2 rounded-lg border border-slate-700 w-full sm:w-80">
                                 <span>bag.</span>
-                                <input type="text" value="${state.q6.replace(/^bag\./, '')}" oninput="window.ch3l3State.q6='bag.'+this.value.trim();" placeholder="pop()" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
+                                <input type="text" value="${state.q6.replace(/^bag\./, '')}" oninput="window.ch3l3State.q6='bag.'+this.value.trim();" placeholder="" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
                             </div>
                         </div>
 
@@ -4444,7 +4444,7 @@ function renderCh3L3Module(el) {
                             <p class="font-medium text-slate-200">背包太滿了，你決定扔掉重死人的舊防具<b>「木盾」</b>。請寫出對應程式碼（提示：直接指定名稱移除）：</p>
                             <div class="flex items-center gap-2 font-mono text-cyan-400 bg-slate-900 p-2 rounded-lg border border-slate-700 w-full sm:w-80">
                                 <span>bag.</span>
-                                <input type="text" value="${state.q7.replace(/^bag\./, '')}" oninput="window.ch3l3State.q7='bag.'+this.value.trim();" placeholder="remove('木盾')" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
+                                <input type="text" value="${state.q7.replace(/^bag\./, '')}" oninput="window.ch3l3State.q7='bag.'+this.value.trim();" placeholder="" class="w-full bg-transparent text-cyan-400 font-mono focus:outline-none">
                             </div>
                         </div>
 
@@ -4717,15 +4717,15 @@ function renderCh3L4Module(el) {
                             <div>bag = ["短刀", "紅藥水", "龍之鱗片", "鐵盔"]</div>
                             <div class="flex flex-wrap items-center gap-1.5">
                                 <span>if</span>
-                                <input type="text" value="${state.c1_if}" oninput="window.saveFill34('c1_if', this.value)" placeholder='"王者披風" in bag:' class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-44 font-mono text-2xs focus:outline-none focus:border-indigo-500">
+                                <input type="text" value="${state.c1_if}" oninput="window.saveFill34('c1_if', this.value)" placeholder='' class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-44 font-mono text-2xs focus:outline-none focus:border-indigo-500">
                             </div>
                             <div class="pl-4 text-emerald-400">print("你已經裝備了【王者披風】，無法重複裝備")</div>
                             <div class="flex flex-wrap items-center gap-1.5">
-                                <input type="text" value="${state.c1_else}" oninput="window.saveFill34('c1_else', this.value)" placeholder="else:" class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-16 font-mono text-2xs focus:outline-none focus:border-indigo-500">
+                                <input type="text" value="" oninput="window.saveFill34('c1_else', this.value)" placeholder="" class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-16 font-mono text-2xs focus:outline-none focus:border-indigo-500">
                             </div>
                             <div class="pl-4 flex flex-wrap items-center gap-1.5">
                                 <span>print(</span>
-                                <input type="text" value="${state.c1_print}" oninput="window.saveFill34('c1_print', this.value)" placeholder='"成功裝備王者披風！"' class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-40 font-mono text-2xs focus:outline-none focus:border-indigo-500">
+                                <input type="text" value="" oninput="window.saveFill34('c1_print', this.value)" placeholder='' class="px-2 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-40 font-mono text-2xs focus:outline-none focus:border-indigo-500">
                                 <span>)</span>
                             </div>
                         </div>
@@ -4742,10 +4742,10 @@ function renderCh3L4Module(el) {
                             <div>name = input('輸入你的姓名')</div>
                             <div class="flex flex-wrap items-center gap-1">
                                 <span>lucky = ["淑", </span>
-                                <input type="text" value="${state.c2_list1}" oninput="window.saveFill34('c2_list1', this.value)" placeholder='"志"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
-                                <input type="text" value="${state.c2_list2}" oninput="window.saveFill34('c2_list2', this.value)" placeholder='"豪"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
-                                <input type="text" value="${state.c2_list3}" oninput="window.saveFill34('c2_list3', this.value)" placeholder='"雅"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
-                                <input type="text" value="${state.c2_list4}" oninput="window.saveFill34('c2_list4', this.value)" placeholder='"婷"' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500">
+                                <input type="text" value="${state.c2_list1}" oninput="window.saveFill34('c2_list1', this.value)" placeholder='' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
+                                <input type="text" value="${state.c2_list2}" oninput="window.saveFill34('c2_list2', this.value)" placeholder='' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
+                                <input type="text" value="${state.c2_list3}" oninput="window.saveFill34('c2_list3', this.value)" placeholder='' class="px-1.5 py-0.5 bg-slate-950 border borer-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500"><span>,</span>
+                                <input type="text" value="${state.c2_list4}" oninput="window.saveFill34('c2_list4', this.value)" placeholder='' class="px-1.5 py-0.5 bg-slate-950 border border-slate-700 text-cyan-400 rounded w-10 text-center text-2xs focus:outline-none focus:border-indigo-500">
                                 <span>]</span>
                             </div>
                             <div class="flex flex-wrap items-center gap-1.5">

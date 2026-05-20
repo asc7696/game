@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D 立方體踩地雷</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: radial-gradient(circle, #1a1c2e 0%, #0f101a 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+        }
+
+        #canvas-container {
+            width: 100vw;
+            height: 100vh;
+            display: block;
+        }
+
+        /* UI 面板 */
+        #ui-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 20px;
+            border-radius: 10px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: none;
+        }
+
+        h1 { margin: 0 0 10px 0; font-size: 22px; color: #00ffcc; text-shadow: 0 0 10px rgba(0,255,204,0.5); }
+        p { margin: 5px 0; font-size: 14px; color: #ccc; }
+        .highlight { color: #ffcc00; font-weight: bold; }
+
+        /* 遊戲狀態提示（勝/敗） */
+        #status-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s ease;
+        }
+
+        #status-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        #status-title {
+            font-size: 48px;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        .win { color: #00ffcc; text-shadow: 0 0 20px rgba(0,255,204,0.6); }
+        .lose { color: #ff3366; text-shadow: 0 0 20px rgba(255,51,102,0.6); }
+
+        .btn {
+            padding: 12px 35px;
+            font-size: 18px;
+            background: #00ffcc;
+            color: #111;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(0,255,204,0.6);
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+</head>
+<body>
+
+    <div id="ui-panel">
+        <h1>3D MINESWEEPER</h1>
+        <p>剩餘地雷: <span id="mine-count" class="highlight">0</span></p>
+        <p>剩餘未知方塊: <span id="safe-count">0</span></p>
+        <hr style="border: 0; border-top: 1px solid rgba(255,255,255,0.2); margin: 10px 0;">
+        <p>🖱️ <b>左鍵拖曳</b>：旋轉視角</p>
+        <p>🖱️ <b>滾輪</b>：縮放遠近</p>
